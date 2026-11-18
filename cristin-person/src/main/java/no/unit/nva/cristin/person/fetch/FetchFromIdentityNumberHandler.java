@@ -17,7 +17,8 @@ import java.util.Objects;
 import java.util.Optional;
 import no.bekk.bekkopen.person.FodselsnummerValidator;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
-import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.cristin.person.model.nva.PersonLookupResult;
+import no.unit.nva.cristin.person.model.nva.ThirdPartyPersonLookupResponse;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
@@ -30,7 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @JacocoGenerated
-public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue, Person> {
+public class FetchFromIdentityNumberHandler
+    extends ApiGatewayHandler<TypedValue, PersonLookupResult> {
 
   private static final Logger logger =
       LoggerFactory.getLogger(FetchFromIdentityNumberHandler.class);
@@ -67,8 +69,8 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
   }
 
   @Override
-  protected Person processInput(TypedValue input, RequestInfo requestInfo, Context context)
-      throws ApiGatewayException {
+  protected PersonLookupResult processInput(
+      TypedValue input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
 
     logger.info(
         LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
@@ -81,23 +83,32 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
     validateQueryParameters(requestInfo);
     validateInput(input);
 
-    return apiClient.getPersonFromNationalIdentityNumber(input.value());
+    var person = apiClient.getPersonFromNationalIdentityNumber(input.value());
+
+    return requestInfo.clientIsThirdParty()
+        ? ThirdPartyPersonLookupResponse.fromPerson(person)
+        : person;
   }
 
   @Override
-  protected Integer getSuccessStatusCode(TypedValue input, Person output) {
+  protected Integer getSuccessStatusCode(TypedValue input, PersonLookupResult output) {
     var personCristinId = attempt(() -> getPotentialPersonId(output)).orElse(fail -> null);
     logger.info(FOUND_THE_FOLLOWING_RESOURCE, personCristinId);
 
     return HttpURLConnection.HTTP_OK;
   }
 
-  private static String getPotentialPersonId(Person output) {
-    return Optional.ofNullable(output).map(Person::id).map(URI::toString).orElse(null);
+  private static String getPotentialPersonId(PersonLookupResult output) {
+    return Optional.ofNullable(output)
+        .map(PersonLookupResult::getId)
+        .map(URI::toString)
+        .orElse(null);
   }
 
   private boolean clientIsAuthorized(RequestInfo requestInfo) {
-    return requesterIsUserAdministrator(requestInfo) || clientIsCustomerAdministrator(requestInfo);
+    return requesterIsUserAdministrator(requestInfo)
+        || clientIsCustomerAdministrator(requestInfo)
+        || requestInfo.clientIsThirdParty();
   }
 
   private void validateQueryParameters(RequestInfo requestInfo) throws BadRequestException {
