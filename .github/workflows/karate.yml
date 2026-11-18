@@ -10,7 +10,6 @@ env:
   DOMAIN_NAME: "api.dev.nva.aws.unit.no"
   CRISTIN_API_URL: "https://api.cristin-test.uio.no/v2"
   COGNITO_USER_POOL_ID: "eu-west-1_nLV9i5X5D"
-  COGNITO_CLIENT_APP_ID: "5qo1p8hv58o6f4ke2p72h69pjm"
   LOGIN_REDIRECT_URL: "http://localhost:3000"
   ADMIN_TESTUSER_ID: "karate-admin-user"
   ADMIN_TESTUSER_NIN: ${{ secrets.COGNITO_ADMIN_TESTUSER_NIN }}
@@ -49,6 +48,11 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::884807050265:role/nva-dev-github-actions-role
           aws-region: eu-west-1
+      # The test users log in through the same app client as the frontend
+      - name: Read the Cognito app client ID
+        run: |
+          COGNITO_CLIENT_APP_ID=$(aws ssm get-parameter --name /CognitoUserPoolAppClientId --query Parameter.Value --output text)
+          echo "COGNITO_CLIENT_APP_ID=${COGNITO_CLIENT_APP_ID}" >> "$GITHUB_ENV"
       # Stack name cannot contain slashes, but are based on the branch name which can contain slashes
       - name: Set stack name
         run: |
