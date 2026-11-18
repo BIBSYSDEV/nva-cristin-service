@@ -59,10 +59,8 @@ anything has been saved there yet. Both fields are omitted when the project is n
 ### Clinical trial request
 
 ```json
-{ "reportable": "YES" }
+{ "reportingDecision": "Include" | "Exclude" }
 ```
-
-`reportable` is the researcher's declaration, one of `YES` or `NO`.
 
 ### Clinical trial response
 
@@ -72,7 +70,7 @@ anything has been saved there yet. Both fields are omitted when the project is n
   "@context": "https://bibsysdev.github.io/src/project-context.json",
   "id": "https://api.nva.unit.no/cristin/project/987654/clinical-trial",
   "project": "https://api.nva.unit.no/cristin/project/987654",
-  "reportable": "YES",
+  "reportingDecision": "Include",
   "submissions": [
     {
       "type": "Submission",
@@ -156,12 +154,13 @@ cannot be answered by this key layout and needs an index on `PERIOD#<period>` / 
   output.
 - Writing a clinical trial or a submission requires the caller to be the project's manager: a
   `contributors[]` entry whose `roles[].type` is `ProjectManager` and whose `identity.id` is the
-  caller's person. `UpdateProjectResourceAccessCheck` in `cristin-project` already makes that check
+  caller's person. User with access right MANAGE_KBS is allowed to write ClinicalTrial and Submission as well. `UpdateProjectResourceAccessCheck` in `cristin-project` already makes that check
   for project update.
+- Only Norwegian institutions report inclusions
 
 ## Open questions
 
-1. `GET` of a period with no submission: `404`, or a built `NOT_SUBMITTED` response?
+1. `GET` of clinical trial in a period with no submission: `NOT_SUBMITTED` response?
 2. How is "included nobody this period" recorded, so the admin output can tell "reported zero" from
    "not reported"? A `NO_INCLUSIONS` status on a submission saved with an empty `inclusions[]`, or
    something else?
