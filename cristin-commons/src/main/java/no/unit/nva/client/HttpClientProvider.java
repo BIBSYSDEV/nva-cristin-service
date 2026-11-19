@@ -14,11 +14,14 @@ public class HttpClientProvider {
     return DEFAULT_HTTP_CLIENT;
   }
 
-  private static HttpClient buildDefaultHttpClient() {
+  public static HttpClient.Builder defaultHttpClientBuilder() {
     return HttpClient.newBuilder()
         .followRedirects(HttpClient.Redirect.ALWAYS)
         .version(Version.HTTP_1_1)
-        .connectTimeout(CONNECT_TIMEOUT)
-        .build();
+        .connectTimeout(CONNECT_TIMEOUT);
+  }
+
+  private static HttpClient buildDefaultHttpClient() {
+    return defaultHttpClientBuilder().build();
   }
 }

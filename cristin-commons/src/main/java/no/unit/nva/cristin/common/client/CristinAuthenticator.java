@@ -1,13 +1,12 @@
 package no.unit.nva.cristin.common.client;
 
+import static no.unit.nva.client.HttpClientProvider.defaultHttpClientBuilder;
 import static nva.commons.core.attempt.Try.attempt;
 
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.http.HttpClient;
-import java.net.http.HttpClient.Version;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Base64;
 import nva.commons.secrets.SecretsReader;
 import org.slf4j.Logger;
@@ -28,7 +27,6 @@ public class CristinAuthenticator {
   public static final String USING_AN_AUTHORIZED_HTTP_CLIENT = "Using an authorized Http Client";
   public static final String USING_A_BASIC_AUTH_HEADER =
       "Using basic auth header in upstream request";
-  private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(15);
   private static final HttpClient AUTHENTICATED_HTTP_CLIENT = buildHttpClient();
 
   /**
@@ -71,12 +69,7 @@ public class CristinAuthenticator {
   }
 
   private static HttpClient buildHttpClient() {
-    return HttpClient.newBuilder()
-        .followRedirects(HttpClient.Redirect.ALWAYS)
-        .version(Version.HTTP_1_1)
-        .authenticator(getBasicAuthenticator())
-        .connectTimeout(CONNECT_TIMEOUT)
-        .build();
+    return defaultHttpClientBuilder().authenticator(getBasicAuthenticator()).build();
   }
 
   private static String getPassWord() {
