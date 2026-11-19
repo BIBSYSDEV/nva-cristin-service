@@ -17,9 +17,6 @@ public record ClinicalTrialDao(
   private static final String PROJECT_KEY_PREFIX = "PROJECT#";
   private static final String CLINICAL_TRIAL_SORT_KEY = "CLINICAL_TRIAL";
 
-  private static final String NEW_ITEM_CONDITION_EXPRESSION =
-      "attribute_not_exists(" + PARTITION_KEY + ")";
-
   public static ClinicalTrialDao fromClinicalTrial(ClinicalTrial clinicalTrial, Instant timestamp) {
     return new ClinicalTrialDao(
         projectKey(clinicalTrial.projectIdentifier()),
@@ -50,11 +47,7 @@ public record ClinicalTrialDao(
   }
 
   private Put put(String tableName) {
-    return Put.builder()
-        .tableName(tableName)
-        .item(toItem())
-        .conditionExpression(NEW_ITEM_CONDITION_EXPRESSION)
-        .build();
+    return Put.builder().tableName(tableName).item(toItem()).build();
   }
 
   private Map<String, AttributeValue> toItem() {
