@@ -73,13 +73,12 @@ class UtilsTest {
   @Test
   void shouldReturnInstitutionOfTopLevelOrganizationWhenUserIsUserAdministrator() throws Exception {
     var requestInfo =
-        request(
-            builder ->
-                builder
-                    .withScope(FRONTEND_SCOPE)
-                    .withCurrentCustomer(CUSTOMER)
-                    .withAccessRights(CUSTOMER, MANAGE_OWN_AFFILIATION)
-                    .withTopLevelCristinOrgId(TOP_ORG));
+        request(builder ->
+            builder
+                .withScope(FRONTEND_SCOPE)
+                .withCurrentCustomer(CUSTOMER)
+                .withAccessRights(CUSTOMER, MANAGE_OWN_AFFILIATION)
+                .withTopLevelCristinOrgId(TOP_ORG));
 
     assertThat(extractCristinInstitutionIdentifier(requestInfo)).isEqualTo("185");
   }
@@ -87,12 +86,11 @@ class UtilsTest {
   @Test
   void shouldThrowBadRequestWhenUserAdministratorHasNoTopLevelOrganization() throws Exception {
     var requestInfo =
-        request(
-            builder ->
-                builder
-                    .withScope(FRONTEND_SCOPE)
-                    .withCurrentCustomer(CUSTOMER)
-                    .withAccessRights(CUSTOMER, MANAGE_OWN_AFFILIATION));
+        request(builder ->
+            builder
+                .withScope(FRONTEND_SCOPE)
+                .withCurrentCustomer(CUSTOMER)
+                .withAccessRights(CUSTOMER, MANAGE_OWN_AFFILIATION));
 
     assertThatThrownBy(() -> extractCristinInstitutionIdentifier(requestInfo))
         .isInstanceOf(BadRequestException.class);
@@ -101,24 +99,22 @@ class UtilsTest {
   @Test
   void shouldThrowForbiddenWhenUserIsNotUserAdministrator() throws Exception {
     var requestInfo =
-        request(
-            builder ->
-                builder
-                    .withScope(FRONTEND_SCOPE)
-                    .withCurrentCustomer(CUSTOMER)
-                    .withTopLevelCristinOrgId(TOP_ORG));
+        request(builder ->
+            builder
+                .withScope(FRONTEND_SCOPE)
+                .withCurrentCustomer(CUSTOMER)
+                .withTopLevelCristinOrgId(TOP_ORG));
 
     assertThatThrownBy(() -> extractCristinInstitutionIdentifier(requestInfo))
         .isInstanceOf(ForbiddenException.class);
   }
 
   private static RequestInfo thirdPartyRequest(URI topLevelOrganization) throws Exception {
-    return request(
-        builder ->
-            builder
-                .withScope(THIRD_PARTY_SCOPE_PERSON_UPSERT)
-                .withClientId(CLIENT_ID)
-                .withTopLevelCristinOrgId(topLevelOrganization));
+    return request(builder ->
+        builder
+            .withScope(THIRD_PARTY_SCOPE_PERSON_UPSERT)
+            .withClientId(CLIENT_ID)
+            .withTopLevelCristinOrgId(topLevelOrganization));
   }
 
   private static RequestInfo request(UnaryOperator<HandlerRequestBuilder<Void>> customizer)
