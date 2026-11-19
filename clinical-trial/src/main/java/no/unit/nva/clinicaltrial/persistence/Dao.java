@@ -8,6 +8,7 @@ import static nva.commons.core.attempt.Try.attempt;
 import com.fasterxml.jackson.databind.JavaType;
 import java.time.Instant;
 import java.util.Map;
+import no.unit.nva.identifiers.SortableIdentifier;
 import software.amazon.awssdk.enhanced.dynamodb.document.EnhancedDocument;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
@@ -16,6 +17,8 @@ public interface Dao {
   String partitionKey();
 
   String sortKey();
+
+  SortableIdentifier version();
 
   Instant createdDate();
 

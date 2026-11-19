@@ -31,9 +31,7 @@ public class ClinicalTrialRepository {
     var expectedVersion = clinicalTrialWrite.clinicalTrial().version();
     var clinicalTrial = nextVersionOf(clinicalTrialWrite.clinicalTrial());
     var dao = daoToPersist(clinicalTrial, expectedVersion, now);
-    var versionDao =
-        VersionDao.fromDao(
-            dao, clinicalTrial, clinicalTrialWrite.user(), clinicalTrial.version(), now);
+    var versionDao = VersionDao.newVersionOf(dao, clinicalTrial, clinicalTrialWrite.user());
     try {
       client.transactWriteItems(saveRequest(dao, versionDao, expectedVersion));
     } catch (TransactionCanceledException conditionNotMet) {

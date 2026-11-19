@@ -126,7 +126,8 @@ class ClinicalTrialRepositoryTest {
   }
 
   @Test
-  void shouldThrowConditionFailedExceptionWhenUpdatingClinicalTrialWithOutdatedVersion() throws ConditionFailedException {
+  void shouldThrowConditionFailedExceptionWhenUpdatingClinicalTrialWithOutdatedVersion()
+      throws ConditionFailedException {
     var clinicalTrial = clinicalTrial(null);
     repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
     var outdated = new ClinicalTrial(clinicalTrial.projectIdentifier(), SortableIdentifier.next());
