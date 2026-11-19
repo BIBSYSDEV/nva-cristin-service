@@ -28,6 +28,8 @@ public class CristinAuthenticator {
   public static final String USING_AN_AUTHORIZED_HTTP_CLIENT = "Using an authorized Http Client";
   public static final String USING_A_BASIC_AUTH_HEADER =
       "Using basic auth header in upstream request";
+  private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(15);
+  private static final HttpClient AUTHENTICATED_HTTP_CLIENT = buildHttpClient();
 
   /**
    * Creates an Authenticator from credentials stored in AWS SecretsManager.
@@ -45,19 +47,14 @@ public class CristinAuthenticator {
   }
 
   /**
-   * Create an HTTPClient with authentication.
+   * Shared HTTPClient with authentication. Must not be closed by callers.
    *
    * @return HTTPClient with authentication
    */
   public static HttpClient getHttpClient() {
     logger.info(USING_AN_AUTHORIZED_HTTP_CLIENT);
 
-    return HttpClient.newBuilder()
-        .followRedirects(HttpClient.Redirect.ALWAYS)
-        .version(Version.HTTP_1_1)
-        .authenticator(getBasicAuthenticator())
-        .connectTimeout(Duration.ofSeconds(15))
-        .build();
+    return AUTHENTICATED_HTTP_CLIENT;
   }
 
   /**
@@ -71,6 +68,15 @@ public class CristinAuthenticator {
     return "Basic "
         + Base64.getEncoder()
             .encodeToString((getUserName() + ":" + getPassWord()).getBytes(StandardCharsets.UTF_8));
+  }
+
+  private static HttpClient buildHttpClient() {
+    return HttpClient.newBuilder()
+        .followRedirects(HttpClient.Redirect.ALWAYS)
+        .version(Version.HTTP_1_1)
+        .authenticator(getBasicAuthenticator())
+        .connectTimeout(CONNECT_TIMEOUT)
+        .build();
   }
 
   private static String getPassWord() {

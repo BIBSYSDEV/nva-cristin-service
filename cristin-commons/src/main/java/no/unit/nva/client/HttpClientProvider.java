@@ -9,7 +9,7 @@ public class HttpClientProvider {
   private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(15);
   private static final HttpClient DEFAULT_HTTP_CLIENT = buildDefaultHttpClient();
 
-  /** Default HttpClient without authentication for general use. */
+  /** Shared default HttpClient without authentication. Must not be closed by callers. */
   public static HttpClient defaultHttpClient() {
     return DEFAULT_HTTP_CLIENT;
   }
