@@ -1,16 +1,19 @@
 package no.unit.nva.clinicaltrial.persistence;
 
-import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomClinicalTrial;
+import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.clinicalTrial;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomProjectIdentifier;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomUser;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import no.unit.nva.clinicaltrial.model.ClinicalTrial;
 import no.unit.nva.clinicaltrial.model.ClinicalTrialWrite;
+import no.unit.nva.identifiers.SortableIdentifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -33,8 +36,8 @@ class ClinicalTrialRepositoryTest {
   }
 
   @Test
-  void shouldSaveClinicalTrial() {
-    var clinicalTrial = randomClinicalTrial();
+  void shouldSaveClinicalTrial() throws ConditionFailedException {
+    var clinicalTrial = clinicalTrial(null);
 
     repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
 
@@ -49,8 +52,8 @@ class ClinicalTrialRepositoryTest {
   }
 
   @Test
-  void shouldPersistClinicalTrialWithExpectedAttributeNames() {
-    var clinicalTrial = randomClinicalTrial();
+  void shouldPersistClinicalTrialWithExpectedAttributeNames() throws ConditionFailedException {
+    var clinicalTrial = clinicalTrial(null);
 
     repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
 
@@ -60,8 +63,8 @@ class ClinicalTrialRepositoryTest {
   }
 
   @Test
-  void shouldPersistVersionWithExpectedAttributeNames() {
-    var clinicalTrial = randomClinicalTrial();
+  void shouldPersistVersionWithExpectedAttributeNames() throws ConditionFailedException {
+    var clinicalTrial = clinicalTrial(null);
 
     repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
 
@@ -84,8 +87,9 @@ class ClinicalTrialRepositoryTest {
   }
 
   @Test
-  void shouldReturnVersionWithCallerAndEntityWhenClinicalTrialIsSaved() {
-    var clinicalTrial = randomClinicalTrial();
+  void shouldReturnVersionWithCallerAndEntityWhenClinicalTrialIsSaved()
+      throws ConditionFailedException {
+    var clinicalTrial = clinicalTrial(null);
     var user = randomUser();
 
     repository.save(new ClinicalTrialWrite(clinicalTrial, user));
@@ -96,10 +100,11 @@ class ClinicalTrialRepositoryTest {
   }
 
   @Test
-  void shouldReturnVersionsNewestFirstWhenClinicalTrialIsSavedTwice() {
-    var clinicalTrial = randomClinicalTrial();
+  void shouldReturnVersionsNewestFirstWhenClinicalTrialIsSavedTwice()
+      throws ConditionFailedException {
+    var clinicalTrial = clinicalTrial(null);
     repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
-    repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
+    repository.save(new ClinicalTrialWrite(persisted(clinicalTrial), randomUser()));
 
     var versions = repository.findVersions(clinicalTrial.projectIdentifier());
 
@@ -107,6 +112,53 @@ class ClinicalTrialRepositoryTest {
     assertThat(
         versions.getFirst().identifier().toString(),
         is(persistedItem(clinicalTrial.projectIdentifier()).get("version").s()));
+  }
+
+  @Test
+  void shouldThrowConditionFailedExceptionWhenCreatingClinicalTrialForProjectThatAlreadyHasOne()
+      throws ConditionFailedException {
+    var clinicalTrial = clinicalTrial(null);
+    repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
+
+    assertThrows(
+        ConditionFailedException.class,
+        () -> repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser())));
+  }
+
+  @Test
+  void shouldThrowConditionFailedExceptionWhenUpdatingClinicalTrialWithOutdatedVersion() throws ConditionFailedException {
+    var clinicalTrial = clinicalTrial(null);
+    repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
+    var outdated = new ClinicalTrial(clinicalTrial.projectIdentifier(), SortableIdentifier.next());
+
+    assertThrows(
+        ConditionFailedException.class,
+        () -> repository.save(new ClinicalTrialWrite(outdated, randomUser())));
+  }
+
+  @Test
+  void shouldThrowConditionFailedExceptionWhenUpdatingNonExistingClinicalTrial() {
+    var clinicalTrial = clinicalTrial(SortableIdentifier.next());
+
+    assertThrows(
+        ConditionFailedException.class,
+        () -> repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser())));
+  }
+
+  @Test
+  void shouldKeepCreatedDateWhenClinicalTrialIsUpdated() throws ConditionFailedException {
+    var clinicalTrial = clinicalTrial(null);
+    repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
+    var createdDate = persistedItem(clinicalTrial.projectIdentifier()).get("createdDate").s();
+
+    repository.save(new ClinicalTrialWrite(persisted(clinicalTrial), randomUser()));
+
+    assertThat(
+        persistedItem(clinicalTrial.projectIdentifier()).get("createdDate").s(), is(createdDate));
+  }
+
+  private ClinicalTrial persisted(ClinicalTrial clinicalTrial) {
+    return repository.find(clinicalTrial.projectIdentifier()).orElseThrow();
   }
 
   private Map<String, AttributeValue> persistedItem(String projectIdentifier) {

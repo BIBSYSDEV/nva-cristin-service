@@ -10,8 +10,8 @@ public final class ClinicalTrialFixtures {
 
   private ClinicalTrialFixtures() {}
 
-  public static ClinicalTrial randomClinicalTrial() {
-    return new ClinicalTrial(randomProjectIdentifier(), SortableIdentifier.next());
+  public static ClinicalTrial clinicalTrial(SortableIdentifier version) {
+    return new ClinicalTrial(randomProjectIdentifier(), version);
   }
 
   public static User randomUser() {
