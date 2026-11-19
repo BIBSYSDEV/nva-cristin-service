@@ -4,6 +4,12 @@ plugins {
 
 dependencies {
     api(nvaCatalog.aws.sdk2.dynamo)
+    api(nvaCatalog.jackson.annotations)
+    api(nvaLibs.identifiers)
+    implementation(nvaCatalog.aws.sdk2.dynamodbenhanced)
+    implementation(nvaCatalog.jackson.databind)
+    implementation(nvaLibs.core)
+    implementation(nvaLibs.json)
     testFixturesImplementation(nvaLibs.testutils)
     testImplementation(nvaCatalog.aws.sdk2.dynamodblocal)
     testImplementation(nvaCatalog.hamcrest)
