@@ -85,7 +85,7 @@ public class FetchFromIdentityNumberHandler
 
     var person = apiClient.getPersonFromNationalIdentityNumber(input.value());
 
-    return requestInfo.clientIsThirdParty()
+    return requestInfo.clientIsThirdParty() && !requestInfo.clientIsInternalBackend()
         ? ThirdPartyPersonLookupResponse.fromPerson(person)
         : person;
   }

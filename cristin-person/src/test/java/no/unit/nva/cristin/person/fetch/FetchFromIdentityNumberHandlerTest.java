@@ -89,6 +89,7 @@ public class FetchFromIdentityNumberHandlerTest {
   private static final String ID = "id";
   private static final String TYPE = "type";
   private static final String NAMES = "names";
+  private static final String CONTACT_DETAILS = "contactDetails";
   private final Environment environment = new Environment();
   private CristinPersonApiClient apiClient;
   private Context context;
@@ -264,6 +265,22 @@ public class FetchFromIdentityNumberHandlerTest {
 
     Assertions.assertThat(response.getStatusCode()).isEqualTo(HTTP_OK);
     Assertions.assertThat(fieldNamesOf(body)).containsExactlyInAnyOrder(CONTEXT, ID, TYPE, NAMES);
+  }
+
+  @Test
+  void shouldReturnFullPersonWhenClientIsInternalBackendAndThirdParty() throws Exception {
+    output = new ByteArrayOutputStream();
+    try (var input =
+        new HandlerRequestBuilder<TypedValue>(OBJECT_MAPPER)
+            .withScope(ACCESS_TOKEN_BACKEND_SCOPE + "," + THIRD_PARTY_SCOPE)
+            .withBody(defaultBody())
+            .build()) {
+      handler.handleRequest(input, output, context);
+    }
+    var response = GatewayResponse.fromOutputStream(output, Object.class);
+    var body = OBJECT_MAPPER.readTree(response.getBody());
+
+    Assertions.assertThat(fieldNamesOf(body)).contains(CONTACT_DETAILS);
   }
 
   private GatewayResponse<Object> sendQueryAsThirdParty(TypedValue body) throws IOException {
