@@ -210,7 +210,8 @@
           }
         ]
       },
-      "webPage": "https://www.external.url"
+      "webPage": "https://www.external.url",
+      "clinicalTrialEligible": true
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -414,7 +415,8 @@
           }
         ]
       },
-      "webPage": "https://www.external.url"
+      "webPage": "https://www.external.url",
+      "clinicalTrialEligible": true
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -618,7 +620,8 @@
           }
         ]
       },
-      "webPage": "https://www.external.url"
+      "webPage": "https://www.external.url",
+      "clinicalTrialEligible": true
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -822,7 +825,8 @@
           }
         ]
       },
-      "webPage": "https://www.external.url"
+      "webPage": "https://www.external.url",
+      "clinicalTrialEligible": true
     },
     {
       "id": "https://api.dev.nva.aws.unit.no/cristin/project/456789",
@@ -1026,7 +1030,8 @@
           }
         ]
       },
-      "webPage": "https://www.external.url"
+      "webPage": "https://www.external.url",
+      "clinicalTrialEligible": true
     }
   ]
 }
