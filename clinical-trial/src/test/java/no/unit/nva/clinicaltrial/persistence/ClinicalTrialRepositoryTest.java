@@ -1,6 +1,7 @@
 package no.unit.nva.clinicaltrial.persistence;
 
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.clinicalTrial;
+import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.kbsAdmin;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomProjectIdentifier;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomUser;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -87,7 +88,9 @@ class ClinicalTrialRepositoryTest {
                 "SK",
                 "entity",
                 "username",
+                "personIdentifier",
                 "customerIdentifier",
+                "accessRights",
                 "createdDate",
                 "modifiedDate")));
   }
@@ -101,7 +104,7 @@ class ClinicalTrialRepositoryTest {
   void shouldReturnVersionWithCallerAndEntityWhenClinicalTrialIsSaved()
       throws ConditionFailedException {
     var clinicalTrial = clinicalTrial(null);
-    var user = randomUser();
+    var user = kbsAdmin();
 
     repository.save(new ClinicalTrialWrite(clinicalTrial, user));
 

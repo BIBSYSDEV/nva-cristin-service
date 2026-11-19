@@ -1,5 +1,6 @@
 package no.unit.nva.clinicaltrial.persistence;
 
+import static java.util.stream.Collectors.toSet;
 import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.KEY_SEPARATOR;
 import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.PARTITION_KEY;
 import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.PARTITION_KEY_VALUE;
@@ -9,10 +10,13 @@ import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.VERSION_PR
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import no.unit.nva.clinicaltrial.model.User;
 import no.unit.nva.clinicaltrial.model.Version;
 import no.unit.nva.identifiers.SortableIdentifier;
+import nva.commons.apigateway.AccessRight;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 public record VersionDao<T>(
@@ -20,7 +24,9 @@ public record VersionDao<T>(
     @JsonProperty(SORT_KEY) String sortKey,
     T entity,
     String username,
+    String personIdentifier,
     UUID customerIdentifier,
+    Set<String> accessRights,
     Instant createdDate,
     Instant modifiedDate)
     implements Dao {
@@ -33,7 +39,9 @@ public record VersionDao<T>(
         versionKey(dao.sortKey(), dao.version()),
         entity,
         user.username(),
+        user.personIdentifier(),
         user.customerIdentifier(),
+        persistedAccessRights(user),
         dao.modifiedDate(),
         dao.modifiedDate());
   }
@@ -52,7 +60,22 @@ public record VersionDao<T>(
   }
 
   public Version<T> toVersion() {
-    return new Version<>(version(), entity, new User(username, customerIdentifier), modifiedDate);
+    return new Version<>(
+        version(),
+        entity,
+        new User(username, personIdentifier, customerIdentifier, toAccessRights()),
+        modifiedDate);
+  }
+
+  private static Set<String> persistedAccessRights(User user) {
+    return user.accessRights().stream().map(AccessRight::toPersistedString).collect(toSet());
+  }
+
+  private Set<AccessRight> toAccessRights() {
+    return accessRights.stream()
+        .map(AccessRight::fromPersistedStringOptional)
+        .flatMap(Optional::stream)
+        .collect(toSet());
   }
 
   private static String versionKey(String entitySortKey, SortableIdentifier version) {
