@@ -20,6 +20,15 @@ public class LogUtils {
     }
   }
 
+  /** Extracts client id from requestInfo or else default value. */
+  public static String extractClientId(RequestInfo requestInfo) {
+    try {
+      return requestInfo.getClientId().orElse(NOT_PRESENT);
+    } catch (Exception e) {
+      return NOT_PRESENT;
+    }
+  }
+
   /** Extracts cristin identifier from requestInfo or else default value. */
   public static String extractCristinIdentifier(RequestInfo requestInfo) {
     try {

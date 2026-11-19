@@ -6,6 +6,7 @@ import static no.unit.nva.cristin.common.client.CristinAuthenticator.getHttpClie
 import static no.unit.nva.utils.AccessUtils.clientIsCustomerAdministrator;
 import static no.unit.nva.utils.AccessUtils.requesterIsUserAdministrator;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
+import static no.unit.nva.utils.LogUtils.extractClientId;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 import static nva.commons.core.attempt.Try.attempt;
@@ -20,11 +21,13 @@ import no.unit.nva.cristin.person.client.CristinPersonApiClient;
 import no.unit.nva.cristin.person.model.nva.PersonLookupResult;
 import no.unit.nva.cristin.person.model.nva.ThirdPartyPersonLookupResponse;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.ForbiddenException;
+import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 import org.slf4j.Logger;
@@ -39,9 +42,14 @@ public class FetchFromIdentityNumberHandler
 
   public static final String NIN_TYPE = "NationalIdentificationNumber";
   public static final String NOT_AUTHORIZED_TO_USE_THIS_ENDPOINT =
-      "CLient is not authorized to use this endpoint";
+      "Client is not authorized to use this endpoint";
   public static final String FOUND_THE_FOLLOWING_RESOURCE =
       "Client found the following resource: {}";
+  public static final String THIRD_PARTY_LOOKUP_FOUND_PERSON =
+      "Third-party person lookup by NIN: clientId={}, clientInstitution={}, "
+          + "resolvedPersonIdentifier={}";
+  public static final String THIRD_PARTY_LOOKUP_NO_MATCH =
+      "Third-party person lookup by NIN: clientId={}, clientInstitution={}, no person resolved";
 
   private final transient CristinPersonApiClient apiClient;
 
@@ -83,11 +91,31 @@ public class FetchFromIdentityNumberHandler
     validateQueryParameters(requestInfo);
     validateInput(input);
 
-    var person = apiClient.getPersonFromNationalIdentityNumber(input.value());
-
     return requestInfo.clientIsThirdParty() && !requestInfo.clientIsInternalBackend()
-        ? ThirdPartyPersonLookupResponse.fromPerson(person)
-        : person;
+        ? lookUpAsThirdParty(input, requestInfo)
+        : apiClient.getPersonFromNationalIdentityNumber(input.value());
+  }
+
+  /**
+   * Looks up a person for a third-party client and logs the outcome. Only values from the token and
+   * from Cristin's response are logged, never the national identity number.
+   */
+  private ThirdPartyPersonLookupResponse lookUpAsThirdParty(
+      TypedValue input, RequestInfo requestInfo) throws ApiGatewayException {
+    var clientId = extractClientId(requestInfo);
+    var institution = extractOrgIdentifier(requestInfo);
+    try {
+      var person = apiClient.getPersonFromNationalIdentityNumber(input.value());
+      logger.info(
+          THIRD_PARTY_LOOKUP_FOUND_PERSON,
+          clientId,
+          institution,
+          UriUtils.extractLastPathElement(person.id()));
+      return ThirdPartyPersonLookupResponse.fromPerson(person);
+    } catch (NotFoundException notFound) {
+      logger.info(THIRD_PARTY_LOOKUP_NO_MATCH, clientId, institution);
+      throw notFound;
+    }
   }
 
   @Override
