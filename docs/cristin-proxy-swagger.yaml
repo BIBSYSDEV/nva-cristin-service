@@ -1489,7 +1489,11 @@ paths:
       tags:
         - Person
       summary: Query person by national identity number
-      description: Returns a single person matching nin query parameter
+      description: >
+        Returns a single person matching the national identity number in the request body.
+        Third-party clients need the scope
+        https://api.nva.unit.no/scopes/third-party/person-lookup-by-nin, and get only the
+        person's id and names in the response.
       operationId: GetPersonByNIN
       security:
         - CognitoUserPool:
@@ -1497,6 +1501,7 @@ paths:
               "https://api.nva.unit.no/scopes/backend",
               "https://api.nva.unit.no/scopes/frontend",
               "aws.cognito.signin.user.admin",
+              "https://api.nva.unit.no/scopes/third-party/person-lookup-by-nin",
             ]
       requestBody:
         required: true
