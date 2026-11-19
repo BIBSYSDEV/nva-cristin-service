@@ -6,12 +6,19 @@ import java.time.Duration;
 
 public class HttpClientProvider {
 
+  private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(15);
+  private static final HttpClient DEFAULT_HTTP_CLIENT = buildDefaultHttpClient();
+
   /** Default HttpClient without authentication for general use. */
   public static HttpClient defaultHttpClient() {
+    return DEFAULT_HTTP_CLIENT;
+  }
+
+  private static HttpClient buildDefaultHttpClient() {
     return HttpClient.newBuilder()
         .followRedirects(HttpClient.Redirect.ALWAYS)
         .version(Version.HTTP_1_1)
-        .connectTimeout(Duration.ofSeconds(15))
+        .connectTimeout(CONNECT_TIMEOUT)
         .build();
   }
 }
