@@ -5,7 +5,6 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.person.fetch.FetchFromIdentityNumberHandler.NIN_TYPE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.ACCESS_TOKEN_CLAIMS_FIELD;
 import static no.unit.nva.utils.AccessUtils.ACCESS_TOKEN_CLAIMS_SCOPE_FIELD;
@@ -76,6 +75,7 @@ public class FetchFromIdentityNumberHandlerTest {
   private static final Map<String, String> EMPTY_MAP = Collections.emptyMap();
   private static final String NVA_API_GET_PERSON_RESPONSE_JSON = "nvaApiGetPersonResponse.json";
   private static final String DEFAULT_IDENTITY_NUMBER = "07117631634";
+  private static final String NIN_TYPE = "NationalIdentificationNumber";
   private static final String VALID_CRISTIN_NATIONAL_ID_URI =
       "https://api.cristin-test.uio.no/v2/persons?national_id=07117631634";
   private static final String URI_FIRST_HIT_FROM_CRISTIN =
