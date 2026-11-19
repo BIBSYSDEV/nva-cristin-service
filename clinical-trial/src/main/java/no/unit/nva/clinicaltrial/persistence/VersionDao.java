@@ -2,7 +2,9 @@ package no.unit.nva.clinicaltrial.persistence;
 
 import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.KEY_SEPARATOR;
 import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.PARTITION_KEY;
+import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.PARTITION_KEY_VALUE;
 import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.SORT_KEY;
+import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.VERSION_PREFIX_VALUE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
@@ -24,17 +26,6 @@ public record VersionDao<T>(
     implements Dao {
 
   private static final String VERSION_KEY_PREFIX = "VERSION" + KEY_SEPARATOR;
-  private static final String PARTITION_KEY_VALUE = ":partitionKey";
-  private static final String VERSION_PREFIX_VALUE = ":versionPrefix";
-  public static final String VERSIONS_KEY_CONDITION =
-      PARTITION_KEY
-          + " = "
-          + PARTITION_KEY_VALUE
-          + " AND begins_with("
-          + SORT_KEY
-          + ", "
-          + VERSION_PREFIX_VALUE
-          + ")";
 
   public static <T> VersionDao<T> newVersionOf(Dao dao, T entity, User user) {
     return new VersionDao<>(

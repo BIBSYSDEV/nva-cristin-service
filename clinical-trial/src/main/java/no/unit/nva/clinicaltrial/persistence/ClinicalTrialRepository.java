@@ -1,13 +1,20 @@
 package no.unit.nva.clinicaltrial.persistence;
 
+import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.CREATE_CONDITION;
+import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.EXPECTED_VERSION_VALUE;
+import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.UPDATE_CONDITION;
+import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.VERSIONS_KEY_CONDITION;
+
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import no.unit.nva.clinicaltrial.model.ClinicalTrial;
 import no.unit.nva.clinicaltrial.model.ClinicalTrialWrite;
 import no.unit.nva.clinicaltrial.model.Version;
 import no.unit.nva.identifiers.SortableIdentifier;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.Put;
@@ -79,16 +86,15 @@ public class ClinicalTrialRepository {
   }
 
   private TransactWriteItem createdClinicalTrialItem(ClinicalTrialDao dao) {
-    return transactItem(
-        itemToPut(dao).conditionExpression(ClinicalTrialDao.CREATE_CONDITION).build());
+    return transactItem(itemToPut(dao).conditionExpression(CREATE_CONDITION).build());
   }
 
   private TransactWriteItem updatedClinicalTrialItem(
       ClinicalTrialDao dao, SortableIdentifier expectedVersion) {
     return transactItem(
         itemToPut(dao)
-            .conditionExpression(ClinicalTrialDao.UPDATE_CONDITION)
-            .expressionAttributeValues(ClinicalTrialDao.expectedVersionValues(expectedVersion))
+            .conditionExpression(UPDATE_CONDITION)
+            .expressionAttributeValues(expectedVersionValues(expectedVersion))
             .build());
   }
 
@@ -98,6 +104,11 @@ public class ClinicalTrialRepository {
 
   private Put.Builder itemToPut(Dao dao) {
     return Put.builder().tableName(tableName).item(dao.toItem());
+  }
+
+  private static Map<String, AttributeValue> expectedVersionValues(
+      SortableIdentifier expectedVersion) {
+    return Map.of(EXPECTED_VERSION_VALUE, AttributeValue.fromS(expectedVersion.toString()));
   }
 
   private static TransactWriteItem transactItem(Put put) {
@@ -115,7 +126,7 @@ public class ClinicalTrialRepository {
   private QueryRequest versionsRequest(String projectIdentifier) {
     return QueryRequest.builder()
         .tableName(tableName)
-        .keyConditionExpression(VersionDao.VERSIONS_KEY_CONDITION)
+        .keyConditionExpression(VERSIONS_KEY_CONDITION)
         .expressionAttributeValues(
             VersionDao.versionsConditionValues(ClinicalTrialDao.keyOf(projectIdentifier)))
         .scanIndexForward(false)

@@ -21,12 +21,6 @@ public record ClinicalTrialDao(
 
   private static final String PROJECT_KEY_PREFIX = "PROJECT" + KEY_SEPARATOR;
   private static final String CLINICAL_TRIAL_SORT_KEY = "CLINICAL_TRIAL";
-  private static final String VERSION = "version";
-  private static final String EXPECTED_VERSION_VALUE = ":expectedVersion";
-
-  public static final String CREATE_CONDITION = "attribute_not_exists(" + PARTITION_KEY + ")";
-  public static final String UPDATE_CONDITION =
-      "attribute_exists(" + PARTITION_KEY + ") AND " + VERSION + " = " + EXPECTED_VERSION_VALUE;
 
   public static ClinicalTrialDao fromClinicalTrial(ClinicalTrial clinicalTrial, Instant timestamp) {
     return new ClinicalTrialDao(
@@ -39,11 +33,6 @@ public record ClinicalTrialDao(
 
   public static ClinicalTrialDao fromItem(Map<String, AttributeValue> item) {
     return Dao.fromItem(item, ClinicalTrialDao.class);
-  }
-
-  public static Map<String, AttributeValue> expectedVersionValues(
-      SortableIdentifier expectedVersion) {
-    return Map.of(EXPECTED_VERSION_VALUE, string(expectedVersion.toString()));
   }
 
   public static Map<String, AttributeValue> keyOf(String projectIdentifier) {
