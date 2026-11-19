@@ -5,7 +5,6 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUE
 import static no.unit.nva.cristin.common.client.CristinAuthenticator.getHttpClient;
 import static no.unit.nva.utils.AccessUtils.clientIsCustomerAdministrator;
 import static no.unit.nva.utils.AccessUtils.requesterIsUserAdministrator;
-import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
 import static no.unit.nva.utils.LogUtils.extractClientId;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
@@ -40,15 +39,21 @@ public class FetchFromIdentityNumberHandler
   private static final Logger logger =
       LoggerFactory.getLogger(FetchFromIdentityNumberHandler.class);
 
-  public static final String NIN_TYPE = "NationalIdentificationNumber";
-  public static final String NOT_AUTHORIZED_TO_USE_THIS_ENDPOINT =
+  private static final String NIN_TYPE = "NationalIdentificationNumber";
+  private static final String NOT_AUTHORIZED_TO_USE_THIS_ENDPOINT =
       "Client is not authorized to use this endpoint";
-  public static final String FOUND_THE_FOLLOWING_RESOURCE =
+  private static final String FOUND_THE_FOLLOWING_RESOURCE =
       "Client found the following resource: {}";
-  public static final String THIRD_PARTY_LOOKUP_FOUND_PERSON =
+  private static final String REQUESTED_BY_GUI_USER =
+      "Person lookup by NIN requested by GUI user with Cristin identifier {} from organization {}";
+  private static final String REQUESTED_BY_INTERNAL_BACKEND =
+      "Person lookup by NIN requested by internal backend";
+  private static final String REQUESTED_BY_THIRD_PARTY =
+      "Person lookup by NIN requested by third party with clientId={}, clientInstitution={}";
+  private static final String THIRD_PARTY_LOOKUP_FOUND_PERSON =
       "Third-party person lookup by NIN: clientId={}, clientInstitution={}, "
           + "resolvedPersonIdentifier={}";
-  public static final String THIRD_PARTY_LOOKUP_NO_MATCH =
+  private static final String THIRD_PARTY_LOOKUP_NO_MATCH =
       "Third-party person lookup by NIN: clientId={}, clientInstitution={}, no person resolved";
 
   private final transient CristinPersonApiClient apiClient;
@@ -80,8 +85,7 @@ public class FetchFromIdentityNumberHandler
   protected PersonLookupResult processInput(
       TypedValue input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
 
-    logger.info(
-        LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
+    logRequester(requestInfo);
 
     if (!clientIsAuthorized(requestInfo)) {
       logger.info(NOT_AUTHORIZED_TO_USE_THIS_ENDPOINT);
@@ -94,6 +98,26 @@ public class FetchFromIdentityNumberHandler
     return requestInfo.clientIsThirdParty() && !requestInfo.clientIsInternalBackend()
         ? lookUpAsThirdParty(input, requestInfo)
         : apiClient.getPersonFromNationalIdentityNumber(input.value());
+  }
+
+  /**
+   * Logs who requested the lookup, so GUI users, internal backend and third parties can be told
+   * apart. Only values from the token are logged.
+   */
+  private static void logRequester(RequestInfo requestInfo) {
+    if (requestInfo.clientIsInternalBackend()) {
+      logger.info(REQUESTED_BY_INTERNAL_BACKEND);
+    } else if (requestInfo.clientIsThirdParty()) {
+      logger.info(
+          REQUESTED_BY_THIRD_PARTY,
+          extractClientId(requestInfo),
+          extractOrgIdentifier(requestInfo));
+    } else {
+      logger.info(
+          REQUESTED_BY_GUI_USER,
+          extractCristinIdentifier(requestInfo),
+          extractOrgIdentifier(requestInfo));
+    }
   }
 
   /**
