@@ -1,3 +1,12 @@
 plugins {
     id 'nva.cristin.service.core.java-conventions'
 }
+
+dependencies {
+    api(nvaCatalog.aws.sdk2.dynamo)
+    testFixturesImplementation(nvaLibs.testutils)
+    testImplementation(nvaCatalog.aws.sdk2.dynamodblocal)
+    testImplementation(nvaCatalog.hamcrest)
+    testImplementation(nvaCatalog.junit.jupiter.api)
+    testRuntimeOnly(nvaCatalog.junit.jupiter.engine)
+}
