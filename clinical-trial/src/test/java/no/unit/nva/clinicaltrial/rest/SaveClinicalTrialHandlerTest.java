@@ -4,6 +4,9 @@ import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_CONFLICT;
 import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
+import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
+import static java.net.HttpURLConnection.HTTP_OK;
+import static java.net.HttpURLConnection.HTTP_PRECON_FAILED;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.personId;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomCustomer;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomPersonIdentifier;
@@ -29,6 +32,7 @@ import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
 import no.unit.nva.cristin.projects.model.nva.Role;
+import no.unit.nva.identifiers.SortableIdentifier;
 import no.unit.nva.model.ApprovalStatus;
 import no.unit.nva.stubs.FakeContext;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -43,7 +47,11 @@ class SaveClinicalTrialHandlerTest {
   private static final String TABLE_NAME = "clinical-trial";
   private static final String PROJECT_MANAGER = "ProjectManager";
   private static final String IDENTIFIER = "identifier";
+  private static final String IF_MATCH = "If-Match";
   private static final String ETAG = "ETag";
+  private static final String OPERATION_NAME = "operationName";
+  private static final String CREATE_OPERATION_ID = "CreateClinicalTrial";
+  private static final String UPDATE_OPERATION_ID = "UpdateClinicalTrial";
 
   private String projectManagerIdentifier;
   private ByteArrayOutputStream output;
@@ -79,6 +87,58 @@ class SaveClinicalTrialHandlerTest {
   }
 
   @Test
+  void shouldReturnOkWhenProjectManagerUpdatesClinicalTrialWithCurrentVersion() throws Exception {
+    var projectIdentifier = randomProjectIdentifier();
+    var created = new ByteArrayOutputStream();
+    handler.handleRequest(postRequest(projectIdentifier), created, context());
+    var version =
+        GatewayResponse.fromOutputStream(created, ClinicalTrialResponse.class)
+            .getHeaders()
+            .get(ETAG);
+
+    handler.handleRequest(putRequest(projectIdentifier, version), output, context());
+
+    assertThat(
+        GatewayResponse.fromOutputStream(output, ClinicalTrialResponse.class).getStatusCode(),
+        is(HTTP_OK));
+  }
+
+  @Test
+  void shouldReturnNotFoundWhenUpdatingClinicalTrialForProjectWithoutOne() throws Exception {
+    handler.handleRequest(
+        putRequest(randomProjectIdentifier(), SortableIdentifier.next().toString()),
+        output,
+        context());
+
+    assertThat(
+        GatewayResponse.fromOutputStream(output, Problem.class).getStatusCode(),
+        is(HTTP_NOT_FOUND));
+  }
+
+  @Test
+  void shouldReturnPreconditionRequiredWhenUpdatingWithoutIfMatchHeader() throws Exception {
+    var projectIdentifier = randomProjectIdentifier();
+    handler.handleRequest(postRequest(projectIdentifier), new ByteArrayOutputStream(), context());
+
+    handler.handleRequest(putRequest(projectIdentifier, null), output, context());
+
+    assertThat(GatewayResponse.fromOutputStream(output, Problem.class).getStatusCode(), is(428));
+  }
+
+  @Test
+  void shouldReturnPreconditionFailedWhenUpdatingWithOutdatedVersion() throws Exception {
+    var projectIdentifier = randomProjectIdentifier();
+    handler.handleRequest(postRequest(projectIdentifier), new ByteArrayOutputStream(), context());
+
+    handler.handleRequest(
+        putRequest(projectIdentifier, SortableIdentifier.next().toString()), output, context());
+
+    assertThat(
+        GatewayResponse.fromOutputStream(output, Problem.class).getStatusCode(),
+        is(HTTP_PRECON_FAILED));
+  }
+
+  @Test
   void shouldReturnBadRequestWhenProjectIdentifierIsNotCristinIdentifier() throws Exception {
     handler.handleRequest(postRequest(randomString()), output, context());
 
@@ -89,7 +149,8 @@ class SaveClinicalTrialHandlerTest {
 
   @Test
   void shouldReturnForbiddenWhenCallerIsNotProjectManager() throws Exception {
-    var request = requestBuilder(randomProjectIdentifier(), randomPersonIdentifier()).build();
+    var request =
+        creating(requestBuilder(randomProjectIdentifier(), randomPersonIdentifier())).build();
 
     handler.handleRequest(request, output, context());
 
@@ -99,7 +160,22 @@ class SaveClinicalTrialHandlerTest {
   }
 
   private InputStream postRequest(String projectIdentifier) throws Exception {
-    return requestBuilder(projectIdentifier, projectManagerIdentifier).build();
+    return creating(requestBuilder(projectIdentifier, projectManagerIdentifier)).build();
+  }
+
+  private InputStream putRequest(String projectIdentifier, String version) throws Exception {
+    var builder = updating(requestBuilder(projectIdentifier, projectManagerIdentifier));
+    return version == null
+        ? builder.build()
+        : builder.withHeaders(Map.of(IF_MATCH, version)).build();
+  }
+
+  private HandlerRequestBuilder<Void> creating(HandlerRequestBuilder<Void> builder) {
+    return builder.withRequestContextValue(OPERATION_NAME, CREATE_OPERATION_ID);
+  }
+
+  private HandlerRequestBuilder<Void> updating(HandlerRequestBuilder<Void> builder) {
+    return builder.withRequestContextValue(OPERATION_NAME, UPDATE_OPERATION_ID);
   }
 
   private HandlerRequestBuilder<Void> requestBuilder(

@@ -39,7 +39,7 @@ class ClinicalTrialRepositoryTest {
   }
 
   @Test
-  void shouldSaveClinicalTrial() throws ConditionFailedException {
+  void shouldSaveClinicalTrial() throws Exception {
     var clinicalTrial = clinicalTrial(null);
 
     repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
@@ -66,7 +66,7 @@ class ClinicalTrialRepositoryTest {
   }
 
   @Test
-  void shouldPersistClinicalTrialWithExpectedAttributeNames() throws ConditionFailedException {
+  void shouldPersistClinicalTrialWithExpectedAttributeNames() throws Exception {
     var clinicalTrial = clinicalTrial(null);
 
     repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
@@ -77,7 +77,7 @@ class ClinicalTrialRepositoryTest {
   }
 
   @Test
-  void shouldPersistVersionWithExpectedAttributeNames() throws ConditionFailedException {
+  void shouldPersistVersionWithExpectedAttributeNames() throws Exception {
     var clinicalTrial = clinicalTrial(null);
 
     repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
@@ -104,8 +104,7 @@ class ClinicalTrialRepositoryTest {
   }
 
   @Test
-  void shouldReturnVersionWithCallerAndEntityWhenClinicalTrialIsSaved()
-      throws ConditionFailedException {
+  void shouldReturnVersionWithCallerAndEntityWhenClinicalTrialIsSaved() throws Exception {
     var clinicalTrial = clinicalTrial(null);
     var user = clinicalTrialAdmin();
 
@@ -117,7 +116,7 @@ class ClinicalTrialRepositoryTest {
   }
 
   @Test
-  void shouldReturnVersionWithGrantThatAllowedTheWrite() throws ConditionFailedException {
+  void shouldReturnVersionWithGrantThatAllowedTheWrite() throws Exception {
     var clinicalTrial = clinicalTrial(null);
 
     repository.save(new ClinicalTrialWrite(clinicalTrial, clinicalTrialAdmin()));
@@ -127,7 +126,7 @@ class ClinicalTrialRepositoryTest {
   }
 
   @Test
-  void shouldRecordCreateAsActionOfFirstVersionAndUpdateOfNext() throws ConditionFailedException {
+  void shouldRecordCreateAsActionOfFirstVersionAndUpdateOfNext() throws Exception {
     var clinicalTrial = clinicalTrial(null);
     repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
     repository.save(new ClinicalTrialWrite(persisted(clinicalTrial), randomUser()));
@@ -139,8 +138,7 @@ class ClinicalTrialRepositoryTest {
   }
 
   @Test
-  void shouldReturnVersionsNewestFirstWhenClinicalTrialIsSavedTwice()
-      throws ConditionFailedException {
+  void shouldReturnVersionsNewestFirstWhenClinicalTrialIsSavedTwice() throws Exception {
     var clinicalTrial = clinicalTrial(null);
     repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
     repository.save(new ClinicalTrialWrite(persisted(clinicalTrial), randomUser()));
@@ -155,7 +153,7 @@ class ClinicalTrialRepositoryTest {
 
   @Test
   void shouldThrowConditionFailedExceptionWhenCreatingClinicalTrialForProjectThatAlreadyHasOne()
-      throws ConditionFailedException {
+      throws Exception {
     var clinicalTrial = clinicalTrial(null);
     repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
 
@@ -166,7 +164,7 @@ class ClinicalTrialRepositoryTest {
 
   @Test
   void shouldThrowConditionFailedExceptionWhenUpdatingClinicalTrialWithOutdatedVersion()
-      throws ConditionFailedException {
+      throws Exception {
     var clinicalTrial = clinicalTrial(null);
     repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
     var outdated = new ClinicalTrial(clinicalTrial.projectIdentifier(), SortableIdentifier.next());
@@ -177,16 +175,16 @@ class ClinicalTrialRepositoryTest {
   }
 
   @Test
-  void shouldThrowConditionFailedExceptionWhenUpdatingNonExistingClinicalTrial() {
+  void shouldThrowClinicalTrialNotFoundExceptionWhenUpdatingNonExistingClinicalTrial() {
     var clinicalTrial = clinicalTrial(SortableIdentifier.next());
 
     assertThrows(
-        ConditionFailedException.class,
+        ClinicalTrialNotFoundException.class,
         () -> repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser())));
   }
 
   @Test
-  void shouldKeepCreatedDateWhenClinicalTrialIsUpdated() throws ConditionFailedException {
+  void shouldKeepCreatedDateWhenClinicalTrialIsUpdated() throws Exception {
     var clinicalTrial = clinicalTrial(null);
     repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
     var createdDate = persistedItem(clinicalTrial.projectIdentifier()).get("createdDate").s();
