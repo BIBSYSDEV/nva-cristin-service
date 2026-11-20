@@ -5,13 +5,13 @@ as clinical trials, and how many participants each institution has included in e
 
 ## Terms
 
-| Term          | Meaning                                                                                                                                                         |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ClinicalTrial | The project as a clinical trial. One per project.                                                                                                               |
-| Submission    | Inclusions per institution for one period, with a status. One per project per period.                                                                           |
-| Inclusion     | Number of participants included at one institution during one period.                                                                                           |
-| Period        | Shared reporting window, such as `2026-H1`. Opened and closed by the admin side, not by this API.                                                               |
-| Version       | Counter on a stored entity, raised by every write. Served as `ETag`, required back in `If-Match`. The entity as it was at that count is kept as a Version item. |
+| Term          | Meaning                                                                                           |
+| ------------- | ------------------------------------------------------------------------------------------------- |
+| ClinicalTrial | The project as a clinical trial. One per project.                                                 |
+| Submission    | Inclusions per institution for one period, with a status. One per project per period.             |
+| Inclusion     | Number of participants included at one institution during one period.                             |
+| Period        | Shared reporting window, such as `2026-H1`. Opened and closed by the admin side, not by this API. |
+| Version       | Version of entity, including the caller                                                           |
 
 ## Endpoints
 
@@ -124,12 +124,12 @@ Submissions are listed without their inclusions; a submission is read in full th
 
 ## Storage
 
-| Type          | PK               | SK                              | Attributes                                                        |
-| ------------- | ---------------- | ------------------------------- | ----------------------------------------------------------------- |
-| ClinicalTrial | `PROJECT#987654` | `CLINICAL_TRIAL`                | `reportable`, `version`                                           |
-| Submission    | `PROJECT#987654` | `SUBMISSION#2026-H1`            | `status`, `inclusions[]`, `version`                               |
-| Period        | `PERIOD`         | `2026-H1`                       | `status`                                                          |
-| Version       | entity's PK      | `VERSION#<entity SK>#<version>` | the entity item, `modifiedBy`, `modifiedByCustomer`, `modifiedAt` |
+| Type          | PK               | SK                              | Attributes                                                                |
+| ------------- | ---------------- | ------------------------------- | ------------------------------------------------------------------------- |
+| ClinicalTrial | `PROJECT#987654` | `CLINICAL_TRIAL`                | `reportable`, `version`                                                   |
+| Submission    | `PROJECT#987654` | `SUBMISSION#2026-H1`            | `status`, `inclusions[]`, `version`                                       |
+| Period        | `PERIOD`         | `2026-H1`                       | `status`                                                                  |
+| Version       | entity's PK      | `VERSION#<entity SK>#<version>` | `entity`, `username`, `customerIdentifier`, `createdDate`, `modifiedDate` |
 
 Every write raises `version` on the entity and writes one Version item in the same transaction.
 Version items are the audit trail of who changed reported numbers; nothing in this API reads them,
