@@ -34,7 +34,6 @@ import no.unit.nva.commons.json.JsonSerializable;
 import no.unit.nva.cristin.person.model.cristin.CristinPerson;
 import no.unit.nva.cristin.person.model.nva.adapter.PersonToCristinFormat;
 import no.unit.nva.model.TypedLabel;
-import no.unit.nva.model.UriId;
 
 @SuppressWarnings("PMD.TooManyFields")
 @JsonPropertyOrder({
@@ -75,7 +74,7 @@ public record Person(
     @JsonProperty(COLLABORATION) Map<String, String> collaboration,
     @JsonProperty(COUNTRIES) Set<TypedLabel> countries,
     @JsonProperty(AWARDS) Set<Award> awards)
-    implements JsonSerializable, UriId {
+    implements JsonSerializable, PersonLookupResult {
 
   public static final String type = "Person";
 

@@ -5,7 +5,6 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_PAYLOAD;
 import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUERY_PARAMETER_ON_PERSON_LOOKUP;
 import static no.unit.nva.cristin.model.Constants.OBJECT_MAPPER;
-import static no.unit.nva.cristin.person.fetch.FetchFromIdentityNumberHandler.NIN_TYPE;
 import static no.unit.nva.testutils.RandomDataGenerator.randomUri;
 import static no.unit.nva.utils.AccessUtils.ACCESS_TOKEN_CLAIMS_FIELD;
 import static no.unit.nva.utils.AccessUtils.ACCESS_TOKEN_CLAIMS_SCOPE_FIELD;
@@ -30,6 +29,7 @@ import static org.mockito.Mockito.when;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +37,9 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
@@ -73,10 +75,21 @@ public class FetchFromIdentityNumberHandlerTest {
   private static final Map<String, String> EMPTY_MAP = Collections.emptyMap();
   private static final String NVA_API_GET_PERSON_RESPONSE_JSON = "nvaApiGetPersonResponse.json";
   private static final String DEFAULT_IDENTITY_NUMBER = "07117631634";
+  private static final String NIN_TYPE = "NationalIdentificationNumber";
   private static final String VALID_CRISTIN_NATIONAL_ID_URI =
       "https://api.cristin-test.uio.no/v2/persons?national_id=07117631634";
   private static final String URI_FIRST_HIT_FROM_CRISTIN =
       "https://api.cristin-test.uio.no/v2/persons/359084";
+  private static final String THIRD_PARTY_SCOPE =
+      "https://api.nva.unit.no/scopes/third-party/person-lookup-by-nin";
+  private static final String THIRD_PARTY_CLIENT_ID = "some-third-party-client-id";
+  private static final URI THIRD_PARTY_TOP_ORG =
+      URI.create("https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0");
+  private static final String CONTEXT = "@context";
+  private static final String ID = "id";
+  private static final String TYPE = "type";
+  private static final String NAMES = "names";
+  private static final String CONTACT_DETAILS = "contactDetails";
   private final Environment environment = new Environment();
   private CristinPersonApiClient apiClient;
   private Context context;
@@ -185,13 +198,27 @@ public class FetchFromIdentityNumberHandlerTest {
         .when(apiClient)
         .fetchQueryResults(any(URI.class));
     handler = new FetchFromIdentityNumberHandler(apiClient, environment);
-    var gatewayResponse = sendQuery(defaultBody(), EMPTY_MAP);
 
-    assertEquals(HttpURLConnection.HTTP_NOT_FOUND, gatewayResponse.getStatusCode());
+    var response = sendQuery(defaultBody(), EMPTY_MAP);
+
+    assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_NOT_FOUND));
   }
 
   @Test
-  void shouldReturnPersonWhenClientIsAuthenticatedWithAccessTokenContaininingTheBackendScope()
+  void shouldReturnNotFoundWhenNoMatchAndClientIsThirdParty() throws Exception {
+    apiClient = spy(apiClient);
+    doReturn(new HttpResponseFaker(EMPTY_ARRAY, 200))
+        .when(apiClient)
+        .fetchQueryResults(any(URI.class));
+    handler = new FetchFromIdentityNumberHandler(apiClient, environment);
+
+    var response = sendQueryAsThirdParty(defaultBody());
+
+    assertThat(response.getStatusCode(), equalTo(HttpURLConnection.HTTP_NOT_FOUND));
+  }
+
+  @Test
+  void shouldReturnPersonWhenClientIsAuthenticatedWithAccessTokenContainingTheBackendScope()
       throws IOException {
     var request = requestWithBackendScope();
     handler.handleRequest(request, output, context);
@@ -229,6 +256,54 @@ public class FetchFromIdentityNumberHandlerTest {
     assertEquals(HTTP_BAD_GATEWAY, gatewayResponse.getStatusCode());
     Assertions.assertThat(logRecorder.messages())
         .noneMatch(message -> message.contains(DEFAULT_IDENTITY_NUMBER));
+  }
+
+  @Test
+  void shouldReturnOnlyIdAndNamesWhenClientIsThirdParty() throws Exception {
+    var response = sendQueryAsThirdParty(defaultBody());
+    var body = OBJECT_MAPPER.readTree(response.getBody());
+
+    Assertions.assertThat(response.getStatusCode()).isEqualTo(HTTP_OK);
+    Assertions.assertThat(fieldNamesOf(body)).containsExactlyInAnyOrder(CONTEXT, ID, TYPE, NAMES);
+  }
+
+  @Test
+  void shouldReturnFullPersonWhenClientIsInternalBackendAndThirdParty() throws Exception {
+    output = new ByteArrayOutputStream();
+    try (var input =
+        new HandlerRequestBuilder<TypedValue>(OBJECT_MAPPER)
+            .withScope(ACCESS_TOKEN_BACKEND_SCOPE + "," + THIRD_PARTY_SCOPE)
+            .withBody(defaultBody())
+            .build()) {
+      handler.handleRequest(input, output, context);
+    }
+    var response = GatewayResponse.fromOutputStream(output, Object.class);
+    var body = OBJECT_MAPPER.readTree(response.getBody());
+
+    Assertions.assertThat(fieldNamesOf(body)).contains(CONTACT_DETAILS);
+  }
+
+  private GatewayResponse<Object> sendQueryAsThirdParty(TypedValue body) throws IOException {
+    output = new ByteArrayOutputStream();
+    try (var input = thirdPartyRequest(body)) {
+      handler.handleRequest(input, output, context);
+    }
+    return GatewayResponse.fromOutputStream(output, Object.class);
+  }
+
+  private InputStream thirdPartyRequest(TypedValue body) throws JsonProcessingException {
+    return new HandlerRequestBuilder<TypedValue>(OBJECT_MAPPER)
+        .withScope(THIRD_PARTY_SCOPE)
+        .withClientId(THIRD_PARTY_CLIENT_ID)
+        .withTopLevelCristinOrgId(THIRD_PARTY_TOP_ORG)
+        .withBody(body)
+        .build();
+  }
+
+  private static List<String> fieldNamesOf(JsonNode body) {
+    var fieldNames = new ArrayList<String>();
+    body.fieldNames().forEachRemaining(fieldNames::add);
+    return fieldNames;
   }
 
   private InputStream requestWithBackendScope() throws JsonProcessingException {
