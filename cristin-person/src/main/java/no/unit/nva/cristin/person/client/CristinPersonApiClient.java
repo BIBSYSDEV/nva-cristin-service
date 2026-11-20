@@ -299,9 +299,13 @@ public class CristinPersonApiClient extends ApiClient
   /**
    * Perform a query for Person matching National Identification Number in request body.
    *
+   * <p>Reserved persons are never resolved. They give the same NotFoundException as when no person
+   * matches, so the caller cannot tell that a reserved person exists.
+   *
    * @param nationalIdentificationNumber National Identification Number uniquely identifying person
-   * @return Person object with person data from upstream
-   * @throws ApiGatewayException when request fails at some point
+   * @return Person object with person data from upstream, never a reserved person
+   * @throws ApiGatewayException when request fails at some point, no person matches or the person
+   *     is reserved
    */
   public Person getPersonFromNationalIdentityNumber(String nationalIdentificationNumber)
       throws ApiGatewayException {
@@ -309,10 +313,17 @@ public class CristinPersonApiClient extends ApiClient
     var cristinPersons = queryUpstreamUsingIdentityNumber(nationalIdentificationNumber);
     throwNotFoundIfNoMatches(cristinPersons);
 
-    return enrichFirstMatchFromQueryResponse(cristinPersons)
-        .toPersonBuilderWithAuthorizedFields()
-        .withContext(PERSON_CONTEXT)
-        .build();
+    var cristinPerson = enrichFirstMatchFromQueryResponse(cristinPersons);
+    throwNotFoundIfReserved(cristinPerson);
+
+    return cristinPerson.toPersonBuilderWithAuthorizedFields().withContext(PERSON_CONTEXT).build();
+  }
+
+  private static void throwNotFoundIfReserved(CristinPerson cristinPerson)
+      throws NotFoundException {
+    if (Boolean.TRUE.equals(cristinPerson.getReserved())) {
+      throw new NotFoundException(ERROR_MESSAGE_NO_MATCH_FOUND_FOR_SUPPLIED_PAYLOAD);
+    }
   }
 
   private List<CristinPerson> queryUpstreamUsingIdentityNumber(String identifier)
