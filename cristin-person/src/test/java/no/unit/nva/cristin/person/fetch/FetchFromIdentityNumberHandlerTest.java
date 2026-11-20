@@ -83,6 +83,12 @@ public class FetchFromIdentityNumberHandlerTest {
   private static final String THIRD_PARTY_SCOPE =
       "https://api.nva.unit.no/scopes/third-party/person-lookup-by-nin";
   private static final String THIRD_PARTY_CLIENT_ID = "some-third-party-client-id";
+  private static final String THIRD_PARTY_INSTITUTION = "185.90.0.0";
+  private static final String FOUND_PERSON_CRISTIN_ID = "359084";
+  private static final String NO_PERSON_RESOLVED = "no person resolved";
+  private static final String REQUESTED_BY_GUI_USER = "requested by GUI user";
+  private static final String REQUESTED_BY_INTERNAL_BACKEND = "requested by internal backend";
+  private static final String REQUESTED_BY_THIRD_PARTY = "requested by third party";
   private static final URI THIRD_PARTY_TOP_ORG =
       URI.create("https://api.dev.nva.aws.unit.no/cristin/organization/185.90.0.0");
   private static final String CONTEXT = "@context";
@@ -271,16 +277,92 @@ public class FetchFromIdentityNumberHandlerTest {
   void shouldReturnFullPersonWhenClientIsInternalBackendAndThirdParty() throws Exception {
     output = new ByteArrayOutputStream();
     try (var input =
-        new HandlerRequestBuilder<TypedValue>(OBJECT_MAPPER)
-            .withScope(ACCESS_TOKEN_BACKEND_SCOPE + "," + THIRD_PARTY_SCOPE)
-            .withBody(defaultBody())
-            .build()) {
+             new HandlerRequestBuilder<TypedValue>(OBJECT_MAPPER)
+                 .withScope(ACCESS_TOKEN_BACKEND_SCOPE + "," + THIRD_PARTY_SCOPE)
+                 .withBody(defaultBody())
+                 .build()) {
       handler.handleRequest(input, output, context);
     }
     var response = GatewayResponse.fromOutputStream(output, Object.class);
     var body = OBJECT_MAPPER.readTree(response.getBody());
 
     Assertions.assertThat(fieldNamesOf(body)).contains(CONTACT_DETAILS);
+  }
+
+  @Test
+  void shouldLogThatLookupIsRequestedByGuiUserWhenClientIsGuiUser() throws Exception {
+    var logRecorder = LogRecorder.forClass(FetchFromIdentityNumberHandler.class);
+
+    sendQuery(defaultBody(), EMPTY_MAP);
+
+    Assertions.assertThat(logRecorder.messages())
+        .anyMatch(message -> message.contains(REQUESTED_BY_GUI_USER))
+        .noneMatch(message -> message.contains(REQUESTED_BY_INTERNAL_BACKEND))
+        .noneMatch(message -> message.contains(REQUESTED_BY_THIRD_PARTY));
+  }
+
+  @Test
+  void shouldLogThatLookupIsRequestedByInternalBackendWhenClientIsInternalBackend()
+      throws Exception {
+    var logRecorder = LogRecorder.forClass(FetchFromIdentityNumberHandler.class);
+
+    handler.handleRequest(requestWithBackendScope(), output, context);
+
+    Assertions.assertThat(logRecorder.messages())
+        .anyMatch(message -> message.contains(REQUESTED_BY_INTERNAL_BACKEND))
+        .noneMatch(message -> message.contains(REQUESTED_BY_GUI_USER))
+        .noneMatch(message -> message.contains(REQUESTED_BY_THIRD_PARTY));
+  }
+
+  @Test
+  void shouldLogThatLookupIsRequestedByThirdPartyWhenClientIsThirdParty() throws Exception {
+    var logRecorder = LogRecorder.forClass(FetchFromIdentityNumberHandler.class);
+
+    sendQueryAsThirdParty(defaultBody());
+
+    Assertions.assertThat(logRecorder.messages())
+        .anyMatch(
+            message ->
+                message.contains(REQUESTED_BY_THIRD_PARTY)
+                    && message.contains(THIRD_PARTY_CLIENT_ID)
+                    && message.contains(THIRD_PARTY_INSTITUTION))
+        .noneMatch(message -> message.contains(REQUESTED_BY_GUI_USER))
+        .noneMatch(message -> message.contains(REQUESTED_BY_INTERNAL_BACKEND));
+  }
+
+  @Test
+  void shouldLogClientIdInstitutionAndPersonWhenThirdPartyLookupFindsPerson() throws Exception {
+    var logRecorder = LogRecorder.forClass(FetchFromIdentityNumberHandler.class);
+
+    sendQueryAsThirdParty(defaultBody());
+
+    Assertions.assertThat(logRecorder.messages())
+        .anyMatch(
+            message ->
+                message.contains(THIRD_PARTY_CLIENT_ID)
+                    && message.contains(THIRD_PARTY_INSTITUTION)
+                    && message.contains(FOUND_PERSON_CRISTIN_ID))
+        .noneMatch(message -> message.contains(DEFAULT_IDENTITY_NUMBER));
+  }
+
+  @Test
+  void shouldLogOnlyClientIdAndInstitutionWhenThirdPartyLookupFindsNoPerson() throws Exception {
+    var logRecorder = LogRecorder.forClass(FetchFromIdentityNumberHandler.class);
+    apiClient = spy(apiClient);
+    doReturn(new HttpResponseFaker(EMPTY_ARRAY, 200))
+        .when(apiClient)
+        .fetchQueryResults(any(URI.class));
+    handler = new FetchFromIdentityNumberHandler(apiClient, environment);
+
+    sendQueryAsThirdParty(defaultBody());
+
+    Assertions.assertThat(logRecorder.messages())
+        .anyMatch(
+            message ->
+                message.contains(THIRD_PARTY_CLIENT_ID)
+                    && message.contains(THIRD_PARTY_INSTITUTION)
+                    && message.contains(NO_PERSON_RESOLVED))
+        .noneMatch(message -> message.contains(DEFAULT_IDENTITY_NUMBER));
   }
 
   private GatewayResponse<Object> sendQueryAsThirdParty(TypedValue body) throws IOException {
