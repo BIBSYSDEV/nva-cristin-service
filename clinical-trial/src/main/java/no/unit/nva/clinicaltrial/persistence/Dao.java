@@ -33,13 +33,15 @@ public interface Dao {
   default Map<String, AttributeValue> toItem() {
     var json =
         attempt(() -> dtoObjectMapper.writeValueAsString(this))
-            .orElseThrow(failure -> new IllegalStateException(ITEM_NOT_SERIALIZABLE));
+            .orElseThrow(failure ->
+                new IllegalStateException(ITEM_NOT_SERIALIZABLE, failure.getException()));
     return EnhancedDocument.fromJson(json).toMap();
   }
 
   private static <D> D fromItem(Map<String, AttributeValue> item, JavaType daoType) {
     var json = EnhancedDocument.fromAttributeValueMap(item).toJson();
     return attempt(() -> dtoObjectMapper.<D>readValue(json, daoType))
-        .orElseThrow(failure -> new IllegalStateException(ITEM_NOT_READABLE));
+        .orElseThrow(
+            failure -> new IllegalStateException(ITEM_NOT_READABLE, failure.getException()));
   }
 }
