@@ -1,13 +1,12 @@
 package no.unit.nva.cristin.common.client;
 
+import static no.unit.nva.client.HttpClientProvider.defaultHttpClientBuilder;
 import static nva.commons.core.attempt.Try.attempt;
 
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.http.HttpClient;
-import java.net.http.HttpClient.Version;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Base64;
 import nva.commons.secrets.SecretsReader;
 import org.slf4j.Logger;
@@ -28,6 +27,7 @@ public class CristinAuthenticator {
   public static final String USING_AN_AUTHORIZED_HTTP_CLIENT = "Using an authorized Http Client";
   public static final String USING_A_BASIC_AUTH_HEADER =
       "Using basic auth header in upstream request";
+  private static final HttpClient AUTHENTICATED_HTTP_CLIENT = buildHttpClient();
 
   /**
    * Creates an Authenticator from credentials stored in AWS SecretsManager.
@@ -45,19 +45,14 @@ public class CristinAuthenticator {
   }
 
   /**
-   * Create an HTTPClient with authentication.
+   * Shared HTTPClient with authentication. Must not be closed by callers.
    *
    * @return HTTPClient with authentication
    */
   public static HttpClient getHttpClient() {
     logger.info(USING_AN_AUTHORIZED_HTTP_CLIENT);
 
-    return HttpClient.newBuilder()
-        .followRedirects(HttpClient.Redirect.ALWAYS)
-        .version(Version.HTTP_1_1)
-        .authenticator(getBasicAuthenticator())
-        .connectTimeout(Duration.ofSeconds(15))
-        .build();
+    return AUTHENTICATED_HTTP_CLIENT;
   }
 
   /**
@@ -71,6 +66,10 @@ public class CristinAuthenticator {
     return "Basic "
         + Base64.getEncoder()
             .encodeToString((getUserName() + ":" + getPassWord()).getBytes(StandardCharsets.UTF_8));
+  }
+
+  private static HttpClient buildHttpClient() {
+    return defaultHttpClientBuilder().authenticator(getBasicAuthenticator()).build();
   }
 
   private static String getPassWord() {
