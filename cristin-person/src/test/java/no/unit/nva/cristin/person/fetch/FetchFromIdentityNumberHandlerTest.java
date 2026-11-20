@@ -277,10 +277,10 @@ public class FetchFromIdentityNumberHandlerTest {
   void shouldReturnFullPersonWhenClientIsInternalBackendAndThirdParty() throws Exception {
     output = new ByteArrayOutputStream();
     try (var input =
-             new HandlerRequestBuilder<TypedValue>(OBJECT_MAPPER)
-                 .withScope(ACCESS_TOKEN_BACKEND_SCOPE + "," + THIRD_PARTY_SCOPE)
-                 .withBody(defaultBody())
-                 .build()) {
+        new HandlerRequestBuilder<TypedValue>(OBJECT_MAPPER)
+            .withScope(ACCESS_TOKEN_BACKEND_SCOPE + "," + THIRD_PARTY_SCOPE)
+            .withBody(defaultBody())
+            .build()) {
       handler.handleRequest(input, output, context);
     }
     var response = GatewayResponse.fromOutputStream(output, Object.class);
@@ -321,11 +321,10 @@ public class FetchFromIdentityNumberHandlerTest {
     sendQueryAsThirdParty(defaultBody());
 
     Assertions.assertThat(logRecorder.messages())
-        .anyMatch(
-            message ->
-                message.contains(REQUESTED_BY_THIRD_PARTY)
-                    && message.contains(THIRD_PARTY_CLIENT_ID)
-                    && message.contains(THIRD_PARTY_INSTITUTION))
+        .anyMatch(message ->
+            message.contains(REQUESTED_BY_THIRD_PARTY)
+                && message.contains(THIRD_PARTY_CLIENT_ID)
+                && message.contains(THIRD_PARTY_INSTITUTION))
         .noneMatch(message -> message.contains(REQUESTED_BY_GUI_USER))
         .noneMatch(message -> message.contains(REQUESTED_BY_INTERNAL_BACKEND));
   }
@@ -337,11 +336,10 @@ public class FetchFromIdentityNumberHandlerTest {
     sendQueryAsThirdParty(defaultBody());
 
     Assertions.assertThat(logRecorder.messages())
-        .anyMatch(
-            message ->
-                message.contains(THIRD_PARTY_CLIENT_ID)
-                    && message.contains(THIRD_PARTY_INSTITUTION)
-                    && message.contains(FOUND_PERSON_CRISTIN_ID))
+        .anyMatch(message ->
+            message.contains(THIRD_PARTY_CLIENT_ID)
+                && message.contains(THIRD_PARTY_INSTITUTION)
+                && message.contains(FOUND_PERSON_CRISTIN_ID))
         .noneMatch(message -> message.contains(DEFAULT_IDENTITY_NUMBER));
   }
 
@@ -357,11 +355,10 @@ public class FetchFromIdentityNumberHandlerTest {
     sendQueryAsThirdParty(defaultBody());
 
     Assertions.assertThat(logRecorder.messages())
-        .anyMatch(
-            message ->
-                message.contains(THIRD_PARTY_CLIENT_ID)
-                    && message.contains(THIRD_PARTY_INSTITUTION)
-                    && message.contains(NO_PERSON_RESOLVED))
+        .anyMatch(message ->
+            message.contains(THIRD_PARTY_CLIENT_ID)
+                && message.contains(THIRD_PARTY_INSTITUTION)
+                && message.contains(NO_PERSON_RESOLVED))
         .noneMatch(message -> message.contains(DEFAULT_IDENTITY_NUMBER));
   }
 
