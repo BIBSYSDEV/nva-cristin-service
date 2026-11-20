@@ -1,5 +1,6 @@
 package no.unit.nva.clinicaltrial.persistence;
 
+import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.CONDITIONAL_CHECK_FAILED;
 import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.CREATE_CONDITION;
 import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.EXPECTED_VERSION_VALUE;
 import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.UPDATE_CONDITION;
@@ -15,6 +16,7 @@ import no.unit.nva.clinicaltrial.model.Version;
 import no.unit.nva.identifiers.SortableIdentifier;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.CancellationReason;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.Put;
@@ -33,7 +35,7 @@ public class ClinicalTrialRepository {
     this.tableName = tableName;
   }
 
-  public void save(ClinicalTrialWrite clinicalTrialWrite) throws ConditionFailedException {
+  public ClinicalTrial save(ClinicalTrialWrite clinicalTrialWrite) throws ConditionFailedException {
     var now = Instant.now();
     var expectedVersion = clinicalTrialWrite.clinicalTrial().version();
     var clinicalTrial = nextVersionOf(clinicalTrialWrite.clinicalTrial());
@@ -41,9 +43,19 @@ public class ClinicalTrialRepository {
     var versionDao = VersionDao.newVersionOf(dao, clinicalTrial, clinicalTrialWrite.user());
     try {
       client.transactWriteItems(saveRequest(dao, versionDao, expectedVersion));
-    } catch (TransactionCanceledException conditionNotMet) {
-      throw new ConditionFailedException();
+    } catch (TransactionCanceledException transactionCanceled) {
+      if (isConditionNotMet(transactionCanceled)) {
+        throw new ConditionFailedException();
+      }
+      throw transactionCanceled;
     }
+    return clinicalTrial;
+  }
+
+  private static boolean isConditionNotMet(TransactionCanceledException transactionCanceled) {
+    return transactionCanceled.cancellationReasons().stream()
+        .map(CancellationReason::code)
+        .anyMatch(CONDITIONAL_CHECK_FAILED::equals);
   }
 
   public Optional<ClinicalTrial> find(String projectIdentifier) {
@@ -137,6 +149,7 @@ public class ClinicalTrialRepository {
     return GetItemRequest.builder()
         .tableName(tableName)
         .key(ClinicalTrialDao.keyOf(projectIdentifier))
+        .consistentRead(true)
         .build();
   }
 }

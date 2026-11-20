@@ -13,6 +13,7 @@ public final class DatabaseConstants {
   public static final String CREATE_CONDITION = "attribute_not_exists(PK)";
   public static final String UPDATE_CONDITION =
       "attribute_exists(PK) AND version = :expectedVersion";
+  public static final String CONDITIONAL_CHECK_FAILED = "ConditionalCheckFailed";
   public static final String ITEM_NOT_SERIALIZABLE = "Item is not serializable";
   public static final String ITEM_NOT_READABLE = "Item is not readable";
 

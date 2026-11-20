@@ -18,13 +18,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.CancellationReason;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
+import software.amazon.awssdk.services.dynamodb.model.TransactWriteItemsRequest;
+import software.amazon.awssdk.services.dynamodb.model.TransactWriteItemsResponse;
+import software.amazon.awssdk.services.dynamodb.model.TransactionCanceledException;
 
 class ClinicalTrialRepositoryTest {
 
   private static final String TABLE_NAME = "clinical-trial";
   private static final String VERSION_KEY_PREFIX = "VERSION#CLINICAL_TRIAL#";
+  private static final String CONFLICT = "TransactionConflict";
 
   private DynamoDbClient client;
   private ClinicalTrialRepository repository;
@@ -44,6 +49,26 @@ class ClinicalTrialRepositoryTest {
     assertThat(
         repository.find(clinicalTrial.projectIdentifier()).orElseThrow().projectIdentifier(),
         is(clinicalTrial.projectIdentifier()));
+  }
+
+  @Test
+  void shouldReturnPersistedClinicalTrialWithItsNewVersionWhenSaved() throws Exception {
+    var clinicalTrial = clinicalTrial(null);
+
+    var persisted = repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
+
+    assertThat(
+        persisted.version().toString(),
+        is(persistedItem(clinicalTrial.projectIdentifier()).get("version").s()));
+  }
+
+  @Test
+  void shouldRethrowTransactionCanceledExceptionWhenCancellationIsNotConditionFailure() {
+    var cancelling = new ClinicalTrialRepository(clientCancellingWith(CONFLICT), TABLE_NAME);
+
+    assertThrows(
+        TransactionCanceledException.class,
+        () -> cancelling.save(new ClinicalTrialWrite(clinicalTrial(null), randomUser())));
   }
 
   @Test
@@ -156,6 +181,25 @@ class ClinicalTrialRepositoryTest {
 
     assertThat(
         persistedItem(clinicalTrial.projectIdentifier()).get("createdDate").s(), is(createdDate));
+  }
+
+  private DynamoDbClient clientCancellingWith(String reasonCode) {
+    return new DynamoDbClient() {
+      @Override
+      public String serviceName() {
+        return "dynamodb";
+      }
+
+      @Override
+      public void close() {}
+
+      @Override
+      public TransactWriteItemsResponse transactWriteItems(TransactWriteItemsRequest request) {
+        throw TransactionCanceledException.builder()
+            .cancellationReasons(CancellationReason.builder().code(reasonCode).build())
+            .build();
+      }
+    };
   }
 
   private ClinicalTrial persisted(ClinicalTrial clinicalTrial) {
