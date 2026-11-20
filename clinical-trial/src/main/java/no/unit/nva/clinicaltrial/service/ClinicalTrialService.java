@@ -12,6 +12,7 @@ import no.unit.nva.client.FetchApiClient;
 import no.unit.nva.clinicaltrial.model.ClinicalTrial;
 import no.unit.nva.clinicaltrial.model.ClinicalTrialWrite;
 import no.unit.nva.clinicaltrial.model.User;
+import no.unit.nva.clinicaltrial.persistence.ClinicalTrialNotFoundException;
 import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
 import no.unit.nva.clinicaltrial.persistence.ConditionFailedException;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
@@ -37,7 +38,7 @@ public class ClinicalTrialService {
   }
 
   public ClinicalTrial save(ClinicalTrialWrite clinicalTrialWrite)
-      throws ApiGatewayException, ConditionFailedException {
+      throws ApiGatewayException, ConditionFailedException, ClinicalTrialNotFoundException {
     var project = projectsApi.executeFetch(clinicalTrialWrite.clinicalTrial().projectIdentifier());
     var user = granted(project, clinicalTrialWrite.user());
     if (!user.isGranted()) {

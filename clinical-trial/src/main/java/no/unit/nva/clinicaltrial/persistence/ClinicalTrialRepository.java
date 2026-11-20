@@ -37,7 +37,8 @@ public class ClinicalTrialRepository {
     this.tableName = tableName;
   }
 
-  public ClinicalTrial save(ClinicalTrialWrite clinicalTrialWrite) throws ConditionFailedException {
+  public ClinicalTrial save(ClinicalTrialWrite clinicalTrialWrite)
+      throws ConditionFailedException, ClinicalTrialNotFoundException {
     var now = Instant.now();
     var expectedVersion = clinicalTrialWrite.clinicalTrial().version();
     var clinicalTrial = nextVersionOf(clinicalTrialWrite.clinicalTrial());
@@ -82,11 +83,16 @@ public class ClinicalTrialRepository {
   }
 
   private ClinicalTrialDao daoToPersist(
-      ClinicalTrial clinicalTrial, SortableIdentifier expectedVersion, Instant timestamp) {
-    return Optional.ofNullable(expectedVersion)
-        .flatMap(version -> findDao(clinicalTrial.projectIdentifier()))
-        .map(persisted -> persisted.updatedTo(clinicalTrial, timestamp))
-        .orElseGet(() -> ClinicalTrialDao.fromClinicalTrial(clinicalTrial, timestamp));
+      ClinicalTrial clinicalTrial, SortableIdentifier expectedVersion, Instant timestamp)
+      throws ClinicalTrialNotFoundException {
+    return Objects.isNull(expectedVersion)
+        ? ClinicalTrialDao.fromClinicalTrial(clinicalTrial, timestamp)
+        : persistedDao(clinicalTrial.projectIdentifier()).updatedTo(clinicalTrial, timestamp);
+  }
+
+  private ClinicalTrialDao persistedDao(String projectIdentifier)
+      throws ClinicalTrialNotFoundException {
+    return findDao(projectIdentifier).orElseThrow(ClinicalTrialNotFoundException::new);
   }
 
   private TransactWriteItem clinicalTrialItem(
