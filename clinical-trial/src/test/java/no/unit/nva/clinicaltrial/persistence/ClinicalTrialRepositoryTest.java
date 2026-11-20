@@ -1,9 +1,10 @@
 package no.unit.nva.clinicaltrial.persistence;
 
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.clinicalTrial;
-import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.kbsAdmin;
+import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.clinicalTrialAdmin;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomProjectIdentifier;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomUser;
+import static no.unit.nva.clinicaltrial.model.Grant.CLINICAL_TRIAL_ADMIN;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import no.unit.nva.clinicaltrial.model.Action;
 import no.unit.nva.clinicaltrial.model.ClinicalTrial;
 import no.unit.nva.clinicaltrial.model.ClinicalTrialWrite;
 import no.unit.nva.identifiers.SortableIdentifier;
@@ -90,7 +92,8 @@ class ClinicalTrialRepositoryTest {
                 "username",
                 "personIdentifier",
                 "customerIdentifier",
-                "accessRights",
+                "grants",
+                "action",
                 "createdDate",
                 "modifiedDate")));
   }
@@ -104,13 +107,35 @@ class ClinicalTrialRepositoryTest {
   void shouldReturnVersionWithCallerAndEntityWhenClinicalTrialIsSaved()
       throws ConditionFailedException {
     var clinicalTrial = clinicalTrial(null);
-    var user = kbsAdmin();
+    var user = clinicalTrialAdmin();
 
     repository.save(new ClinicalTrialWrite(clinicalTrial, user));
 
     var version = repository.findVersions(clinicalTrial.projectIdentifier()).getFirst();
-    assertThat(version.user(), is(user));
+    assertThat(version.user().username(), is(user.username()));
     assertThat(version.entity().projectIdentifier(), is(clinicalTrial.projectIdentifier()));
+  }
+
+  @Test
+  void shouldReturnVersionWithGrantThatAllowedTheWrite() throws ConditionFailedException {
+    var clinicalTrial = clinicalTrial(null);
+
+    repository.save(new ClinicalTrialWrite(clinicalTrial, clinicalTrialAdmin()));
+
+    var version = repository.findVersions(clinicalTrial.projectIdentifier()).getFirst();
+    assertThat(version.user().grants(), is(Set.of(CLINICAL_TRIAL_ADMIN)));
+  }
+
+  @Test
+  void shouldRecordCreateAsActionOfFirstVersionAndUpdateOfNext() throws ConditionFailedException {
+    var clinicalTrial = clinicalTrial(null);
+    repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
+    repository.save(new ClinicalTrialWrite(persisted(clinicalTrial), randomUser()));
+
+    var versions = repository.findVersions(clinicalTrial.projectIdentifier());
+
+    assertThat(versions.getFirst().action(), is(Action.UPDATE_CLINICAL_TRIAL));
+    assertThat(versions.getLast().action(), is(Action.CREATE_CLINICAL_TRIAL));
   }
 
   @Test

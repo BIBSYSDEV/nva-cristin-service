@@ -1,5 +1,7 @@
 package no.unit.nva.clinicaltrial.persistence;
 
+import static no.unit.nva.clinicaltrial.model.Action.CREATE_CLINICAL_TRIAL;
+import static no.unit.nva.clinicaltrial.model.Action.UPDATE_CLINICAL_TRIAL;
 import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.CREATE_CONDITION;
 import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.EXPECTED_VERSION_VALUE;
 import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.UPDATE_CONDITION;
@@ -8,7 +10,9 @@ import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.VERSIONS_K
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import no.unit.nva.clinicaltrial.model.Action;
 import no.unit.nva.clinicaltrial.model.ClinicalTrial;
 import no.unit.nva.clinicaltrial.model.ClinicalTrialWrite;
 import no.unit.nva.clinicaltrial.model.Version;
@@ -38,7 +42,9 @@ public class ClinicalTrialRepository {
     var expectedVersion = clinicalTrialWrite.clinicalTrial().version();
     var clinicalTrial = nextVersionOf(clinicalTrialWrite.clinicalTrial());
     var dao = daoToPersist(clinicalTrial, expectedVersion, now);
-    var versionDao = VersionDao.newVersionOf(dao, clinicalTrial, clinicalTrialWrite.user());
+    var versionDao =
+        VersionDao.newVersionOf(
+            dao, clinicalTrial, clinicalTrialWrite.user(), action(expectedVersion));
     try {
       client.transactWriteItems(saveRequest(dao, versionDao, expectedVersion));
     } catch (TransactionCanceledException transactionCanceled) {
@@ -56,6 +62,10 @@ public class ClinicalTrialRepository {
         .map(item -> VersionDao.fromItem(item, ClinicalTrial.class))
         .map(VersionDao::toVersion)
         .toList();
+  }
+
+  private static Action action(SortableIdentifier expectedVersion) {
+    return Objects.isNull(expectedVersion) ? CREATE_CLINICAL_TRIAL : UPDATE_CLINICAL_TRIAL;
   }
 
   private static ClinicalTrial nextVersionOf(ClinicalTrial clinicalTrial) {

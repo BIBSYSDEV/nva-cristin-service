@@ -13,7 +13,6 @@ dependencies {
     implementation(nvaCatalog.jackson.databind)
     implementation(nvaLibs.core)
     implementation(nvaLibs.json)
-    testFixturesApi(nvaLibs.apigateway)
     testFixturesApi(nvaLibs.identifiers)
     testFixturesImplementation(nvaLibs.testutils)
     testImplementation(nvaCatalog.aws.sdk2.dynamodblocal)

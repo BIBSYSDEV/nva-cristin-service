@@ -1,17 +1,28 @@
 package no.unit.nva.clinicaltrial.model;
 
+import static java.util.stream.Collectors.toSet;
+
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import nva.commons.apigateway.AccessRight;
+import java.util.stream.Stream;
 
 public record User(
-    String username,
-    String personIdentifier,
-    UUID customerIdentifier,
-    Set<AccessRight> accessRights) {
+    String username, String personIdentifier, UUID customerIdentifier, Set<Grant> grants) {
 
   public User {
-    accessRights = Objects.isNull(accessRights) ? Set.of() : Set.copyOf(accessRights);
+    grants = Objects.isNull(grants) ? Set.of() : Set.copyOf(grants);
+  }
+
+  public User withGrant(Grant grant) {
+    return new User(
+        username,
+        personIdentifier,
+        customerIdentifier,
+        Stream.concat(grants.stream(), Stream.of(grant)).collect(toSet()));
+  }
+
+  public boolean isGranted() {
+    return !grants.isEmpty();
   }
 }

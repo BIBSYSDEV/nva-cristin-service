@@ -1,6 +1,5 @@
 package no.unit.nva.clinicaltrial.persistence;
 
-import static java.util.stream.Collectors.toSet;
 import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.KEY_SEPARATOR;
 import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.PARTITION_KEY;
 import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.PARTITION_KEY_VALUE;
@@ -10,13 +9,13 @@ import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.VERSION_PR
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import no.unit.nva.clinicaltrial.model.Action;
+import no.unit.nva.clinicaltrial.model.Grant;
 import no.unit.nva.clinicaltrial.model.User;
 import no.unit.nva.clinicaltrial.model.Version;
 import no.unit.nva.identifiers.SortableIdentifier;
-import nva.commons.apigateway.AccessRight;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 public record VersionDao<T>(
@@ -26,14 +25,15 @@ public record VersionDao<T>(
     String username,
     String personIdentifier,
     UUID customerIdentifier,
-    Set<String> accessRights,
+    Set<Grant> grants,
+    Action action,
     Instant createdDate,
     Instant modifiedDate)
     implements Dao {
 
   private static final String VERSION_KEY_PREFIX = "VERSION" + KEY_SEPARATOR;
 
-  public static <T> VersionDao<T> newVersionOf(Dao dao, T entity, User user) {
+  public static <T> VersionDao<T> newVersionOf(Dao dao, T entity, User user, Action action) {
     return new VersionDao<>(
         dao.partitionKey(),
         versionKey(dao.sortKey(), dao.version()),
@@ -41,7 +41,8 @@ public record VersionDao<T>(
         user.username(),
         user.personIdentifier(),
         user.customerIdentifier(),
-        persistedAccessRights(user),
+        user.grants(),
+        action,
         dao.modifiedDate(),
         dao.modifiedDate());
   }
@@ -63,19 +64,9 @@ public record VersionDao<T>(
     return new Version<>(
         version(),
         entity,
-        new User(username, personIdentifier, customerIdentifier, toAccessRights()),
+        new User(username, personIdentifier, customerIdentifier, grants),
+        action,
         modifiedDate);
-  }
-
-  private static Set<String> persistedAccessRights(User user) {
-    return user.accessRights().stream().map(AccessRight::toPersistedString).collect(toSet());
-  }
-
-  private Set<AccessRight> toAccessRights() {
-    return accessRights.stream()
-        .map(AccessRight::fromPersistedStringOptional)
-        .flatMap(Optional::stream)
-        .collect(toSet());
   }
 
   private static String versionKey(String entitySortKey, SortableIdentifier version) {

@@ -1,8 +1,8 @@
 package no.unit.nva.clinicaltrial.service;
 
 import static java.util.stream.Collectors.toSet;
+import static no.unit.nva.clinicaltrial.model.Grant.PROJECT_MANAGER;
 import static no.unit.nva.cristin.projects.update.UpdateProjectResourceAccessCheck.PROJECT_MANAGER_ROLE_CODE;
-import static nva.commons.apigateway.AccessRight.MANAGE_KBS;
 
 import java.util.List;
 import java.util.Objects;
@@ -20,9 +20,12 @@ import no.unit.nva.cristin.projects.model.nva.Person;
 import no.unit.nva.cristin.projects.model.nva.Role;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.ConflictException;
 import nva.commons.apigateway.exceptions.ForbiddenException;
 
 public class ClinicalTrialService {
+
+  private static final String PROJECT_NOT_ELIGIBLE = "Project is not eligible for a clinical trial";
 
   private final transient FetchApiClient<String, NvaProject> projectsApi;
   private final transient ClinicalTrialRepository repository;
@@ -36,18 +39,22 @@ public class ClinicalTrialService {
   public ClinicalTrial save(ClinicalTrialWrite clinicalTrialWrite)
       throws ApiGatewayException, ConditionFailedException {
     var project = projectsApi.executeFetch(clinicalTrialWrite.clinicalTrial().projectIdentifier());
-    verifyMayWrite(project, clinicalTrialWrite.user());
-    return repository.save(clinicalTrialWrite);
+    var user = granted(project, clinicalTrialWrite.user());
+    if (!user.isGranted()) {
+      throw new ForbiddenException();
+    }
+    verifyEligible(project);
+    return repository.save(new ClinicalTrialWrite(clinicalTrialWrite.clinicalTrial(), user));
   }
 
-  private static void verifyMayWrite(NvaProject project, User user) throws ForbiddenException {
-    if (!isKbsAdmin(user) && !isProjectManager(project, user)) {
-      throw new ForbiddenException();
+  private static void verifyEligible(NvaProject project) throws ConflictException {
+    if (!project.isClinicalTrialEligible()) {
+      throw new ConflictException(PROJECT_NOT_ELIGIBLE);
     }
   }
 
-  private static boolean isKbsAdmin(User user) {
-    return user.accessRights().contains(MANAGE_KBS);
+  private static User granted(NvaProject project, User user) {
+    return isProjectManager(project, user) ? user.withGrant(PROJECT_MANAGER) : user;
   }
 
   private static boolean isProjectManager(NvaProject project, User user) {
