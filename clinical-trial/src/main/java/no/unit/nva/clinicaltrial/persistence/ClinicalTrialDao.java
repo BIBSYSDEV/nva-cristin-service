@@ -43,6 +43,11 @@ public record ClinicalTrialDao(
         string(CLINICAL_TRIAL_SORT_KEY));
   }
 
+  public ClinicalTrialDao updatedTo(ClinicalTrial clinicalTrial, Instant timestamp) {
+    return new ClinicalTrialDao(
+        partitionKey, sortKey, clinicalTrial.version(), createdDate, timestamp);
+  }
+
   public ClinicalTrial toClinicalTrial() {
     return new ClinicalTrial(partitionKey.substring(PROJECT_KEY_PREFIX.length()), version);
   }

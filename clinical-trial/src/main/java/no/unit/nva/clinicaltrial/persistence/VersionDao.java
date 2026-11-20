@@ -2,7 +2,9 @@ package no.unit.nva.clinicaltrial.persistence;
 
 import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.KEY_SEPARATOR;
 import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.PARTITION_KEY;
+import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.PARTITION_KEY_VALUE;
 import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.SORT_KEY;
+import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.VERSION_PREFIX_VALUE;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
@@ -24,28 +26,16 @@ public record VersionDao<T>(
     implements Dao {
 
   private static final String VERSION_KEY_PREFIX = "VERSION" + KEY_SEPARATOR;
-  private static final String PARTITION_KEY_VALUE = ":partitionKey";
-  private static final String VERSION_PREFIX_VALUE = ":versionPrefix";
-  public static final String VERSIONS_KEY_CONDITION =
-      PARTITION_KEY
-          + " = "
-          + PARTITION_KEY_VALUE
-          + " AND begins_with("
-          + SORT_KEY
-          + ", "
-          + VERSION_PREFIX_VALUE
-          + ")";
 
-  public static <T> VersionDao<T> fromDao(
-      Dao dao, T entity, User user, SortableIdentifier version, Instant timestamp) {
+  public static <T> VersionDao<T> newVersionOf(Dao dao, T entity, User user) {
     return new VersionDao<>(
         dao.partitionKey(),
-        versionKey(dao.sortKey(), version),
+        versionKey(dao.sortKey(), dao.version()),
         entity,
         user.username(),
         user.customerIdentifier(),
-        timestamp,
-        timestamp);
+        dao.modifiedDate(),
+        dao.modifiedDate());
   }
 
   public static <T> VersionDao<T> fromItem(Map<String, AttributeValue> item, Class<T> entityType) {
@@ -62,8 +52,7 @@ public record VersionDao<T>(
   }
 
   public Version<T> toVersion() {
-    return new Version<>(
-        identifier(), entity, new User(username, customerIdentifier), modifiedDate);
+    return new Version<>(version(), entity, new User(username, customerIdentifier), modifiedDate);
   }
 
   private static String versionKey(String entitySortKey, SortableIdentifier version) {
@@ -74,7 +63,8 @@ public record VersionDao<T>(
     return VERSION_KEY_PREFIX + entitySortKey + KEY_SEPARATOR;
   }
 
-  private SortableIdentifier identifier() {
+  @Override
+  public SortableIdentifier version() {
     return new SortableIdentifier(sortKey.substring(sortKey.lastIndexOf(KEY_SEPARATOR) + 1));
   }
 
