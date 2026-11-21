@@ -1489,7 +1489,11 @@ paths:
       tags:
         - Person
       summary: Query person by national identity number
-      description: Returns a single person matching nin query parameter
+      description: >
+        Returns a single person matching the national identity number in the request body.
+        Third-party clients need the scope
+        https://api.nva.unit.no/scopes/third-party/person-lookup-by-nin, and get only the
+        person's id and names in the response.
       operationId: GetPersonByNIN
       security:
         - CognitoUserPool:
@@ -1497,6 +1501,7 @@ paths:
               "https://api.nva.unit.no/scopes/backend",
               "https://api.nva.unit.no/scopes/frontend",
               "aws.cognito.signin.user.admin",
+              "https://api.nva.unit.no/scopes/third-party/person-lookup-by-nin",
             ]
       requestBody:
         required: true
@@ -1509,20 +1514,30 @@ paths:
                 $ref: "#/components/examples/PersonNinExample"
       responses:
         "200":
-          description: successful operation
+          description: >
+            The person. GUI users and internal backend get the full Person.
+            Third-party clients get a ThirdPartyPersonLookupResponse with only id and names.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Person"
+                anyOf:
+                  - $ref: "#/components/schemas/Person"
+                  - $ref: "#/components/schemas/ThirdPartyPersonLookupResponse"
               examples:
-                objectExample:
+                personExample:
                   $ref: "#/components/examples/PersonExample"
+                thirdPartyExample:
+                  $ref: "#/components/examples/ThirdPartyPersonLookupExample"
             application/ld+json:
               schema:
-                $ref: "#/components/schemas/Person"
+                anyOf:
+                  - $ref: "#/components/schemas/Person"
+                  - $ref: "#/components/schemas/ThirdPartyPersonLookupResponse"
               examples:
-                objectExample:
+                personExample:
                   $ref: "#/components/examples/PersonExample"
+                thirdPartyExample:
+                  $ref: "#/components/examples/ThirdPartyPersonLookupExample"
         "400":
           $ref: "#/components/responses/400"
         "401":
@@ -3456,6 +3471,34 @@ components:
                     $ref: "#/components/schemas/Languages"
               affiliation:
                 $ref: "#/components/schemas/Organization"
+    ThirdPartyPersonLookupResponse:
+      type: object
+      description: >
+        Response to a third-party client looking up a person by national identity number.
+        Holds only what a third party needs to identify the person in Cristin.
+      properties:
+        "@context":
+          $ref: "#/components/schemas/Context"
+        id:
+          $ref: "#/components/schemas/Id"
+        type:
+          type: string
+          pattern: "Person"
+          description: The type of the returned object, always Person
+        names:
+          type: array
+          description: Names for this person
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                pattern: "PreferredFirstName|PreferredLastName|FirstName|LastName"
+                description: Name of identifier
+              value:
+                type: string
+                pattern: ".+"
+                description: Value of identifier
     PersonPost:
       type: object
       required: [names]
@@ -5089,6 +5132,21 @@ components:
                 "nb": "Nasjonal"
             affiliation:
               id: "https://api.dev.nva.aws.unit.no/cristin/organization/185.11.0.0"
+    ThirdPartyPersonLookupExample:
+      summary: Response to a third-party client
+      value:
+        "@context": "https://example.org/person-context.json"
+        id: "https://api.dev.nva.aws.unit.no/cristin/person/99999"
+        type: "Person"
+        names:
+          - type: "PreferredFirstName"
+            value: "Ola"
+          - type: "PreferredLastName"
+            value: "Nordmann"
+          - type: "FirstName"
+            value: "Kjell Ola"
+          - type: "LastName"
+            value: "Nordmann"
     PersonPatchExample:
       value:
         orcid: "1234-1234-1234-1234"

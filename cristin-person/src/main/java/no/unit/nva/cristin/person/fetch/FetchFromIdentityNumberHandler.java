@@ -5,7 +5,7 @@ import static no.unit.nva.cristin.common.ErrorMessages.ERROR_MESSAGE_INVALID_QUE
 import static no.unit.nva.cristin.common.client.CristinAuthenticator.getHttpClient;
 import static no.unit.nva.utils.AccessUtils.clientIsCustomerAdministrator;
 import static no.unit.nva.utils.AccessUtils.requesterIsUserAdministrator;
-import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
+import static no.unit.nva.utils.LogUtils.extractClientId;
 import static no.unit.nva.utils.LogUtils.extractCristinIdentifier;
 import static no.unit.nva.utils.LogUtils.extractOrgIdentifier;
 import static nva.commons.core.attempt.Try.attempt;
@@ -17,29 +17,44 @@ import java.util.Objects;
 import java.util.Optional;
 import no.bekk.bekkopen.person.FodselsnummerValidator;
 import no.unit.nva.cristin.person.client.CristinPersonApiClient;
-import no.unit.nva.cristin.person.model.nva.Person;
+import no.unit.nva.cristin.person.model.nva.PersonLookupResult;
+import no.unit.nva.cristin.person.model.nva.ThirdPartyPersonLookupResponse;
 import no.unit.nva.cristin.person.model.nva.TypedValue;
+import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.ForbiddenException;
+import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.core.Environment;
 import nva.commons.core.JacocoGenerated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @JacocoGenerated
-public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue, Person> {
+public class FetchFromIdentityNumberHandler
+    extends ApiGatewayHandler<TypedValue, PersonLookupResult> {
 
   private static final Logger logger =
       LoggerFactory.getLogger(FetchFromIdentityNumberHandler.class);
 
-  public static final String NIN_TYPE = "NationalIdentificationNumber";
-  public static final String NOT_AUTHORIZED_TO_USE_THIS_ENDPOINT =
-      "CLient is not authorized to use this endpoint";
-  public static final String FOUND_THE_FOLLOWING_RESOURCE =
+  private static final String NIN_TYPE = "NationalIdentificationNumber";
+  private static final String NOT_AUTHORIZED_TO_USE_THIS_ENDPOINT =
+      "Client is not authorized to use this endpoint";
+  private static final String FOUND_THE_FOLLOWING_RESOURCE =
       "Client found the following resource: {}";
+  private static final String REQUESTED_BY_GUI_USER =
+      "Person lookup by NIN requested by GUI user with Cristin identifier {} from organization {}";
+  private static final String REQUESTED_BY_INTERNAL_BACKEND =
+      "Person lookup by NIN requested by internal backend";
+  private static final String REQUESTED_BY_THIRD_PARTY =
+      "Person lookup by NIN requested by third party with clientId={}, clientInstitution={}";
+  private static final String THIRD_PARTY_LOOKUP_FOUND_PERSON =
+      "Third-party person lookup by NIN: clientId={}, clientInstitution={}, "
+          + "resolvedPersonIdentifier={}";
+  private static final String THIRD_PARTY_LOOKUP_NO_MATCH =
+      "Third-party person lookup by NIN: clientId={}, clientInstitution={}, no person resolved";
 
   private final transient CristinPersonApiClient apiClient;
 
@@ -67,11 +82,10 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
   }
 
   @Override
-  protected Person processInput(TypedValue input, RequestInfo requestInfo, Context context)
-      throws ApiGatewayException {
+  protected PersonLookupResult processInput(
+      TypedValue input, RequestInfo requestInfo, Context context) throws ApiGatewayException {
 
-    logger.info(
-        LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
+    logRequester(requestInfo);
 
     if (!clientIsAuthorized(requestInfo)) {
       logger.info(NOT_AUTHORIZED_TO_USE_THIS_ENDPOINT);
@@ -81,23 +95,72 @@ public class FetchFromIdentityNumberHandler extends ApiGatewayHandler<TypedValue
     validateQueryParameters(requestInfo);
     validateInput(input);
 
-    return apiClient.getPersonFromNationalIdentityNumber(input.value());
+    return requestInfo.clientIsThirdParty() && !requestInfo.clientIsInternalBackend()
+        ? lookUpAsThirdParty(input, requestInfo)
+        : apiClient.getPersonFromNationalIdentityNumber(input.value());
+  }
+
+  /**
+   * Logs who requested the lookup, so GUI users, internal backend and third parties can be told
+   * apart. Only values from the token are logged.
+   */
+  private static void logRequester(RequestInfo requestInfo) {
+    if (requestInfo.clientIsInternalBackend()) {
+      logger.info(REQUESTED_BY_INTERNAL_BACKEND);
+    } else if (requestInfo.clientIsThirdParty()) {
+      logger.info(
+          REQUESTED_BY_THIRD_PARTY,
+          extractClientId(requestInfo),
+          extractOrgIdentifier(requestInfo));
+    } else {
+      logger.info(
+          REQUESTED_BY_GUI_USER,
+          extractCristinIdentifier(requestInfo),
+          extractOrgIdentifier(requestInfo));
+    }
+  }
+
+  /**
+   * Looks up a person for a third-party client and logs the outcome. Only values from the token and
+   * from Cristin's response are logged, never the national identity number.
+   */
+  private ThirdPartyPersonLookupResponse lookUpAsThirdParty(
+      TypedValue input, RequestInfo requestInfo) throws ApiGatewayException {
+    var clientId = extractClientId(requestInfo);
+    var institution = extractOrgIdentifier(requestInfo);
+    try {
+      var person = apiClient.getPersonFromNationalIdentityNumber(input.value());
+      logger.info(
+          THIRD_PARTY_LOOKUP_FOUND_PERSON,
+          clientId,
+          institution,
+          UriUtils.extractLastPathElement(person.id()));
+      return ThirdPartyPersonLookupResponse.fromPerson(person);
+    } catch (NotFoundException notFound) {
+      logger.info(THIRD_PARTY_LOOKUP_NO_MATCH, clientId, institution);
+      throw notFound;
+    }
   }
 
   @Override
-  protected Integer getSuccessStatusCode(TypedValue input, Person output) {
+  protected Integer getSuccessStatusCode(TypedValue input, PersonLookupResult output) {
     var personCristinId = attempt(() -> getPotentialPersonId(output)).orElse(fail -> null);
     logger.info(FOUND_THE_FOLLOWING_RESOURCE, personCristinId);
 
     return HttpURLConnection.HTTP_OK;
   }
 
-  private static String getPotentialPersonId(Person output) {
-    return Optional.ofNullable(output).map(Person::id).map(URI::toString).orElse(null);
+  private static String getPotentialPersonId(PersonLookupResult output) {
+    return Optional.ofNullable(output)
+        .map(PersonLookupResult::getId)
+        .map(URI::toString)
+        .orElse(null);
   }
 
   private boolean clientIsAuthorized(RequestInfo requestInfo) {
-    return requesterIsUserAdministrator(requestInfo) || clientIsCustomerAdministrator(requestInfo);
+    return requesterIsUserAdministrator(requestInfo)
+        || clientIsCustomerAdministrator(requestInfo)
+        || requestInfo.clientIsThirdParty();
   }
 
   private void validateQueryParameters(RequestInfo requestInfo) throws BadRequestException {
