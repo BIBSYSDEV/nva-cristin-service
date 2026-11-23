@@ -31,7 +31,6 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.UserType;
 
 public class CognitoUtil {
 
-  public static final String NVA_NIN_ATTRIBUTE = "custom:feideIdNin";
   public static final String PERSON_ID_ATTRIBUTE = "custom:cristinId";
 
   public static final String CURRENT_CUSTOMER_CLAIM_NAME = "custom:customerId";
@@ -63,18 +62,12 @@ public class CognitoUtil {
    * @return username in cognito for user created from parameters.
    */
   public static String adminCreateUser(
-      String username,
-      String password,
-      String nvaUserNin,
-      URI personId,
-      String poolId,
-      String clientId) {
+      String username, String password, URI personId, String poolId, String clientId) {
 
     List<AttributeType> list = new ArrayList<>();
     list.add(newAttribute(PERSON_ID_ATTRIBUTE, personId.toString()));
     list.add(newAttribute(CURRENT_CUSTOMER_CLAIM_NAME, CURRENT_CUSTOMER_CLAIM_VALUE.toString()));
     list.add(newAttribute(ACCESS_RIGHTS_CLAIM_NAME, ACCESS_RIGHTS_CLAIM_VALUE));
-    list.add(newAttribute(NVA_NIN_ATTRIBUTE, nvaUserNin));
 
     var createUserRequest =
         AdminCreateUserRequest.builder()

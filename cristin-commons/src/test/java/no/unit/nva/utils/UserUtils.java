@@ -48,8 +48,7 @@ public final class UserUtils {
     var personId = fetchPersonId(nationalIdentityNumber);
 
     CognitoUtil.deleteUser(username, poolId);
-    CognitoUtil.adminCreateUser(
-        username, password, nationalIdentityNumber, personId, poolId, appClientClientId);
+    CognitoUtil.adminCreateUser(username, password, personId, poolId, appClientClientId);
 
     logger.info(USER_CREATED_WITH_ROLES, username, roles);
   }
