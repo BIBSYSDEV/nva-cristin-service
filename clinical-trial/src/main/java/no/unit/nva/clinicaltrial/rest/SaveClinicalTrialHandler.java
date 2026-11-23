@@ -34,7 +34,9 @@ public class SaveClinicalTrialHandler extends ApiGatewayHandler<Void, ClinicalTr
 
   @Override
   protected void validateRequest(Void input, RequestInfo requestInfo, Context context)
-      throws ApiGatewayException {}
+      throws ApiGatewayException {
+    // no-op
+  }
 
   @Override
   protected ClinicalTrialResponse processInput(Void input, RequestInfo requestInfo, Context context)
