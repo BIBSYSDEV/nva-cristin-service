@@ -9,7 +9,10 @@ import static no.unit.nva.clinicaltrial.persistence.DatabaseConstants.VERSION_PR
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import no.unit.nva.clinicaltrial.model.Action;
+import no.unit.nva.clinicaltrial.model.Grant;
 import no.unit.nva.clinicaltrial.model.User;
 import no.unit.nva.clinicaltrial.model.Version;
 import no.unit.nva.identifiers.SortableIdentifier;
@@ -20,20 +23,26 @@ public record VersionDao<T>(
     @JsonProperty(SORT_KEY) String sortKey,
     T entity,
     String username,
+    String personIdentifier,
     UUID customerIdentifier,
+    Set<Grant> grants,
+    Action action,
     Instant createdDate,
     Instant modifiedDate)
     implements Dao {
 
   private static final String VERSION_KEY_PREFIX = "VERSION" + KEY_SEPARATOR;
 
-  public static <T> VersionDao<T> newVersionOf(Dao dao, T entity, User user) {
+  public static <T> VersionDao<T> newVersionOf(Dao dao, T entity, User user, Action action) {
     return new VersionDao<>(
         dao.partitionKey(),
         versionKey(dao.sortKey(), dao.version()),
         entity,
         user.username(),
+        user.personIdentifier(),
         user.customerIdentifier(),
+        user.grants(),
+        action,
         dao.modifiedDate(),
         dao.modifiedDate());
   }
@@ -52,7 +61,12 @@ public record VersionDao<T>(
   }
 
   public Version<T> toVersion() {
-    return new Version<>(version(), entity, new User(username, customerIdentifier), modifiedDate);
+    return new Version<>(
+        version(),
+        entity,
+        new User(username, personIdentifier, customerIdentifier, grants),
+        action,
+        modifiedDate);
   }
 
   private static String versionKey(String entitySortKey, SortableIdentifier version) {

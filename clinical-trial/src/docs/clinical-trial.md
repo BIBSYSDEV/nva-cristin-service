@@ -124,12 +124,12 @@ Submissions are listed without their inclusions; a submission is read in full th
 
 ## Storage
 
-| Type          | PK               | SK                              | Attributes                                                                |
-| ------------- | ---------------- | ------------------------------- | ------------------------------------------------------------------------- |
-| ClinicalTrial | `PROJECT#987654` | `CLINICAL_TRIAL`                | `reportable`, `version`                                                   |
-| Submission    | `PROJECT#987654` | `SUBMISSION#2026-H1`            | `status`, `inclusions[]`, `version`                                       |
-| Period        | `PERIOD`         | `2026-H1`                       | `status`                                                                  |
-| Version       | entity's PK      | `VERSION#<entity SK>#<version>` | `entity`, `username`, `customerIdentifier`, `createdDate`, `modifiedDate` |
+| Type          | PK               | SK                              | Attributes                                                                                                        |
+| ------------- | ---------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| ClinicalTrial | `PROJECT#987654` | `CLINICAL_TRIAL`                | `reportable`, `version`, `createdDate`, `modifiedDate`                                                            |
+| Submission    | `PROJECT#987654` | `SUBMISSION#2026-H1`            | `status`, `inclusions[]`, `version`                                                                               |
+| Period        | `PERIOD`         | `2026-H1`                       | `status`                                                                                                          |
+| Version       | entity's PK      | `VERSION#<entity SK>#<version>` | `entity`, `username`, `personIdentifier`, `customerIdentifier`, `grants`, `action`, `createdDate`, `modifiedDate` |
 
 Every write raises `version` on the entity and writes one Version item in the same transaction.
 Version items are the audit trail of who changed reported numbers; nothing in this API reads them,

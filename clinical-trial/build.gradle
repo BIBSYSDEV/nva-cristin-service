@@ -5,7 +5,10 @@ plugins {
 dependencies {
     api(nvaCatalog.aws.sdk2.dynamo)
     api(nvaCatalog.jackson.annotations)
+    api(nvaLibs.apigateway)
     api(nvaLibs.identifiers)
+    api(project(":cristin-commons"))
+    api(project(":cristin-project"))
     implementation(nvaCatalog.aws.sdk2.dynamodbenhanced)
     implementation(nvaCatalog.jackson.databind)
     implementation(nvaLibs.core)
@@ -15,5 +18,6 @@ dependencies {
     testImplementation(nvaCatalog.aws.sdk2.dynamodblocal)
     testImplementation(nvaCatalog.hamcrest)
     testImplementation(nvaCatalog.junit.jupiter.api)
+    testImplementation(nvaLibs.testutils)
     testRuntimeOnly(nvaCatalog.junit.jupiter.engine)
 }
