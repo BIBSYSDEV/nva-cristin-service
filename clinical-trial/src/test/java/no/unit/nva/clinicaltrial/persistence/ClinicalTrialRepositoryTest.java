@@ -16,6 +16,7 @@ import java.util.Set;
 import no.unit.nva.clinicaltrial.model.Action;
 import no.unit.nva.clinicaltrial.model.ClinicalTrial;
 import no.unit.nva.clinicaltrial.model.ClinicalTrialWrite;
+import no.unit.nva.clinicaltrial.model.Reportable;
 import no.unit.nva.identifiers.SortableIdentifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,6 +62,31 @@ class ClinicalTrialRepositoryTest {
   }
 
   @Test
+  void shouldPersistReportableWithClinicalTrial() throws Exception {
+    var clinicalTrial = clinicalTrial(Reportable.NO, null);
+
+    repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
+
+    assertThat(
+        repository.find(clinicalTrial.projectIdentifier()).orElseThrow().reportable(),
+        is(Reportable.NO));
+  }
+
+  @Test
+  void shouldPersistChangedReportableWhenClinicalTrialIsUpdated() throws Exception {
+    var clinicalTrial = clinicalTrial(Reportable.YES, null);
+    repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
+    var persisted = persisted(clinicalTrial);
+
+    repository.save(
+        new ClinicalTrialWrite(
+            new ClinicalTrial(persisted.projectIdentifier(), Reportable.NO, persisted.version()),
+            randomUser()));
+
+    assertThat(persistedItem(clinicalTrial.projectIdentifier()).get("reportable").s(), is("No"));
+  }
+
+  @Test
   void shouldReturnOptionalEmptyWhenProjectHasNoClinicalTrial() {
     assertThat(repository.find(randomProjectIdentifier()), is(Optional.empty()));
   }
@@ -73,7 +99,7 @@ class ClinicalTrialRepositoryTest {
 
     assertThat(
         persistedItem(clinicalTrial.projectIdentifier()).keySet(),
-        is(Set.of("PK", "SK", "version", "createdDate", "modifiedDate")));
+        is(Set.of("PK", "SK", "reportable", "version", "createdDate", "modifiedDate")));
   }
 
   @Test
@@ -167,7 +193,9 @@ class ClinicalTrialRepositoryTest {
       throws Exception {
     var clinicalTrial = clinicalTrial(null);
     repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
-    var outdated = new ClinicalTrial(clinicalTrial.projectIdentifier(), SortableIdentifier.next());
+    var outdated =
+        new ClinicalTrial(
+            clinicalTrial.projectIdentifier(), Reportable.YES, SortableIdentifier.next());
 
     assertThrows(
         ConditionFailedException.class,

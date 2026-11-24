@@ -70,7 +70,8 @@ public class ClinicalTrialRepository {
   }
 
   private static ClinicalTrial nextVersionOf(ClinicalTrial clinicalTrial) {
-    return new ClinicalTrial(clinicalTrial.projectIdentifier(), SortableIdentifier.next());
+    return new ClinicalTrial(
+        clinicalTrial.projectIdentifier(), clinicalTrial.reportable(), SortableIdentifier.next());
   }
 
   private TransactWriteItemsRequest saveRequest(

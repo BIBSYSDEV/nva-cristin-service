@@ -8,8 +8,10 @@ import static no.unit.nva.clinicaltrial.rest.RequestUtils.userFrom;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import java.util.Map;
+import java.util.Optional;
 import no.unit.nva.clinicaltrial.model.ClinicalTrial;
 import no.unit.nva.clinicaltrial.model.ClinicalTrialWrite;
+import no.unit.nva.clinicaltrial.model.Reportable;
 import no.unit.nva.clinicaltrial.persistence.ClinicalTrialNotFoundException;
 import no.unit.nva.clinicaltrial.persistence.ConditionFailedException;
 import no.unit.nva.clinicaltrial.service.ClinicalTrialService;
@@ -17,14 +19,17 @@ import no.unit.nva.identifiers.SortableIdentifier;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
+import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.ConflictException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.apigateway.exceptions.PreconditionFailedException;
 import nva.commons.core.Environment;
 
-public class SaveClinicalTrialHandler extends ApiGatewayHandler<Void, ClinicalTrialResponse> {
+public class SaveClinicalTrialHandler
+    extends ApiGatewayHandler<ClinicalTrialRequest, ClinicalTrialResponse> {
 
   private static final String ETAG_HEADER = "ETag";
+  public static final String INVALID_REPORTABLE = "Reportable must be Yes or No";
   private static final String PROJECT_ALREADY_HAS_CLINICAL_TRIAL =
       "Project already has a clinical trial";
 
@@ -32,21 +37,23 @@ public class SaveClinicalTrialHandler extends ApiGatewayHandler<Void, ClinicalTr
   private transient ClinicalTrialOperation operation;
 
   public SaveClinicalTrialHandler(ClinicalTrialService service, Environment environment) {
-    super(Void.class, environment);
+    super(ClinicalTrialRequest.class, environment);
     this.service = service;
   }
 
   @Override
-  protected void validateRequest(Void input, RequestInfo requestInfo, Context context)
+  protected void validateRequest(
+      ClinicalTrialRequest input, RequestInfo requestInfo, Context context)
       throws ApiGatewayException {
     // no-op
   }
 
   @Override
-  protected ClinicalTrialResponse processInput(Void input, RequestInfo requestInfo, Context context)
+  protected ClinicalTrialResponse processInput(
+      ClinicalTrialRequest input, RequestInfo requestInfo, Context context)
       throws ApiGatewayException {
     operation = ClinicalTrialOperation.fromRequest(requestInfo);
-    var clinicalTrial = createClinicalTrial(requestInfo);
+    var clinicalTrial = createClinicalTrial(input, requestInfo);
     var user = userFrom(requestInfo);
     var persisted = save(new ClinicalTrialWrite(clinicalTrial, user));
     addAdditionalHeaders(
@@ -54,12 +61,20 @@ public class SaveClinicalTrialHandler extends ApiGatewayHandler<Void, ClinicalTr
     return ClinicalTrialResponse.from(persisted);
   }
 
-  private ClinicalTrial createClinicalTrial(RequestInfo requestInfo) throws ApiGatewayException {
-    return new ClinicalTrial(getProjectIdentifier(requestInfo), version(requestInfo));
+  private ClinicalTrial createClinicalTrial(ClinicalTrialRequest input, RequestInfo requestInfo)
+      throws ApiGatewayException {
+    return new ClinicalTrial(
+        getProjectIdentifier(requestInfo), reportableOf(input), version(requestInfo));
+  }
+
+  private static Reportable reportableOf(ClinicalTrialRequest input) throws BadRequestException {
+    return Optional.ofNullable(input)
+        .map(ClinicalTrialRequest::reportable)
+        .orElseThrow(() -> new BadRequestException(INVALID_REPORTABLE));
   }
 
   @Override
-  protected Integer getSuccessStatusCode(Void input, ClinicalTrialResponse output) {
+  protected Integer getSuccessStatusCode(ClinicalTrialRequest input, ClinicalTrialResponse output) {
     return operation.isCreate() ? HTTP_CREATED : HTTP_OK;
   }
 

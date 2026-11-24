@@ -8,12 +8,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
 import java.util.Map;
 import no.unit.nva.clinicaltrial.model.ClinicalTrial;
+import no.unit.nva.clinicaltrial.model.Reportable;
 import no.unit.nva.identifiers.SortableIdentifier;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 public record ClinicalTrialDao(
     @JsonProperty(PARTITION_KEY) String partitionKey,
     @JsonProperty(SORT_KEY) String sortKey,
+    Reportable reportable,
     SortableIdentifier version,
     Instant createdDate,
     Instant modifiedDate)
@@ -26,6 +28,7 @@ public record ClinicalTrialDao(
     return new ClinicalTrialDao(
         projectKey(clinicalTrial.projectIdentifier()),
         CLINICAL_TRIAL_SORT_KEY,
+        clinicalTrial.reportable(),
         clinicalTrial.version(),
         timestamp,
         timestamp);
@@ -45,11 +48,17 @@ public record ClinicalTrialDao(
 
   public ClinicalTrialDao updatedTo(ClinicalTrial clinicalTrial, Instant timestamp) {
     return new ClinicalTrialDao(
-        partitionKey, sortKey, clinicalTrial.version(), createdDate, timestamp);
+        partitionKey,
+        sortKey,
+        clinicalTrial.reportable(),
+        clinicalTrial.version(),
+        createdDate,
+        timestamp);
   }
 
   public ClinicalTrial toClinicalTrial() {
-    return new ClinicalTrial(partitionKey.substring(PROJECT_KEY_PREFIX.length()), version);
+    return new ClinicalTrial(
+        partitionKey.substring(PROJECT_KEY_PREFIX.length()), reportable, version);
   }
 
   private static String projectKey(String projectIdentifier) {
