@@ -4,9 +4,7 @@ import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.clinicalTria
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.clinicalTrialAdmin;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomPersonIdentifier;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomUser;
-import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
-import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -16,6 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import no.unit.nva.client.FetchApiClient;
+import no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures;
 import no.unit.nva.clinicaltrial.model.ClinicalTrialWrite;
 import no.unit.nva.clinicaltrial.model.Grant;
 import no.unit.nva.clinicaltrial.model.User;
@@ -170,9 +169,7 @@ class ClinicalTrialServiceTest {
 
   private Person person(String personIdentifier) {
     return new Person(
-        Optional.ofNullable(personIdentifier)
-            .map(identifier -> getNvaApiId(identifier, PERSON_PATH_NVA))
-            .orElse(null),
+        Optional.ofNullable(personIdentifier).map(ClinicalTrialFixtures::personId).orElse(null),
         randomString(),
         randomString(),
         randomString(),

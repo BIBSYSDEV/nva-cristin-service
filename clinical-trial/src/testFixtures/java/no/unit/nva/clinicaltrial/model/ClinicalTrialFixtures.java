@@ -1,15 +1,28 @@
 package no.unit.nva.clinicaltrial.model;
 
+import static no.unit.nva.cristin.model.Constants.PERSON_PATH_NVA;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
+import static no.unit.nva.utils.UriUtils.getNvaApiId;
 
+import java.net.URI;
 import java.util.Set;
 import java.util.UUID;
 import no.unit.nva.identifiers.SortableIdentifier;
 
 public final class ClinicalTrialFixtures {
 
+  private static final String CUSTOMER_PATH = "customer";
+
   private ClinicalTrialFixtures() {}
+
+  public static URI randomCustomer() {
+    return getNvaApiId(UUID.randomUUID().toString(), CUSTOMER_PATH);
+  }
+
+  public static URI personId(String personIdentifier) {
+    return getNvaApiId(personIdentifier, PERSON_PATH_NVA);
+  }
 
   public static ClinicalTrial clinicalTrial(SortableIdentifier version) {
     return new ClinicalTrial(randomProjectIdentifier(), version);

@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+    api(nvaCatalog.aws.lambda.core)
     api(nvaCatalog.aws.sdk2.dynamo)
     api(nvaCatalog.jackson.annotations)
     api(nvaLibs.apigateway)
@@ -10,14 +11,20 @@ dependencies {
     api(project(":cristin-commons"))
     api(project(":cristin-project"))
     implementation(nvaCatalog.aws.sdk2.dynamodbenhanced)
+    runtimeOnly(nvaCatalog.jackson.core)
     implementation(nvaCatalog.jackson.databind)
-    implementation(nvaLibs.core)
+    api(nvaLibs.core)
     implementation(nvaLibs.json)
     testFixturesApi(nvaLibs.identifiers)
     testFixturesImplementation(nvaLibs.testutils)
     testImplementation(nvaCatalog.aws.sdk2.dynamodblocal)
     testImplementation(nvaCatalog.hamcrest)
     testImplementation(nvaCatalog.junit.jupiter.api)
+    testImplementation(nvaCatalog.zalando)
     testImplementation(nvaLibs.testutils)
     testRuntimeOnly(nvaCatalog.junit.jupiter.engine)
+}
+
+test {
+    environment "COGNITO_AUTHORIZER_URLS", "http://localhost:3000"
 }
