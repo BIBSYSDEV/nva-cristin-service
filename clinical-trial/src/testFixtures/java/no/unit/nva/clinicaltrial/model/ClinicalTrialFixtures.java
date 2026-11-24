@@ -25,7 +25,11 @@ public final class ClinicalTrialFixtures {
   }
 
   public static ClinicalTrial clinicalTrial(SortableIdentifier version) {
-    return new ClinicalTrial(randomProjectIdentifier(), version);
+    return clinicalTrial(Reportable.YES, version);
+  }
+
+  public static ClinicalTrial clinicalTrial(Reportable reportable, SortableIdentifier version) {
+    return new ClinicalTrial(randomProjectIdentifier(), reportable, version);
   }
 
   public static User randomUser() {

@@ -2,4 +2,5 @@ package no.unit.nva.clinicaltrial.model;
 
 import no.unit.nva.identifiers.SortableIdentifier;
 
-public record ClinicalTrial(String projectIdentifier, SortableIdentifier version) {}
+public record ClinicalTrial(
+    String projectIdentifier, Reportable reportable, SortableIdentifier version) {}

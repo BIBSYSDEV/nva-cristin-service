@@ -58,7 +58,7 @@ anything has been saved there yet. Both fields are omitted when the project is n
 ### Clinical trial request
 
 ```json
-{ "reportingDecision": "Include" | "Exclude" }
+{ "reportable": "Yes" | "No" }
 ```
 
 ### Clinical trial response
@@ -69,7 +69,7 @@ anything has been saved there yet. Both fields are omitted when the project is n
   "@context": "https://bibsysdev.github.io/src/project-context.json",
   "id": "https://api.nva.unit.no/cristin/project/987654/clinical-trial",
   "project": "https://api.nva.unit.no/cristin/project/987654",
-  "reportingDecision": "Include",
+  "reportable": "Yes",
   "submissions": [
     {
       "type": "Submission",
@@ -159,13 +159,12 @@ cannot be answered by this key layout and needs an index on `PERIOD#<period>` / 
 - Only Norwegian institutions report inclusions
 - Project manager submits 0 if there were no inclusion in period. Count can not be null. Not submitted (empty list) is considered as not reported
 - `GET` of clinical trial in a period with no submission: `NOT_SUBMITTED` status in response
+- `reportable` may change from `Yes` to `No` when submission carries inclusions. In that case submission gets retracted.
 
 ## Open questions
 
-1. May `reportable` change from `YES` to `NO` once a submission carries inclusions, or is that
-   blocked until the inclusions are cleared?
-2. The admin side closing a period writes `REPORTED` with no user behind it. Does the command take
+1. The admin side closing a period writes `REPORTED` with no user behind it. Does the command take
    a system actor, or does that write go another way?
-3. The project context is served from `bibsysdev.github.io` today. Is the versioned
+2. The project context is served from `bibsysdev.github.io` today. Is the versioned
    `/cristin/project/context/{version}` plus `/cristin/project/ontology#` hosting landing before this
    feature, and should the examples use it instead?

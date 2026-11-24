@@ -11,6 +11,7 @@ import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.personId;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomCustomer;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomPersonIdentifier;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomProjectIdentifier;
+import static no.unit.nva.clinicaltrial.rest.SaveClinicalTrialHandler.INVALID_REPORTABLE;
 import static no.unit.nva.commons.json.JsonUtils.dtoObjectMapper;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -22,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import no.unit.nva.clinicaltrial.model.Reportable;
 import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
 import no.unit.nva.clinicaltrial.persistence.LocalDynamoDbTable;
 import no.unit.nva.clinicaltrial.service.ClinicalTrialService;
@@ -73,6 +75,38 @@ class SaveClinicalTrialHandlerTest {
     var response = GatewayResponse.fromOutputStream(output, ClinicalTrialResponse.class);
     assertThat(response.getStatusCode(), is(HTTP_CREATED));
     assertThat(response.getHeaders().get(ETAG), is(notNullValue()));
+  }
+
+  @Test
+  void shouldReturnBadRequestNamingValidValuesWhenReportableIsNotValid() throws Exception {
+    var request =
+        new HandlerRequestBuilder<String>(dtoObjectMapper)
+            .withBody("{\"reportable\":\"Maybe\"}")
+            .withPathParameters(Map.of(IDENTIFIER, randomProjectIdentifier()))
+            .withUserName(randomString())
+            .withPersonCristinId(personId(projectManagerIdentifier))
+            .withCurrentCustomer(randomCustomer())
+            .withRequestContextValue(OPERATION_NAME, CREATE_OPERATION_ID)
+            .build();
+
+    handler.handleRequest(request, output, context());
+
+    var problem =
+        GatewayResponse.fromOutputStream(output, Problem.class).getBodyObject(Problem.class);
+    assertThat(problem.getStatus().getStatusCode(), is(HTTP_BAD_REQUEST));
+    assertThat(problem.getDetail(), is(INVALID_REPORTABLE));
+  }
+
+  @Test
+  void shouldReturnBadRequestWhenReportableIsMissing() throws Exception {
+    var request =
+        creating(requestBuilder(randomProjectIdentifier(), projectManagerIdentifier, null)).build();
+
+    handler.handleRequest(request, output, context());
+
+    assertThat(
+        GatewayResponse.fromOutputStream(output, Problem.class).getStatusCode(),
+        is(HTTP_BAD_REQUEST));
   }
 
   @Test
@@ -170,17 +204,25 @@ class SaveClinicalTrialHandlerTest {
         : builder.withHeaders(Map.of(IF_MATCH, version)).build();
   }
 
-  private HandlerRequestBuilder<Void> creating(HandlerRequestBuilder<Void> builder) {
+  private HandlerRequestBuilder<ClinicalTrialRequest> creating(
+      HandlerRequestBuilder<ClinicalTrialRequest> builder) {
     return builder.withRequestContextValue(OPERATION_NAME, CREATE_OPERATION_ID);
   }
 
-  private HandlerRequestBuilder<Void> updating(HandlerRequestBuilder<Void> builder) {
+  private HandlerRequestBuilder<ClinicalTrialRequest> updating(
+      HandlerRequestBuilder<ClinicalTrialRequest> builder) {
     return builder.withRequestContextValue(OPERATION_NAME, UPDATE_OPERATION_ID);
   }
 
-  private HandlerRequestBuilder<Void> requestBuilder(
-      String projectIdentifier, String personIdentifier) {
-    return new HandlerRequestBuilder<Void>(dtoObjectMapper)
+  private HandlerRequestBuilder<ClinicalTrialRequest> requestBuilder(
+      String projectIdentifier, String personIdentifier) throws Exception {
+    return requestBuilder(projectIdentifier, personIdentifier, Reportable.YES);
+  }
+
+  private HandlerRequestBuilder<ClinicalTrialRequest> requestBuilder(
+      String projectIdentifier, String personIdentifier, Reportable reportable) throws Exception {
+    return new HandlerRequestBuilder<ClinicalTrialRequest>(dtoObjectMapper)
+        .withBody(new ClinicalTrialRequest(reportable))
         .withPathParameters(Map.of(IDENTIFIER, projectIdentifier))
         .withUserName(randomString())
         .withPersonCristinId(personId(personIdentifier))
