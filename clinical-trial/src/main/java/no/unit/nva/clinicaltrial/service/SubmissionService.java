@@ -14,15 +14,19 @@ import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
 import no.unit.nva.clinicaltrial.persistence.exceptions.ConditionFailedException;
 import no.unit.nva.clinicaltrial.persistence.exceptions.ItemNotFoundException;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.identifiers.OrganizationIdentifier;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 
 public class SubmissionService {
 
+  public static final String MISSING_INCLUSIONS = "Submission must report at least one institution";
+
   private static final String CLINICAL_TRIAL_DOES_NOT_EXIST = "Clinical trial does not exist";
   private static final String PERIOD_DOES_NOT_EXIST = "Reporting period does not exist";
-  private static final String MISSING_INSTITUTION = "Each inclusion must name an institution";
+  private static final String MISSING_INSTITUTION =
+      "Each inclusion must name an institution by its organization identifier";
   private static final String INVALID_COUNT = "Inclusion count must be zero or greater";
   private static final String INSTITUTION_REPEATED = "Each institution may be included only once";
 
@@ -59,6 +63,9 @@ public class SubmissionService {
   }
 
   private static void verifyInclusions(List<Inclusion> inclusions) throws BadRequestException {
+    if (inclusions.isEmpty()) {
+      throw new BadRequestException(MISSING_INCLUSIONS);
+    }
     if (inclusions.stream().anyMatch(SubmissionService::hasNoInstitution)) {
       throw new BadRequestException(MISSING_INSTITUTION);
     }
@@ -78,7 +85,7 @@ public class SubmissionService {
     return Objects.isNull(inclusion.count()) || inclusion.count() < 0;
   }
 
-  private static Set<String> institutions(List<Inclusion> inclusions) {
+  private static Set<OrganizationIdentifier> institutions(List<Inclusion> inclusions) {
     return inclusions.stream().map(Inclusion::institutionIdentifier).collect(toSet());
   }
 

@@ -5,12 +5,16 @@ import static java.util.stream.Collectors.toSet;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Stream;
 import no.unit.nva.clinicaltrial.model.Grant;
+import no.unit.nva.identifiers.CustomerIdentifier;
+import no.unit.nva.identifiers.PersonIdentifier;
 
 public record User(
-    String username, String personIdentifier, UUID customerIdentifier, Set<Grant> grants)
+    String username,
+    PersonIdentifier personIdentifier,
+    CustomerIdentifier customerIdentifier,
+    Set<Grant> grants)
     implements Writer {
 
   @Override

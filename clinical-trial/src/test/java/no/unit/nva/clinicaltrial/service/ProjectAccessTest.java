@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 import no.unit.nva.clinicaltrial.model.Grant;
 import no.unit.nva.clinicaltrial.model.write.User;
+import no.unit.nva.identifiers.CustomerIdentifier;
 import nva.commons.apigateway.exceptions.ForbiddenException;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +47,8 @@ class ProjectAccessTest {
   @Test
   void shouldThrowForbiddenWhenProjectManagerIsUnidentifiedAndCallerHasNoPersonIdentifier() {
     var project = projectManagedBy(null);
-    var caller = new User(randomString(), null, UUID.randomUUID(), Set.of());
+    var caller =
+        new User(randomString(), null, new CustomerIdentifier(UUID.randomUUID()), Set.of());
 
     assertThrows(ForbiddenException.class, () -> ProjectAccess.granted(project, caller));
   }

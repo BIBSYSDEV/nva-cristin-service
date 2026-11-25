@@ -24,6 +24,7 @@ import no.unit.nva.clinicaltrial.model.write.SubmissionWrite;
 import no.unit.nva.clinicaltrial.model.write.SystemWriter;
 import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
 import no.unit.nva.clinicaltrial.persistence.LocalDynamoDbTable;
+import no.unit.nva.identifiers.PersonIdentifier;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.apigateway.exceptions.NotFoundException;
@@ -126,6 +127,16 @@ class SubmissionServiceTest {
   }
 
   @Test
+  void shouldThrowBadRequestWhenSubmissionReportsNoInclusions() {
+    var user = randomUser();
+    var submission = submissionOf(List.of(), null);
+    var service = serviceFor(user.personIdentifier());
+
+    assertThrows(
+        BadRequestException.class, () -> service.save(new SubmissionWrite(submission, user)));
+  }
+
+  @Test
   void shouldThrowBadRequestWhenInclusionHasNoInstitution() {
     var user = randomUser();
     var submission = submissionOf(List.of(new Inclusion(null, 3)), null);
@@ -177,7 +188,7 @@ class SubmissionServiceTest {
         .orElseThrow();
   }
 
-  private SubmissionService serviceFor(String managerPersonIdentifier) {
+  private SubmissionService serviceFor(PersonIdentifier managerPersonIdentifier) {
     return new SubmissionService(_ -> projectManagedBy(managerPersonIdentifier), repository);
   }
 }

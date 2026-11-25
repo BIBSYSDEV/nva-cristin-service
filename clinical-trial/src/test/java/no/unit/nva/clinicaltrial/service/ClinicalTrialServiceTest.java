@@ -17,6 +17,7 @@ import no.unit.nva.clinicaltrial.model.write.ClinicalTrialWrite;
 import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
 import no.unit.nva.clinicaltrial.persistence.LocalDynamoDbTable;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.identifiers.PersonIdentifier;
 import nva.commons.apigateway.exceptions.ConflictException;
 import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.apigateway.exceptions.NotFoundException;
@@ -97,7 +98,7 @@ class ClinicalTrialServiceTest {
         () -> service.save(new ClinicalTrialWrite(clinicalTrial(null), randomUser())));
   }
 
-  private ClinicalTrialService serviceReturningProjectManagedBy(String personIdentifier) {
+  private ClinicalTrialService serviceReturningProjectManagedBy(PersonIdentifier personIdentifier) {
     FetchApiClient<String, NvaProject> projectsApi =
         _ -> eligibleProjectManagedBy(personIdentifier);
     return new ClinicalTrialService(projectsApi, repository);
