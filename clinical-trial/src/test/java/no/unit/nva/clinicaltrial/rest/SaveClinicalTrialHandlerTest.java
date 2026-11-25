@@ -123,7 +123,7 @@ class SaveClinicalTrialHandlerTest {
       throws Exception {
     var projectIdentifier = randomProjectIdentifier();
     handler.handleRequest(postRequest(projectIdentifier), new ByteArrayOutputStream(), context());
-    var version = repository.find(projectIdentifier).orElseThrow().version();
+    var version = repository.findClinicalTrial(projectIdentifier).orElseThrow().version();
 
     handler.handleRequest(putRequest(projectIdentifier, version.toString()), output, context());
 

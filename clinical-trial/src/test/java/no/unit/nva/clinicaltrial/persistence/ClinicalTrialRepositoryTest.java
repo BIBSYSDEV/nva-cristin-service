@@ -50,7 +50,7 @@ class ClinicalTrialRepositoryTest {
 
   @Test
   void shouldReturnOptionalEmptyWhenProjectHasNoClinicalTrial() {
-    assertThat(repository.find(randomProjectIdentifier()), is(Optional.empty()));
+    assertThat(repository.findClinicalTrial(randomProjectIdentifier()), is(Optional.empty()));
   }
 
   @Test
@@ -125,7 +125,7 @@ class ClinicalTrialRepositoryTest {
 
   @Test
   void shouldReturnEmptyListOfVersionsWhenProjectHasNoClinicalTrial() {
-    assertThat(repository.findVersions(randomProjectIdentifier()), is(List.of()));
+    assertThat(repository.findClinicalTrialVersions(randomProjectIdentifier()), is(List.of()));
   }
 
   @Test
@@ -134,11 +134,15 @@ class ClinicalTrialRepositoryTest {
 
     repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
 
+    var item = persistedVersion(clinicalTrial.projectIdentifier());
     assertThat(
-        persistedVersion(clinicalTrial.projectIdentifier()).keySet(),
+        item.keySet(),
         is(
             Set.of(
                 "PK", "SK", "type", "entity", "writer", "action", "createdDate", "modifiedDate")));
+    assertThat(
+        item.get("writer").m().keySet(),
+        is(Set.of("kind", "username", "personIdentifier", "customerIdentifier", "grants")));
   }
 
   @Test
@@ -148,7 +152,8 @@ class ClinicalTrialRepositoryTest {
 
     repository.save(new ClinicalTrialWrite(clinicalTrial, user));
 
-    var version = repository.findVersions(clinicalTrial.projectIdentifier()).getFirst();
+    var version =
+        repository.findClinicalTrialVersions(clinicalTrial.projectIdentifier()).getFirst();
     assertThat(version.writer(), is(user));
     assertThat(version.entity().projectIdentifier(), is(clinicalTrial.projectIdentifier()));
   }
@@ -159,7 +164,7 @@ class ClinicalTrialRepositoryTest {
     repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
     repository.save(new ClinicalTrialWrite(persisted(clinicalTrial), randomUser()));
 
-    var versions = repository.findVersions(clinicalTrial.projectIdentifier());
+    var versions = repository.findClinicalTrialVersions(clinicalTrial.projectIdentifier());
 
     assertThat(versions.getFirst().action(), is(Action.UPDATE_CLINICAL_TRIAL));
     assertThat(versions.getLast().action(), is(Action.CREATE_CLINICAL_TRIAL));
@@ -171,14 +176,14 @@ class ClinicalTrialRepositoryTest {
     repository.save(new ClinicalTrialWrite(clinicalTrial, randomUser()));
     repository.save(new ClinicalTrialWrite(persisted(clinicalTrial), randomUser()));
 
-    var versions = repository.findVersions(clinicalTrial.projectIdentifier());
+    var versions = repository.findClinicalTrialVersions(clinicalTrial.projectIdentifier());
 
     assertThat(versions.getFirst().entity().version(), is(2L));
     assertThat(versions.getLast().entity().version(), is(1L));
   }
 
   private ClinicalTrial persisted(ClinicalTrial clinicalTrial) {
-    return repository.find(clinicalTrial.projectIdentifier()).orElseThrow();
+    return repository.findClinicalTrial(clinicalTrial.projectIdentifier()).orElseThrow();
   }
 
   private Map<String, AttributeValue> persistedItem(String projectIdentifier) {

@@ -6,6 +6,7 @@ import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import no.unit.nva.clinicaltrial.model.write.User;
@@ -32,6 +33,15 @@ public final class ClinicalTrialFixtures {
     return new ClinicalTrial(randomProjectIdentifier(), reportable, version);
   }
 
+  public static Submission submission(Long version) {
+    return new Submission(
+        randomProjectIdentifier(),
+        randomPeriodIdentifier(),
+        List.of(randomInclusion()),
+        SubmissionStatus.SUBMITTED,
+        version);
+  }
+
   public static User randomUser() {
     return user(Set.of());
   }
@@ -46,6 +56,14 @@ public final class ClinicalTrialFixtures {
 
   public static String randomPersonIdentifier() {
     return randomInteger().toString();
+  }
+
+  public static String randomPeriodIdentifier() {
+    return randomString();
+  }
+
+  private static Inclusion randomInclusion() {
+    return new Inclusion(randomString(), randomInteger());
   }
 
   public static String randomProjectIdentifier() {

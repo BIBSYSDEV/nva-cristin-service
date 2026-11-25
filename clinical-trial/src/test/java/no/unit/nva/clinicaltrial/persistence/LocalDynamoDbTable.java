@@ -18,17 +18,10 @@ public final class LocalDynamoDbTable {
 
   private LocalDynamoDbTable() {}
 
-  public static PeriodRepository periodsOf(DynamoDbClient client, String tableName) {
-    return new PeriodRepository(tableOf(client, tableName));
-  }
-
   public static ClinicalTrialRepository repositoryOf(DynamoDbClient client, String tableName) {
-    return new ClinicalTrialRepository(tableOf(client, tableName));
-  }
-
-  private static VersionedTable tableOf(DynamoDbClient client, String tableName) {
-    return new VersionedTable(
-        DynamoDbEnhancedClient.builder().dynamoDbClient(client).build(), tableName);
+    return new ClinicalTrialRepository(
+        new VersionedTable(
+            DynamoDbEnhancedClient.builder().dynamoDbClient(client).build(), tableName));
   }
 
   public static DynamoDbClient create(String tableName) {

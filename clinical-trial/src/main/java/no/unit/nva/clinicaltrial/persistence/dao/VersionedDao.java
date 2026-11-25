@@ -7,6 +7,7 @@ import java.util.Objects;
 import no.unit.nva.clinicaltrial.model.ClinicalTrial;
 import no.unit.nva.clinicaltrial.model.Entity;
 import no.unit.nva.clinicaltrial.model.Period;
+import no.unit.nva.clinicaltrial.model.Submission;
 import no.unit.nva.clinicaltrial.model.write.Writer;
 import software.amazon.awssdk.enhanced.dynamodb.Expression;
 import software.amazon.awssdk.enhanced.dynamodb.document.EnhancedDocument;
@@ -26,6 +27,7 @@ public interface VersionedDao<E extends Entity> extends Dao {
     return switch (entity) {
       case ClinicalTrial trial -> ClinicalTrialDao.from(trial, timestamp);
       case Period period -> PeriodDao.from(period, timestamp);
+      case Submission submission -> SubmissionDao.from(submission, timestamp);
     };
   }
 

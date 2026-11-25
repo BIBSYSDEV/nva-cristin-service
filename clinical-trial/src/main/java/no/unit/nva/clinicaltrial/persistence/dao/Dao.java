@@ -17,6 +17,7 @@ public interface Dao {
 
   String PARTITION_KEY = "PK";
   String TYPE_ATTRIBUTE = "type";
+  String PROJECT_KEY_PREFIX = "PROJECT#";
   String SORT_KEY = "SK";
   String ITEM_NOT_MAPPABLE = "Item is not mappable";
 
@@ -41,6 +42,14 @@ public interface Dao {
             .orElseThrow(
                 failure -> new IllegalStateException(ITEM_NOT_MAPPABLE, failure.getException()));
     return EnhancedDocument.fromJson(json);
+  }
+
+  static String projectKeyOf(String projectIdentifier) {
+    return PROJECT_KEY_PREFIX + projectIdentifier;
+  }
+
+  static String projectIdentifierOf(String partitionKey) {
+    return partitionKey.substring(PROJECT_KEY_PREFIX.length());
   }
 
   static <D> D fromDocument(EnhancedDocument document, Class<D> daoType) {
