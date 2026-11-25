@@ -12,17 +12,24 @@ import software.amazon.dynamodb.services.local.embedded.DynamoDBEmbedded;
 
 public final class LocalDynamoDbTable {
 
-  public static ClinicalTrialRepository repositoryOf(DynamoDbClient client, String tableName) {
-    return new ClinicalTrialRepository(
-        new VersionedTable(
-            DynamoDbEnhancedClient.builder().dynamoDbClient(client).build(), tableName));
-  }
-
   private static final String PARTITION_KEY = "PK";
   private static final String SORT_KEY = "SK";
   private static final Long CAPACITY_DOES_NOT_MATTER = 1000L;
 
   private LocalDynamoDbTable() {}
+
+  public static PeriodRepository periodsOf(DynamoDbClient client, String tableName) {
+    return new PeriodRepository(tableOf(client, tableName));
+  }
+
+  public static ClinicalTrialRepository repositoryOf(DynamoDbClient client, String tableName) {
+    return new ClinicalTrialRepository(tableOf(client, tableName));
+  }
+
+  private static VersionedTable tableOf(DynamoDbClient client, String tableName) {
+    return new VersionedTable(
+        DynamoDbEnhancedClient.builder().dynamoDbClient(client).build(), tableName);
+  }
 
   public static DynamoDbClient create(String tableName) {
     var client = DynamoDBEmbedded.create(null, true).dynamoDbClient();
