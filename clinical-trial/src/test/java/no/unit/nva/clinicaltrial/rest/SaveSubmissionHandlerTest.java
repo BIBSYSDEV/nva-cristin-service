@@ -4,6 +4,9 @@ import static java.net.HttpURLConnection.HTTP_BAD_GATEWAY;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_CONFLICT;
 import static java.net.HttpURLConnection.HTTP_CREATED;
+import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
+import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
+import static java.net.HttpURLConnection.HTTP_PRECON_FAILED;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.organizationId;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.personId;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.projectManagedBy;
@@ -51,9 +54,15 @@ class SaveSubmissionHandlerTest {
   private static final String ADMIN_PROCESS = "period-administration";
   private static final String IDENTIFIER = "identifier";
   private static final String PERIOD_IDENTIFIER = "periodIdentifier";
+  private static final String IF_MATCH = "If-Match";
+  private static final String OUTDATED_VERSION = "7";
+  private static final int HTTP_PRECONDITION_REQUIRED = 428;
   private static final URI INSTITUTION_WITHOUT_IDENTIFIER = URI.create("https://example.org");
   private static final URI WRONG_KIND_OF_IDENTIFIER =
       URI.create("https://api.dev.nva.aws.unit.no/cristin/organization/185.0.0.0");
+  private static final String OPERATION_NAME = "operationName";
+  private static final String CREATE_OPERATION_ID = "CreateSubmission";
+  private static final String UPDATE_OPERATION_ID = "UpdateSubmission";
 
   private PersonIdentifier projectManagerIdentifier;
   private String projectIdentifier;
@@ -88,6 +97,19 @@ class SaveSubmissionHandlerTest {
   }
 
   @Test
+  void shouldReturnNoContentWhenProjectManagerUpdatesSubmissionWithCurrentVersion()
+      throws Exception {
+    handler.handleRequest(postRequest(projectIdentifier), new ByteArrayOutputStream(), context());
+    var version =
+        repository.findSubmission(projectIdentifier, periodIdentifier).orElseThrow().version();
+
+    handler.handleRequest(putRequest(version.toString()), output, context());
+
+    assertThat(
+        GatewayResponse.fromOutputStream(output, Void.class).getStatusCode(), is(HTTP_NO_CONTENT));
+  }
+
+  @Test
   void shouldReturnConflictWhenSubmissionAlreadyExistsForPeriod() throws Exception {
     handler.handleRequest(postRequest(projectIdentifier), new ByteArrayOutputStream(), context());
 
@@ -95,6 +117,37 @@ class SaveSubmissionHandlerTest {
 
     assertThat(
         GatewayResponse.fromOutputStream(output, Problem.class).getStatusCode(), is(HTTP_CONFLICT));
+  }
+
+  @Test
+  void shouldReturnPreconditionFailedWhenUpdatingWithOutdatedVersion() throws Exception {
+    handler.handleRequest(postRequest(projectIdentifier), new ByteArrayOutputStream(), context());
+
+    handler.handleRequest(putRequest(OUTDATED_VERSION), output, context());
+
+    assertThat(
+        GatewayResponse.fromOutputStream(output, Problem.class).getStatusCode(),
+        is(HTTP_PRECON_FAILED));
+  }
+
+  @Test
+  void shouldReturnPreconditionRequiredWhenUpdatingWithoutIfMatchHeader() throws Exception {
+    handler.handleRequest(postRequest(projectIdentifier), new ByteArrayOutputStream(), context());
+
+    handler.handleRequest(putRequest(null), output, context());
+
+    assertThat(
+        GatewayResponse.fromOutputStream(output, Problem.class).getStatusCode(),
+        is(HTTP_PRECONDITION_REQUIRED));
+  }
+
+  @Test
+  void shouldReturnNotFoundWhenUpdatingSubmissionThatDoesNotExist() throws Exception {
+    handler.handleRequest(putRequest(OUTDATED_VERSION), output, context());
+
+    assertThat(
+        GatewayResponse.fromOutputStream(output, Problem.class).getStatusCode(),
+        is(HTTP_NOT_FOUND));
   }
 
   @Test
@@ -137,7 +190,10 @@ class SaveSubmissionHandlerTest {
   @Test
   void shouldReturnBadRequestWhenCallerIsNotIdentifiedByPersonUri() throws Exception {
     var request =
-        requestBuilder(projectIdentifier).withPersonCristinId(WRONG_KIND_OF_IDENTIFIER).build();
+        requestBuilder(projectIdentifier)
+            .withPersonCristinId(WRONG_KIND_OF_IDENTIFIER)
+            .withRequestContextValue(OPERATION_NAME, CREATE_OPERATION_ID)
+            .build();
 
     handler.handleRequest(request, output, context());
 
@@ -149,7 +205,10 @@ class SaveSubmissionHandlerTest {
   @Test
   void shouldReturnBadRequestWhenCallerCustomerIsNotCustomerUri() throws Exception {
     var request =
-        requestBuilder(projectIdentifier).withCurrentCustomer(WRONG_KIND_OF_IDENTIFIER).build();
+        requestBuilder(projectIdentifier)
+            .withCurrentCustomer(WRONG_KIND_OF_IDENTIFIER)
+            .withRequestContextValue(OPERATION_NAME, CREATE_OPERATION_ID)
+            .build();
 
     handler.handleRequest(request, output, context());
 
@@ -186,11 +245,25 @@ class SaveSubmissionHandlerTest {
   }
 
   private InputStream submissionRequest(SubmissionRequest body) throws Exception {
-    return requestBuilder(projectIdentifier).withBody(body).build();
+    return requestBuilder(projectIdentifier)
+        .withBody(body)
+        .withRequestContextValue(OPERATION_NAME, CREATE_OPERATION_ID)
+        .build();
   }
 
   private InputStream postRequest(String project) throws Exception {
-    return requestBuilder(project).build();
+    return requestBuilder(project)
+        .withRequestContextValue(OPERATION_NAME, CREATE_OPERATION_ID)
+        .build();
+  }
+
+  private InputStream putRequest(String version) throws Exception {
+    var builder =
+        requestBuilder(projectIdentifier)
+            .withRequestContextValue(OPERATION_NAME, UPDATE_OPERATION_ID);
+    return version == null
+        ? builder.build()
+        : builder.withHeaders(Map.of(IF_MATCH, version)).build();
   }
 
   private HandlerRequestBuilder<SubmissionRequest> requestBuilder(String project) throws Exception {

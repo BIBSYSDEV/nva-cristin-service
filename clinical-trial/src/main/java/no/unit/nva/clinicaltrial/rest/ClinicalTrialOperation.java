@@ -1,6 +1,7 @@
 package no.unit.nva.clinicaltrial.rest;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import static no.unit.nva.clinicaltrial.rest.RequestUtils.getOperationName;
+
 import java.util.Arrays;
 import java.util.Optional;
 import nva.commons.apigateway.RequestInfo;
@@ -9,7 +10,6 @@ public enum ClinicalTrialOperation {
   CREATE("CreateClinicalTrial"),
   UPDATE("UpdateClinicalTrial");
 
-  private static final String OPERATION_NAME = "operationName";
   private static final String UNSUPPORTED_OPERATION =
       "Request is not mapped to a known clinical trial operation";
 
@@ -20,9 +20,7 @@ public enum ClinicalTrialOperation {
   }
 
   public static ClinicalTrialOperation fromRequest(RequestInfo requestInfo) {
-    return Optional.ofNullable(requestInfo.getRequestContext())
-        .map(requestContext -> requestContext.get(OPERATION_NAME))
-        .map(JsonNode::asText)
+    return getOperationName(requestInfo)
         .flatMap(ClinicalTrialOperation::fromOperationId)
         .orElseThrow(() -> new IllegalStateException(UNSUPPORTED_OPERATION));
   }
