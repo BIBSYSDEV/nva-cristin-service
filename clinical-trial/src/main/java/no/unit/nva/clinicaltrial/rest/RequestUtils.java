@@ -7,7 +7,7 @@ import static nva.commons.apigateway.AccessRight.MANAGE_KBS;
 import java.util.Set;
 import java.util.UUID;
 import no.unit.nva.clinicaltrial.model.Grant;
-import no.unit.nva.clinicaltrial.model.User;
+import no.unit.nva.clinicaltrial.model.write.User;
 import no.unit.nva.utils.UriUtils;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;

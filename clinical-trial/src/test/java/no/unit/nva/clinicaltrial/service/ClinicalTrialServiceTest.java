@@ -15,11 +15,11 @@ import java.util.Set;
 import java.util.UUID;
 import no.unit.nva.client.FetchApiClient;
 import no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures;
-import no.unit.nva.clinicaltrial.model.ClinicalTrialWrite;
 import no.unit.nva.clinicaltrial.model.Grant;
-import no.unit.nva.clinicaltrial.model.User;
-import no.unit.nva.clinicaltrial.persistence.v3.ClinicalTrialRepository;
-import no.unit.nva.clinicaltrial.persistence.v3.LocalDynamoDbTable;
+import no.unit.nva.clinicaltrial.model.write.ClinicalTrialWrite;
+import no.unit.nva.clinicaltrial.model.write.User;
+import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
+import no.unit.nva.clinicaltrial.persistence.LocalDynamoDbTable;
 import no.unit.nva.cristin.projects.model.nva.Approval;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
@@ -52,11 +52,9 @@ class ClinicalTrialServiceTest {
     var clinicalTrial = clinicalTrial(null);
     var service = serviceReturningProjectManagedBy(user.personIdentifier());
 
-    var persisted = service.save(new ClinicalTrialWrite(clinicalTrial, user));
+    service.save(new ClinicalTrialWrite(clinicalTrial, user));
 
-    assertThat(
-        repository.find(clinicalTrial.projectIdentifier()).orElseThrow().version(),
-        is(persisted.version()));
+    assertThat(repository.find(clinicalTrial.projectIdentifier()).orElseThrow().version(), is(1L));
   }
 
   @Test
@@ -88,11 +86,9 @@ class ClinicalTrialServiceTest {
     var clinicalTrial = clinicalTrial(null);
     var service = serviceReturningProjectManagedBy(randomPersonIdentifier());
 
-    var persisted = service.save(new ClinicalTrialWrite(clinicalTrial, clinicalTrialAdmin()));
+    service.save(new ClinicalTrialWrite(clinicalTrial, clinicalTrialAdmin()));
 
-    assertThat(
-        repository.find(clinicalTrial.projectIdentifier()).orElseThrow().version(),
-        is(persisted.version()));
+    assertThat(repository.find(clinicalTrial.projectIdentifier()).orElseThrow().version(), is(1L));
   }
 
   @Test

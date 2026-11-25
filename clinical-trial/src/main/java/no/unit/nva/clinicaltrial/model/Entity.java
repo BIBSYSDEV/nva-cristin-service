@@ -6,6 +6,5 @@ public sealed interface Entity permits ClinicalTrial {
 
   Long version();
 
-  /** What this state of the entity does, recorded on its version. */
   Action action();
 }

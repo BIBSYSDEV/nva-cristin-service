@@ -12,7 +12,6 @@ public record EntityTag(Long version) {
 
   private static final String IF_MATCH_HEADER = "If-Match";
   private static final String IF_MATCH_REQUIRED = "Update requires an If-Match header";
-  private static final String ETAG_FORMAT = "\"%s\"";
   private static final String QUOTE = "\"";
   private static final String EMPTY_STRING = "";
 
@@ -27,14 +26,6 @@ public record EntityTag(Long version) {
     return requestInfo
         .getHeaderOptional(IF_MATCH_HEADER)
         .orElseThrow(() -> new PreconditionRequiredException(IF_MATCH_REQUIRED));
-  }
-
-  public static EntityTag fromVersion(Long version) {
-    return new EntityTag(version);
-  }
-
-  public String headerValue() {
-    return ETAG_FORMAT.formatted(version);
   }
 
   private static String unquoted(String value) {

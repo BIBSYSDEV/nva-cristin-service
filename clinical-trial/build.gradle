@@ -13,7 +13,7 @@ dependencies {
     api(nvaCatalog.aws.sdk2.dynamodbenhanced)
     implementation(nvaCatalog.aws.sdk2.sdk.core)
     runtimeOnly(nvaCatalog.jackson.core)
-    api(nvaCatalog.jackson.databind)
+    implementation(nvaCatalog.jackson.databind)
     api(nvaLibs.core)
     implementation(nvaLibs.json)
     testFixturesImplementation(nvaLibs.testutils)

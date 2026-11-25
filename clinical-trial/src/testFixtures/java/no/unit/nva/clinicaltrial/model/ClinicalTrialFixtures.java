@@ -8,6 +8,7 @@ import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import java.net.URI;
 import java.util.Set;
 import java.util.UUID;
+import no.unit.nva.clinicaltrial.model.write.User;
 
 public final class ClinicalTrialFixtures {
 
