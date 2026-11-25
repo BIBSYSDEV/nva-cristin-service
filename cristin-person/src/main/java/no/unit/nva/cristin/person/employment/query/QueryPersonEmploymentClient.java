@@ -14,7 +14,10 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.common.client.ApiClient;
 import no.unit.nva.cristin.model.SearchResponse;
 import no.unit.nva.cristin.person.model.cristin.CristinPersonEmployment;
@@ -38,6 +41,21 @@ public class QueryPersonEmploymentClient extends ApiClient {
   /** Fetches Cristin data from upstream into response object serialized to client. */
   public SearchResponse<Employment> generateQueryResponse(String identifier)
       throws ApiGatewayException {
+    return generateQueryResponse(identifier, _ -> true);
+  }
+
+  /**
+   * Fetches Cristin data from upstream into response object serialized to client, keeping only
+   * employments at the given Cristin institution.
+   */
+  public SearchResponse<Employment> generateQueryResponse(String identifier, String institution)
+      throws ApiGatewayException {
+    return generateQueryResponse(
+        identifier, employment -> isAtInstitution(employment, institution));
+  }
+
+  private SearchResponse<Employment> generateQueryResponse(
+      String identifier, Predicate<Employment> filter) throws ApiGatewayException {
     var startRequestTime = System.currentTimeMillis();
     var cristinUri = generateCristinUri(identifier);
     var response = fetchQueryResults(cristinUri);
@@ -47,7 +65,8 @@ public class QueryPersonEmploymentClient extends ApiClient {
     var requestTime = calculateProcessingTime(startRequestTime, System.currentTimeMillis());
     var cristinEmployments =
         asList(getDeserializedResponse(response, CristinPersonEmployment[].class));
-    var employments = mapEmploymentsToNvaFormat(identifier, cristinEmployments);
+    var employments =
+        mapEmploymentsToNvaFormat(identifier, cristinEmployments).stream().filter(filter).toList();
 
     return new SearchResponse<Employment>(idUri)
         .withContext(EMPLOYMENT_QUERY_CONTEXT)
@@ -61,6 +80,14 @@ public class QueryPersonEmploymentClient extends ApiClient {
     return cristinEmployments.stream()
         .map(cristinEmployment -> cristinEmployment.toEmployment(identifier))
         .collect(Collectors.toList());
+  }
+
+  private static boolean isAtInstitution(Employment employment, String institution) {
+    return Optional.ofNullable(employment.getOrganization())
+        .map(organization -> UriWrapper.fromUri(organization).getLastPathElement())
+        .map(Utils::removeUnitPartFromIdentifierIfPresent)
+        .map(institution::equals)
+        .orElse(false);
   }
 
   private void checkResponseForBadRequestIndicatingNotFoundIdentifier(int statusCode)

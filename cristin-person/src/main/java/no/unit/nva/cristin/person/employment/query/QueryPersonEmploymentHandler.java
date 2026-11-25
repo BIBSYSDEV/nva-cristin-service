@@ -1,5 +1,6 @@
 package no.unit.nva.cristin.person.employment.query;
 
+import static no.unit.nva.cristin.common.Utils.extractCristinInstitutionIdentifier;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
@@ -49,7 +50,14 @@ public class QueryPersonEmploymentHandler
         LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
     var identifier = getValidPersonId(requestInfo);
 
-    return apiClient.generateQueryResponse(identifier);
+    return isRestrictedToOwnInstitution(requestInfo)
+        ? apiClient.generateQueryResponse(
+            identifier, extractCristinInstitutionIdentifier(requestInfo))
+        : apiClient.generateQueryResponse(identifier);
+  }
+
+  private static boolean isRestrictedToOwnInstitution(RequestInfo requestInfo) {
+    return requestInfo.clientIsThirdParty() && !requestInfo.clientIsInternalBackend();
   }
 
   @Override
@@ -65,6 +73,8 @@ public class QueryPersonEmploymentHandler
   @Override
   protected void validateRequest(Void input, RequestInfo requestInfo, Context context)
       throws ApiGatewayException {
-    AccessUtils.validateIdentificationNumberAccess(requestInfo);
+    if (!isRestrictedToOwnInstitution(requestInfo)) {
+      AccessUtils.validateIdentificationNumberAccess(requestInfo);
+    }
   }
 }
