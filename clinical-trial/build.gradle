@@ -16,6 +16,7 @@ dependencies {
     implementation(nvaCatalog.jackson.databind)
     api(nvaLibs.core)
     implementation(nvaLibs.json)
+    testFixturesApi(project(":cristin-project"))
     testFixturesImplementation(nvaLibs.testutils)
     testImplementation(nvaCatalog.aws.sdk2.dynamodblocal)
     testImplementation(nvaCatalog.hamcrest)
