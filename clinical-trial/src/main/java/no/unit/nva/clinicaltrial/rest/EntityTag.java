@@ -2,12 +2,11 @@ package no.unit.nva.clinicaltrial.rest;
 
 import static nva.commons.core.attempt.Try.attempt;
 
-import no.unit.nva.identifiers.SortableIdentifier;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.PreconditionFailedException;
 
-public record EntityTag(SortableIdentifier version) {
+public record EntityTag(Long version) {
 
   public static final String VERSION_DOES_NOT_MATCH = "ETag does not match the current version";
 
@@ -19,7 +18,7 @@ public record EntityTag(SortableIdentifier version) {
 
   public static EntityTag fromRequest(RequestInfo requestInfo) throws ApiGatewayException {
     var ifMatchHeader = getIfMatchHeader(requestInfo);
-    return attempt(() -> new EntityTag(new SortableIdentifier(unquoted(ifMatchHeader))))
+    return attempt(() -> new EntityTag(Long.valueOf(unquoted(ifMatchHeader))))
         .orElseThrow(_ -> new PreconditionFailedException(VERSION_DOES_NOT_MATCH));
   }
 
@@ -30,7 +29,7 @@ public record EntityTag(SortableIdentifier version) {
         .orElseThrow(() -> new PreconditionRequiredException(IF_MATCH_REQUIRED));
   }
 
-  public static EntityTag fromVersion(SortableIdentifier version) {
+  public static EntityTag fromVersion(Long version) {
     return new EntityTag(version);
   }
 

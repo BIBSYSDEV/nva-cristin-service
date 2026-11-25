@@ -12,10 +12,9 @@ import java.util.Optional;
 import no.unit.nva.clinicaltrial.model.ClinicalTrial;
 import no.unit.nva.clinicaltrial.model.ClinicalTrialWrite;
 import no.unit.nva.clinicaltrial.model.Reportable;
-import no.unit.nva.clinicaltrial.persistence.ClinicalTrialNotFoundException;
-import no.unit.nva.clinicaltrial.persistence.ConditionFailedException;
+import no.unit.nva.clinicaltrial.persistence.v3.ConditionFailedException;
+import no.unit.nva.clinicaltrial.persistence.v3.ItemNotFoundException;
 import no.unit.nva.clinicaltrial.service.ClinicalTrialService;
-import no.unit.nva.identifiers.SortableIdentifier;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -30,6 +29,7 @@ public class SaveClinicalTrialHandler
 
   private static final String ETAG_HEADER = "ETag";
   public static final String INVALID_REPORTABLE = "Reportable must be Yes or No";
+  private static final String CLINICAL_TRIAL_DOES_NOT_EXIST = "Clinical trial does not exist";
   private static final String PROJECT_ALREADY_HAS_CLINICAL_TRIAL =
       "Project already has a clinical trial";
 
@@ -85,12 +85,12 @@ public class SaveClinicalTrialHandler
       throw operation.isCreate()
           ? new ConflictException(PROJECT_ALREADY_HAS_CLINICAL_TRIAL)
           : new PreconditionFailedException(VERSION_DOES_NOT_MATCH);
-    } catch (ClinicalTrialNotFoundException notFound) {
-      throw new NotFoundException(notFound.getMessage());
+    } catch (ItemNotFoundException notFound) {
+      throw new NotFoundException(CLINICAL_TRIAL_DOES_NOT_EXIST);
     }
   }
 
-  private SortableIdentifier version(RequestInfo requestInfo) throws ApiGatewayException {
+  private Long version(RequestInfo requestInfo) throws ApiGatewayException {
     return operation.isCreate() ? null : EntityTag.fromRequest(requestInfo).version();
   }
 }

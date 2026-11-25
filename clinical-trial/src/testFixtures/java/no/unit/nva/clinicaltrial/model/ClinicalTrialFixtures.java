@@ -8,7 +8,6 @@ import static no.unit.nva.utils.UriUtils.getNvaApiId;
 import java.net.URI;
 import java.util.Set;
 import java.util.UUID;
-import no.unit.nva.identifiers.SortableIdentifier;
 
 public final class ClinicalTrialFixtures {
 
@@ -24,11 +23,11 @@ public final class ClinicalTrialFixtures {
     return getNvaApiId(personIdentifier, PERSON_PATH_NVA);
   }
 
-  public static ClinicalTrial clinicalTrial(SortableIdentifier version) {
+  public static ClinicalTrial clinicalTrial(Long version) {
     return clinicalTrial(Reportable.YES, version);
   }
 
-  public static ClinicalTrial clinicalTrial(Reportable reportable, SortableIdentifier version) {
+  public static ClinicalTrial clinicalTrial(Reportable reportable, Long version) {
     return new ClinicalTrial(randomProjectIdentifier(), reportable, version);
   }
 

@@ -18,8 +18,8 @@ import no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures;
 import no.unit.nva.clinicaltrial.model.ClinicalTrialWrite;
 import no.unit.nva.clinicaltrial.model.Grant;
 import no.unit.nva.clinicaltrial.model.User;
-import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
-import no.unit.nva.clinicaltrial.persistence.LocalDynamoDbTable;
+import no.unit.nva.clinicaltrial.persistence.v3.ClinicalTrialRepository;
+import no.unit.nva.clinicaltrial.persistence.v3.LocalDynamoDbTable;
 import no.unit.nva.cristin.projects.model.nva.Approval;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
@@ -43,7 +43,7 @@ class ClinicalTrialServiceTest {
 
   @BeforeEach
   void setUp() {
-    repository = new ClinicalTrialRepository(LocalDynamoDbTable.create(TABLE_NAME), TABLE_NAME);
+    repository = LocalDynamoDbTable.repositoryOf(LocalDynamoDbTable.create(TABLE_NAME), TABLE_NAME);
   }
 
   @Test
@@ -68,7 +68,7 @@ class ClinicalTrialServiceTest {
     service.save(new ClinicalTrialWrite(clinicalTrial, user));
 
     var version = repository.findVersions(clinicalTrial.projectIdentifier()).getFirst();
-    assertThat(version.user().grants(), is(Set.of(Grant.PROJECT_MANAGER)));
+    assertThat(version.writer(), is(user.withGrant(Grant.PROJECT_MANAGER)));
   }
 
   @Test
@@ -80,7 +80,7 @@ class ClinicalTrialServiceTest {
     service.save(new ClinicalTrialWrite(clinicalTrial, clinicalTrialAdmin()));
 
     var version = repository.findVersions(clinicalTrial.projectIdentifier()).getFirst();
-    assertThat(version.user().grants(), is(Set.of(Grant.CLINICAL_TRIAL_ADMIN)));
+    assertThat(((User) version.writer()).grants(), is(Set.of(Grant.CLINICAL_TRIAL_ADMIN)));
   }
 
   @Test

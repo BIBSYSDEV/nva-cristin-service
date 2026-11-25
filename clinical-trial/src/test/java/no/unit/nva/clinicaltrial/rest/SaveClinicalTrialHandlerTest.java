@@ -24,8 +24,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import no.unit.nva.clinicaltrial.model.Reportable;
-import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
-import no.unit.nva.clinicaltrial.persistence.LocalDynamoDbTable;
+import no.unit.nva.clinicaltrial.persistence.v3.LocalDynamoDbTable;
 import no.unit.nva.clinicaltrial.service.ClinicalTrialService;
 import no.unit.nva.cristin.projects.model.nva.Approval;
 import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
@@ -34,7 +33,6 @@ import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
 import no.unit.nva.cristin.projects.model.nva.Role;
-import no.unit.nva.identifiers.SortableIdentifier;
 import no.unit.nva.model.ApprovalStatus;
 import no.unit.nva.stubs.FakeContext;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -51,6 +49,7 @@ class SaveClinicalTrialHandlerTest {
   private static final String IDENTIFIER = "identifier";
   private static final String IF_MATCH = "If-Match";
   private static final String ETAG = "ETag";
+  private static final String OUTDATED_VERSION = "7";
   private static final String OPERATION_NAME = "operationName";
   private static final String CREATE_OPERATION_ID = "CreateClinicalTrial";
   private static final String UPDATE_OPERATION_ID = "UpdateClinicalTrial";
@@ -62,7 +61,8 @@ class SaveClinicalTrialHandlerTest {
   @BeforeEach
   void setUp() {
     projectManagerIdentifier = randomPersonIdentifier();
-    var repository = new ClinicalTrialRepository(LocalDynamoDbTable.create(TABLE_NAME), TABLE_NAME);
+    var repository =
+        LocalDynamoDbTable.repositoryOf(LocalDynamoDbTable.create(TABLE_NAME), TABLE_NAME);
     var service = new ClinicalTrialService(_ -> projectManagedBy(), repository);
     output = new ByteArrayOutputStream();
     handler = new SaveClinicalTrialHandler(service, new Environment());
@@ -140,9 +140,7 @@ class SaveClinicalTrialHandlerTest {
   @Test
   void shouldReturnNotFoundWhenUpdatingClinicalTrialForProjectWithoutOne() throws Exception {
     handler.handleRequest(
-        putRequest(randomProjectIdentifier(), SortableIdentifier.next().toString()),
-        output,
-        context());
+        putRequest(randomProjectIdentifier(), OUTDATED_VERSION), output, context());
 
     assertThat(
         GatewayResponse.fromOutputStream(output, Problem.class).getStatusCode(),
@@ -164,8 +162,7 @@ class SaveClinicalTrialHandlerTest {
     var projectIdentifier = randomProjectIdentifier();
     handler.handleRequest(postRequest(projectIdentifier), new ByteArrayOutputStream(), context());
 
-    handler.handleRequest(
-        putRequest(projectIdentifier, SortableIdentifier.next().toString()), output, context());
+    handler.handleRequest(putRequest(projectIdentifier, OUTDATED_VERSION), output, context());
 
     assertThat(
         GatewayResponse.fromOutputStream(output, Problem.class).getStatusCode(),

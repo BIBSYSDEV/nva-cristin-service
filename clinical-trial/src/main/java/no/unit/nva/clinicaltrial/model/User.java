@@ -8,7 +8,18 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 public record User(
-    String username, String personIdentifier, UUID customerIdentifier, Set<Grant> grants) {
+    String username, String personIdentifier, UUID customerIdentifier, Set<Grant> grants)
+    implements Writer {
+
+  @Override
+  public String name() {
+    return username;
+  }
+
+  @Override
+  public WriterKind kind() {
+    return WriterKind.USER;
+  }
 
   public User {
     grants = Objects.isNull(grants) ? Set.of() : Set.copyOf(grants);

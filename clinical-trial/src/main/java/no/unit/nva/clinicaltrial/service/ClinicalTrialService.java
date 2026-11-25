@@ -12,9 +12,9 @@ import no.unit.nva.client.FetchApiClient;
 import no.unit.nva.clinicaltrial.model.ClinicalTrial;
 import no.unit.nva.clinicaltrial.model.ClinicalTrialWrite;
 import no.unit.nva.clinicaltrial.model.User;
-import no.unit.nva.clinicaltrial.persistence.ClinicalTrialNotFoundException;
-import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
-import no.unit.nva.clinicaltrial.persistence.ConditionFailedException;
+import no.unit.nva.clinicaltrial.persistence.v3.ClinicalTrialRepository;
+import no.unit.nva.clinicaltrial.persistence.v3.ConditionFailedException;
+import no.unit.nva.clinicaltrial.persistence.v3.ItemNotFoundException;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
@@ -27,6 +27,7 @@ import nva.commons.apigateway.exceptions.ForbiddenException;
 public class ClinicalTrialService {
 
   private static final String PROJECT_NOT_ELIGIBLE = "Project is not eligible for a clinical trial";
+  private static final String NOT_READABLE = "Clinical trial was written but cannot be read";
 
   private final transient FetchApiClient<String, NvaProject> projectsApi;
   private final transient ClinicalTrialRepository repository;
@@ -38,14 +39,17 @@ public class ClinicalTrialService {
   }
 
   public ClinicalTrial save(ClinicalTrialWrite clinicalTrialWrite)
-      throws ApiGatewayException, ConditionFailedException, ClinicalTrialNotFoundException {
-    var project = projectsApi.executeFetch(clinicalTrialWrite.clinicalTrial().projectIdentifier());
+      throws ApiGatewayException, ConditionFailedException, ItemNotFoundException {
+    var project = projectsApi.executeFetch(clinicalTrialWrite.entity().projectIdentifier());
     var user = granted(project, clinicalTrialWrite.user());
     if (!user.isGranted()) {
       throw new ForbiddenException();
     }
     verifyEligible(project);
-    return repository.save(new ClinicalTrialWrite(clinicalTrialWrite.clinicalTrial(), user));
+    repository.save(new ClinicalTrialWrite(clinicalTrialWrite.entity(), user));
+    return repository
+        .find(clinicalTrialWrite.entity().projectIdentifier())
+        .orElseThrow(() -> new IllegalStateException(NOT_READABLE));
   }
 
   private static void verifyEligible(NvaProject project) throws ConflictException {
