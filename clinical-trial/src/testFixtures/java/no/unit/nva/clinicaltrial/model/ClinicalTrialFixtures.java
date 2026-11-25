@@ -68,6 +68,10 @@ public final class ClinicalTrialFixtures {
     return projectWithManager(personIdentifier).build();
   }
 
+  public static String randomInstitutionIdentifier() {
+    return randomInteger() + ".0.0.0";
+  }
+
   public static NvaProject eligibleProjectManagedBy(String personIdentifier) {
     return projectWithManager(personIdentifier)
         .withHealthProjectData(new HealthProjectData(HealthProjectType.DRUGSTUDY, null, null))
