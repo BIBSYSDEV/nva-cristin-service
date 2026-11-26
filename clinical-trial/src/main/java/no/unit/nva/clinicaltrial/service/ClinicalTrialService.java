@@ -9,12 +9,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import no.unit.nva.client.FetchApiClient;
-import no.unit.nva.clinicaltrial.model.ClinicalTrial;
-import no.unit.nva.clinicaltrial.model.ClinicalTrialWrite;
-import no.unit.nva.clinicaltrial.model.User;
-import no.unit.nva.clinicaltrial.persistence.ClinicalTrialNotFoundException;
+import no.unit.nva.clinicaltrial.model.write.ClinicalTrialWrite;
+import no.unit.nva.clinicaltrial.model.write.User;
 import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
-import no.unit.nva.clinicaltrial.persistence.ConditionFailedException;
+import no.unit.nva.clinicaltrial.persistence.exceptions.ConditionFailedException;
+import no.unit.nva.clinicaltrial.persistence.exceptions.ItemNotFoundException;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
@@ -37,15 +36,15 @@ public class ClinicalTrialService {
     this.repository = repository;
   }
 
-  public ClinicalTrial save(ClinicalTrialWrite clinicalTrialWrite)
-      throws ApiGatewayException, ConditionFailedException, ClinicalTrialNotFoundException {
+  public void save(ClinicalTrialWrite clinicalTrialWrite)
+      throws ApiGatewayException, ConditionFailedException, ItemNotFoundException {
     var project = projectsApi.executeFetch(clinicalTrialWrite.clinicalTrial().projectIdentifier());
     var user = granted(project, clinicalTrialWrite.user());
     if (!user.isGranted()) {
       throw new ForbiddenException();
     }
     verifyEligible(project);
-    return repository.save(new ClinicalTrialWrite(clinicalTrialWrite.clinicalTrial(), user));
+    repository.save(new ClinicalTrialWrite(clinicalTrialWrite.clinicalTrial(), user));
   }
 
   private static void verifyEligible(NvaProject project) throws ConflictException {

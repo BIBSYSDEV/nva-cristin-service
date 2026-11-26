@@ -1,21 +1,19 @@
 package no.unit.nva.clinicaltrial.rest;
 
 import static java.net.HttpURLConnection.HTTP_CREATED;
-import static java.net.HttpURLConnection.HTTP_OK;
+import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
 import static no.unit.nva.clinicaltrial.rest.EntityTag.VERSION_DOES_NOT_MATCH;
 import static no.unit.nva.clinicaltrial.rest.RequestUtils.getProjectIdentifier;
 import static no.unit.nva.clinicaltrial.rest.RequestUtils.userFrom;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import java.util.Map;
 import java.util.Optional;
 import no.unit.nva.clinicaltrial.model.ClinicalTrial;
-import no.unit.nva.clinicaltrial.model.ClinicalTrialWrite;
 import no.unit.nva.clinicaltrial.model.Reportable;
-import no.unit.nva.clinicaltrial.persistence.ClinicalTrialNotFoundException;
-import no.unit.nva.clinicaltrial.persistence.ConditionFailedException;
+import no.unit.nva.clinicaltrial.model.write.ClinicalTrialWrite;
+import no.unit.nva.clinicaltrial.persistence.exceptions.ConditionFailedException;
+import no.unit.nva.clinicaltrial.persistence.exceptions.ItemNotFoundException;
 import no.unit.nva.clinicaltrial.service.ClinicalTrialService;
-import no.unit.nva.identifiers.SortableIdentifier;
 import nva.commons.apigateway.ApiGatewayHandler;
 import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
@@ -25,11 +23,10 @@ import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.apigateway.exceptions.PreconditionFailedException;
 import nva.commons.core.Environment;
 
-public class SaveClinicalTrialHandler
-    extends ApiGatewayHandler<ClinicalTrialRequest, ClinicalTrialResponse> {
+public class SaveClinicalTrialHandler extends ApiGatewayHandler<ClinicalTrialRequest, Void> {
 
-  private static final String ETAG_HEADER = "ETag";
   public static final String INVALID_REPORTABLE = "Reportable must be Yes or No";
+  private static final String CLINICAL_TRIAL_DOES_NOT_EXIST = "Clinical trial does not exist";
   private static final String PROJECT_ALREADY_HAS_CLINICAL_TRIAL =
       "Project already has a clinical trial";
 
@@ -49,16 +46,12 @@ public class SaveClinicalTrialHandler
   }
 
   @Override
-  protected ClinicalTrialResponse processInput(
-      ClinicalTrialRequest input, RequestInfo requestInfo, Context context)
+  protected Void processInput(ClinicalTrialRequest input, RequestInfo requestInfo, Context context)
       throws ApiGatewayException {
     operation = ClinicalTrialOperation.fromRequest(requestInfo);
     var clinicalTrial = createClinicalTrial(input, requestInfo);
-    var user = userFrom(requestInfo);
-    var persisted = save(new ClinicalTrialWrite(clinicalTrial, user));
-    addAdditionalHeaders(
-        () -> Map.of(ETAG_HEADER, EntityTag.fromVersion(persisted.version()).headerValue()));
-    return ClinicalTrialResponse.from(persisted);
+    save(new ClinicalTrialWrite(clinicalTrial, userFrom(requestInfo)));
+    return null;
   }
 
   private ClinicalTrial createClinicalTrial(ClinicalTrialRequest input, RequestInfo requestInfo)
@@ -74,23 +67,23 @@ public class SaveClinicalTrialHandler
   }
 
   @Override
-  protected Integer getSuccessStatusCode(ClinicalTrialRequest input, ClinicalTrialResponse output) {
-    return operation.isCreate() ? HTTP_CREATED : HTTP_OK;
+  protected Integer getSuccessStatusCode(ClinicalTrialRequest input, Void output) {
+    return operation.isCreate() ? HTTP_CREATED : HTTP_NO_CONTENT;
   }
 
-  private ClinicalTrial save(ClinicalTrialWrite clinicalTrialWrite) throws ApiGatewayException {
+  private void save(ClinicalTrialWrite clinicalTrialWrite) throws ApiGatewayException {
     try {
-      return service.save(clinicalTrialWrite);
+      service.save(clinicalTrialWrite);
     } catch (ConditionFailedException conditionFailed) {
       throw operation.isCreate()
           ? new ConflictException(PROJECT_ALREADY_HAS_CLINICAL_TRIAL)
           : new PreconditionFailedException(VERSION_DOES_NOT_MATCH);
-    } catch (ClinicalTrialNotFoundException notFound) {
-      throw new NotFoundException(notFound.getMessage());
+    } catch (ItemNotFoundException notFound) {
+      throw new NotFoundException(CLINICAL_TRIAL_DOES_NOT_EXIST);
     }
   }
 
-  private SortableIdentifier version(RequestInfo requestInfo) throws ApiGatewayException {
+  private Long version(RequestInfo requestInfo) throws ApiGatewayException {
     return operation.isCreate() ? null : EntityTag.fromRequest(requestInfo).version();
   }
 }

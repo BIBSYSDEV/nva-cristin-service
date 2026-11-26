@@ -15,9 +15,9 @@ import java.util.Set;
 import java.util.UUID;
 import no.unit.nva.client.FetchApiClient;
 import no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures;
-import no.unit.nva.clinicaltrial.model.ClinicalTrialWrite;
 import no.unit.nva.clinicaltrial.model.Grant;
-import no.unit.nva.clinicaltrial.model.User;
+import no.unit.nva.clinicaltrial.model.write.ClinicalTrialWrite;
+import no.unit.nva.clinicaltrial.model.write.User;
 import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
 import no.unit.nva.clinicaltrial.persistence.LocalDynamoDbTable;
 import no.unit.nva.cristin.projects.model.nva.Approval;
@@ -43,7 +43,7 @@ class ClinicalTrialServiceTest {
 
   @BeforeEach
   void setUp() {
-    repository = new ClinicalTrialRepository(LocalDynamoDbTable.create(TABLE_NAME), TABLE_NAME);
+    repository = LocalDynamoDbTable.repositoryOf(LocalDynamoDbTable.create(TABLE_NAME), TABLE_NAME);
   }
 
   @Test
@@ -52,11 +52,9 @@ class ClinicalTrialServiceTest {
     var clinicalTrial = clinicalTrial(null);
     var service = serviceReturningProjectManagedBy(user.personIdentifier());
 
-    var persisted = service.save(new ClinicalTrialWrite(clinicalTrial, user));
+    service.save(new ClinicalTrialWrite(clinicalTrial, user));
 
-    assertThat(
-        repository.find(clinicalTrial.projectIdentifier()).orElseThrow().version(),
-        is(persisted.version()));
+    assertThat(repository.find(clinicalTrial.projectIdentifier()).orElseThrow().version(), is(1L));
   }
 
   @Test
@@ -68,7 +66,7 @@ class ClinicalTrialServiceTest {
     service.save(new ClinicalTrialWrite(clinicalTrial, user));
 
     var version = repository.findVersions(clinicalTrial.projectIdentifier()).getFirst();
-    assertThat(version.user().grants(), is(Set.of(Grant.PROJECT_MANAGER)));
+    assertThat(version.writer(), is(user.withGrant(Grant.PROJECT_MANAGER)));
   }
 
   @Test
@@ -80,7 +78,7 @@ class ClinicalTrialServiceTest {
     service.save(new ClinicalTrialWrite(clinicalTrial, clinicalTrialAdmin()));
 
     var version = repository.findVersions(clinicalTrial.projectIdentifier()).getFirst();
-    assertThat(version.user().grants(), is(Set.of(Grant.CLINICAL_TRIAL_ADMIN)));
+    assertThat(((User) version.writer()).grants(), is(Set.of(Grant.CLINICAL_TRIAL_ADMIN)));
   }
 
   @Test
@@ -88,11 +86,9 @@ class ClinicalTrialServiceTest {
     var clinicalTrial = clinicalTrial(null);
     var service = serviceReturningProjectManagedBy(randomPersonIdentifier());
 
-    var persisted = service.save(new ClinicalTrialWrite(clinicalTrial, clinicalTrialAdmin()));
+    service.save(new ClinicalTrialWrite(clinicalTrial, clinicalTrialAdmin()));
 
-    assertThat(
-        repository.find(clinicalTrial.projectIdentifier()).orElseThrow().version(),
-        is(persisted.version()));
+    assertThat(repository.find(clinicalTrial.projectIdentifier()).orElseThrow().version(), is(1L));
   }
 
   @Test

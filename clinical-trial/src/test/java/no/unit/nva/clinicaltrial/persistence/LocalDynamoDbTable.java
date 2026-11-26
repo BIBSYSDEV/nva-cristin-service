@@ -1,5 +1,6 @@
 package no.unit.nva.clinicaltrial.persistence;
 
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition;
 import software.amazon.awssdk.services.dynamodb.model.CreateTableRequest;
@@ -10,6 +11,12 @@ import software.amazon.awssdk.services.dynamodb.model.ScalarAttributeType;
 import software.amazon.dynamodb.services.local.embedded.DynamoDBEmbedded;
 
 public final class LocalDynamoDbTable {
+
+  public static ClinicalTrialRepository repositoryOf(DynamoDbClient client, String tableName) {
+    return new ClinicalTrialRepository(
+        new VersionedTable(
+            DynamoDbEnhancedClient.builder().dynamoDbClient(client).build(), tableName));
+  }
 
   private static final String PARTITION_KEY = "PK";
   private static final String SORT_KEY = "SK";

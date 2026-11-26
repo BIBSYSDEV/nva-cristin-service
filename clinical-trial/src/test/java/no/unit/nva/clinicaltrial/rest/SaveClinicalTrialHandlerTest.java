@@ -5,7 +5,7 @@ import static java.net.HttpURLConnection.HTTP_CONFLICT;
 import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
-import static java.net.HttpURLConnection.HTTP_OK;
+import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
 import static java.net.HttpURLConnection.HTTP_PRECON_FAILED;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.personId;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomCustomer;
@@ -16,7 +16,6 @@ import static no.unit.nva.commons.json.JsonUtils.dtoObjectMapper;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import java.io.ByteArrayOutputStream;
@@ -34,7 +33,6 @@ import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
 import no.unit.nva.cristin.projects.model.nva.Role;
-import no.unit.nva.identifiers.SortableIdentifier;
 import no.unit.nva.model.ApprovalStatus;
 import no.unit.nva.stubs.FakeContext;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -50,31 +48,31 @@ class SaveClinicalTrialHandlerTest {
   private static final String PROJECT_MANAGER = "ProjectManager";
   private static final String IDENTIFIER = "identifier";
   private static final String IF_MATCH = "If-Match";
-  private static final String ETAG = "ETag";
+  private static final String OUTDATED_VERSION = "7";
   private static final String OPERATION_NAME = "operationName";
   private static final String CREATE_OPERATION_ID = "CreateClinicalTrial";
   private static final String UPDATE_OPERATION_ID = "UpdateClinicalTrial";
 
   private String projectManagerIdentifier;
+  private ClinicalTrialRepository repository;
   private ByteArrayOutputStream output;
   private SaveClinicalTrialHandler handler;
 
   @BeforeEach
   void setUp() {
     projectManagerIdentifier = randomPersonIdentifier();
-    var repository = new ClinicalTrialRepository(LocalDynamoDbTable.create(TABLE_NAME), TABLE_NAME);
+    repository = LocalDynamoDbTable.repositoryOf(LocalDynamoDbTable.create(TABLE_NAME), TABLE_NAME);
     var service = new ClinicalTrialService(_ -> projectManagedBy(), repository);
     output = new ByteArrayOutputStream();
     handler = new SaveClinicalTrialHandler(service, new Environment());
   }
 
   @Test
-  void shouldReturnCreatedWithEtagWhenProjectManagerCreatesClinicalTrial() throws Exception {
+  void shouldReturnCreatedWhenProjectManagerCreatesClinicalTrial() throws Exception {
     handler.handleRequest(postRequest(randomProjectIdentifier()), output, context());
 
-    var response = GatewayResponse.fromOutputStream(output, ClinicalTrialResponse.class);
-    assertThat(response.getStatusCode(), is(HTTP_CREATED));
-    assertThat(response.getHeaders().get(ETAG), is(notNullValue()));
+    assertThat(
+        GatewayResponse.fromOutputStream(output, Void.class).getStatusCode(), is(HTTP_CREATED));
   }
 
   @Test
@@ -121,28 +119,22 @@ class SaveClinicalTrialHandlerTest {
   }
 
   @Test
-  void shouldReturnOkWhenProjectManagerUpdatesClinicalTrialWithCurrentVersion() throws Exception {
+  void shouldReturnNoContentWhenProjectManagerUpdatesClinicalTrialWithCurrentVersion()
+      throws Exception {
     var projectIdentifier = randomProjectIdentifier();
-    var created = new ByteArrayOutputStream();
-    handler.handleRequest(postRequest(projectIdentifier), created, context());
-    var version =
-        GatewayResponse.fromOutputStream(created, ClinicalTrialResponse.class)
-            .getHeaders()
-            .get(ETAG);
+    handler.handleRequest(postRequest(projectIdentifier), new ByteArrayOutputStream(), context());
+    var version = repository.find(projectIdentifier).orElseThrow().version();
 
-    handler.handleRequest(putRequest(projectIdentifier, version), output, context());
+    handler.handleRequest(putRequest(projectIdentifier, version.toString()), output, context());
 
     assertThat(
-        GatewayResponse.fromOutputStream(output, ClinicalTrialResponse.class).getStatusCode(),
-        is(HTTP_OK));
+        GatewayResponse.fromOutputStream(output, Void.class).getStatusCode(), is(HTTP_NO_CONTENT));
   }
 
   @Test
   void shouldReturnNotFoundWhenUpdatingClinicalTrialForProjectWithoutOne() throws Exception {
     handler.handleRequest(
-        putRequest(randomProjectIdentifier(), SortableIdentifier.next().toString()),
-        output,
-        context());
+        putRequest(randomProjectIdentifier(), OUTDATED_VERSION), output, context());
 
     assertThat(
         GatewayResponse.fromOutputStream(output, Problem.class).getStatusCode(),
@@ -164,8 +156,7 @@ class SaveClinicalTrialHandlerTest {
     var projectIdentifier = randomProjectIdentifier();
     handler.handleRequest(postRequest(projectIdentifier), new ByteArrayOutputStream(), context());
 
-    handler.handleRequest(
-        putRequest(projectIdentifier, SortableIdentifier.next().toString()), output, context());
+    handler.handleRequest(putRequest(projectIdentifier, OUTDATED_VERSION), output, context());
 
     assertThat(
         GatewayResponse.fromOutputStream(output, Problem.class).getStatusCode(),
