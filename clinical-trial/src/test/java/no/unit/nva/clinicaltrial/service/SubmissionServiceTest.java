@@ -18,7 +18,7 @@ import no.unit.nva.clinicaltrial.model.Period;
 import no.unit.nva.clinicaltrial.model.Reportable;
 import no.unit.nva.clinicaltrial.model.Submission;
 import no.unit.nva.clinicaltrial.model.SubmissionStatus;
-import no.unit.nva.clinicaltrial.model.write.SystemWriter;
+import no.unit.nva.clinicaltrial.model.write.System;
 import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
 import no.unit.nva.clinicaltrial.persistence.LocalDynamoDbTable;
 import no.unit.nva.identifiers.PersonIdentifier;
@@ -42,7 +42,7 @@ class SubmissionServiceTest {
     repository = LocalDynamoDbTable.repositoryOf(LocalDynamoDbTable.create(TABLE_NAME), TABLE_NAME);
     periodIdentifier = randomPeriodIdentifier();
     projectIdentifier = randomProjectIdentifier();
-    repository.save(new SystemWriter(ADMIN_PROCESS), new Period(periodIdentifier, null));
+    repository.save(new System(ADMIN_PROCESS), new Period(periodIdentifier, null));
     repository.save(randomUser(), new ClinicalTrial(projectIdentifier, Reportable.YES, null));
   }
 

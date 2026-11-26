@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import no.unit.nva.clinicaltrial.model.Action;
 import no.unit.nva.clinicaltrial.model.Period;
-import no.unit.nva.clinicaltrial.model.write.SystemWriter;
+import no.unit.nva.clinicaltrial.model.write.System;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -50,7 +50,7 @@ class PeriodPersistenceTest {
   void shouldFindPersistedPeriod() throws Exception {
     var period = new Period(randomString(), null);
 
-    repository.save(new SystemWriter(ADMIN_PROCESS), period);
+    repository.save(new System(ADMIN_PROCESS), period);
 
     assertThat(
         repository.findPeriod(period.identifier()).orElseThrow().identifier(),
@@ -61,7 +61,7 @@ class PeriodPersistenceTest {
   void shouldPersistPeriodWithExpectedAttributeNames() throws Exception {
     var period = new Period(randomString(), null);
 
-    repository.save(new SystemWriter(ADMIN_PROCESS), period);
+    repository.save(new System(ADMIN_PROCESS), period);
 
     assertThat(
         persistedItem(period.identifier()).keySet(),
@@ -71,10 +71,10 @@ class PeriodPersistenceTest {
   @Test
   void shouldListVersionsOfPeriodNewestFirst() throws Exception {
     var period = new Period(randomString(), null);
-    repository.save(new SystemWriter(ADMIN_PROCESS), period);
+    repository.save(new System(ADMIN_PROCESS), period);
     var persisted = repository.findPeriod(period.identifier()).orElseThrow();
 
-    repository.save(new SystemWriter(ADMIN_PROCESS), persisted);
+    repository.save(new System(ADMIN_PROCESS), persisted);
 
     var versions = repository.findPeriodVersions(period.identifier());
     assertThat(versions.getFirst().entity().version(), is(2L));

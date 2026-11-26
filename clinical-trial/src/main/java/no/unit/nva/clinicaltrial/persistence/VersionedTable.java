@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import no.unit.nva.clinicaltrial.model.Action;
 import no.unit.nva.clinicaltrial.model.Entity;
 import no.unit.nva.clinicaltrial.model.Version;
-import no.unit.nva.clinicaltrial.model.write.Writer;
+import no.unit.nva.clinicaltrial.model.write.Actor;
 import no.unit.nva.clinicaltrial.persistence.dao.Dao;
 import no.unit.nva.clinicaltrial.persistence.dao.TableAttributes;
 import no.unit.nva.clinicaltrial.persistence.dao.VersionDao;
@@ -51,30 +51,30 @@ public class VersionedTable {
     this.table = client.table(tableName, Dao.SCHEMA);
   }
 
-  public void save(Writer writer, Entity... entities)
+  public void save(Actor actor, Entity... entities)
       throws ConditionFailedException, ItemNotFoundException {
     try {
-      client.transactWriteItems(transactionOf(List.of(entities), writer));
+      client.transactWriteItems(transactionOf(List.of(entities), actor));
     } catch (TransactionCanceledException cancelled) {
       TransactionFailure.from(cancelled).throwWriteFailure();
     }
   }
 
-  private TransactWriteItemsEnhancedRequest transactionOf(List<Entity> entities, Writer writer) {
+  private TransactWriteItemsEnhancedRequest transactionOf(List<Entity> entities, Actor actor) {
     var transaction =
         TransactWriteItemsEnhancedRequest.builder()
             .clientRequestToken(UUID.randomUUID().toString());
     var timestamp = Instant.now();
     entities.stream()
-        .flatMap(entity -> rowsOf(entity, writer, timestamp))
+        .flatMap(entity -> rowsOf(entity, actor, timestamp))
         .forEach(row -> transaction.addPutItem(table, row));
     return transaction.build();
   }
 
   private static Stream<TransactPutItemEnhancedRequest<EnhancedDocument>> rowsOf(
-      Entity entity, Writer writer, Instant timestamp) {
+      Entity entity, Actor actor, Instant timestamp) {
     var dao = VersionedDao.fromEntity(entity, nextVersion(entity.version()), timestamp);
-    var versionDao = VersionDao.versionOf(dao, Action.from(entity), writer);
+    var versionDao = VersionDao.versionOf(dao, Action.from(entity), actor);
     return Stream.of(
         putRequest(dao.toDocument(), condition(entity.version())),
         putRequest(versionDao.toDocument(), CREATE_EXPRESSION));

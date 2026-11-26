@@ -7,7 +7,7 @@ import no.unit.nva.clinicaltrial.model.Entity;
 import no.unit.nva.clinicaltrial.model.Period;
 import no.unit.nva.clinicaltrial.model.Submission;
 import no.unit.nva.clinicaltrial.model.Version;
-import no.unit.nva.clinicaltrial.model.write.Writer;
+import no.unit.nva.clinicaltrial.model.write.Actor;
 import no.unit.nva.clinicaltrial.persistence.dao.ClinicalTrialDao;
 import no.unit.nva.clinicaltrial.persistence.dao.PeriodDao;
 import no.unit.nva.clinicaltrial.persistence.dao.SubmissionDao;
@@ -22,9 +22,9 @@ public class ClinicalTrialRepository {
     this.table = table;
   }
 
-  public void save(Writer writer, Entity... entities)
+  public void save(Actor actor, Entity... entities)
       throws ConditionFailedException, ItemNotFoundException {
-    table.save(writer, entities);
+    table.save(actor, entities);
   }
 
   public Optional<ClinicalTrial> findClinicalTrial(String projectIdentifier) {

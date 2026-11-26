@@ -32,7 +32,7 @@ import java.util.Map;
 import no.unit.nva.clinicaltrial.model.ClinicalTrial;
 import no.unit.nva.clinicaltrial.model.Period;
 import no.unit.nva.clinicaltrial.model.Reportable;
-import no.unit.nva.clinicaltrial.model.write.SystemWriter;
+import no.unit.nva.clinicaltrial.model.write.System;
 import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
 import no.unit.nva.clinicaltrial.persistence.LocalDynamoDbTable;
 import no.unit.nva.clinicaltrial.service.SubmissionService;
@@ -75,7 +75,7 @@ class SaveSubmissionHandlerTest {
     projectIdentifier = randomProjectIdentifier();
     periodIdentifier = randomPeriodIdentifier();
     repository = LocalDynamoDbTable.repositoryOf(LocalDynamoDbTable.create(TABLE_NAME), TABLE_NAME);
-    repository.save(new SystemWriter(ADMIN_PROCESS), new Period(periodIdentifier, null));
+    repository.save(new System(ADMIN_PROCESS), new Period(periodIdentifier, null));
     repository.save(randomUser(), new ClinicalTrial(projectIdentifier, Reportable.YES, null));
     var service =
         new SubmissionService(_ -> projectManagedBy(projectManagerIdentifier), repository);

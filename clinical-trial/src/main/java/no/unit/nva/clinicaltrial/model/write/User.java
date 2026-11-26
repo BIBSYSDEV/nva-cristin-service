@@ -15,7 +15,7 @@ public record User(
     PersonIdentifier personIdentifier,
     CustomerIdentifier customerIdentifier,
     Set<Grant> grants)
-    implements Writer {
+    implements Actor {
 
   @Override
   public String name() {

@@ -57,7 +57,7 @@ class ClinicalTrialServiceTest {
 
     var version =
         repository.findClinicalTrialVersions(clinicalTrial.projectIdentifier()).getFirst();
-    assertThat(version.writer(), is(user.withGrant(Grant.PROJECT_MANAGER)));
+    assertThat(version.actor(), is(user.withGrant(Grant.PROJECT_MANAGER)));
   }
 
   @Test

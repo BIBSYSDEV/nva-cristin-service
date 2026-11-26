@@ -127,9 +127,9 @@ class ClinicalTrialRepositoryTest {
     var item = persistedVersion(clinicalTrial.projectIdentifier());
     assertThat(
         item.keySet(),
-        is(Set.of("PK", "SK", "type", "entityType", "entity", "writer", "action", "modifiedDate")));
+        is(Set.of("PK", "SK", "type", "entityType", "entity", "actor", "action", "modifiedDate")));
     assertThat(
-        item.get("writer").m().keySet(),
+        item.get("actor").m().keySet(),
         is(Set.of("kind", "username", "personIdentifier", "customerIdentifier", "grants")));
   }
 
@@ -142,7 +142,7 @@ class ClinicalTrialRepositoryTest {
 
     var version =
         repository.findClinicalTrialVersions(clinicalTrial.projectIdentifier()).getFirst();
-    assertThat(version.writer(), is(user));
+    assertThat(version.actor(), is(user));
     assertThat(version.entity().projectIdentifier(), is(clinicalTrial.projectIdentifier()));
   }
 

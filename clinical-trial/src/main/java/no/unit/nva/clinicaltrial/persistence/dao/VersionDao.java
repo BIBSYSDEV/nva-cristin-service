@@ -10,7 +10,7 @@ import java.time.Instant;
 import no.unit.nva.clinicaltrial.model.Action;
 import no.unit.nva.clinicaltrial.model.Entity;
 import no.unit.nva.clinicaltrial.model.Version;
-import no.unit.nva.clinicaltrial.model.write.Writer;
+import no.unit.nva.clinicaltrial.model.write.Actor;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 
 @JsonTypeName("Version")
@@ -19,7 +19,7 @@ public record VersionDao<T>(
     @JsonProperty(SORT_KEY) String sortKey,
     String entityType,
     T entity,
-    Writer writer,
+    Actor actor,
     Action action,
     Instant modifiedDate)
     implements Dao {
@@ -28,14 +28,14 @@ public record VersionDao<T>(
   private static final String VERSION_KEY_FORMAT = "%019d";
 
   public static <E extends Entity> VersionDao<E> versionOf(
-      VersionedDao<E> entityDao, Action action, Writer writer) {
+      VersionedDao<E> entityDao, Action action, Actor actor) {
     var entity = entityDao.toEntity();
     return new VersionDao<>(
         historyPartitionOf(entityDao.partitionKey(), entityDao.sortKey()),
         sortKeyOf(entityDao.version()),
         entity.getClass().getSimpleName(),
         entity,
-        writer,
+        actor,
         action,
         entityDao.modifiedDate());
   }
@@ -50,7 +50,7 @@ public record VersionDao<T>(
   }
 
   public Version<T> toVersion() {
-    return new Version<>(entity, writer, action, modifiedDate);
+    return new Version<>(entity, actor, action, modifiedDate);
   }
 
   private static String sortKeyOf(long version) {
