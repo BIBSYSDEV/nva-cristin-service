@@ -33,6 +33,7 @@ import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.cristin.projects.model.nva.Person;
 import no.unit.nva.cristin.projects.model.nva.Role;
+import no.unit.nva.identifiers.PersonIdentifier;
 import no.unit.nva.model.ApprovalStatus;
 import no.unit.nva.stubs.FakeContext;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -53,7 +54,7 @@ class SaveClinicalTrialHandlerTest {
   private static final String CREATE_OPERATION_ID = "CreateClinicalTrial";
   private static final String UPDATE_OPERATION_ID = "UpdateClinicalTrial";
 
-  private String projectManagerIdentifier;
+  private PersonIdentifier projectManagerIdentifier;
   private ClinicalTrialRepository repository;
   private ByteArrayOutputStream output;
   private SaveClinicalTrialHandler handler;
@@ -206,12 +207,13 @@ class SaveClinicalTrialHandlerTest {
   }
 
   private HandlerRequestBuilder<ClinicalTrialRequest> requestBuilder(
-      String projectIdentifier, String personIdentifier) throws Exception {
+      String projectIdentifier, PersonIdentifier personIdentifier) throws Exception {
     return requestBuilder(projectIdentifier, personIdentifier, Reportable.YES);
   }
 
   private HandlerRequestBuilder<ClinicalTrialRequest> requestBuilder(
-      String projectIdentifier, String personIdentifier, Reportable reportable) throws Exception {
+      String projectIdentifier, PersonIdentifier personIdentifier, Reportable reportable)
+      throws Exception {
     return new HandlerRequestBuilder<ClinicalTrialRequest>(dtoObjectMapper)
         .withBody(new ClinicalTrialRequest(reportable))
         .withPathParameters(Map.of(IDENTIFIER, projectIdentifier))
@@ -231,7 +233,7 @@ class SaveClinicalTrialHandlerTest {
         .build();
   }
 
-  private Person person(String personIdentifier) {
+  private Person person(PersonIdentifier personIdentifier) {
     return new Person(
         personId(personIdentifier), randomString(), randomString(), randomString(), randomString());
   }

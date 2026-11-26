@@ -66,6 +66,18 @@ class SubmissionPersistenceTest {
   }
 
   @Test
+  void shouldPersistInstitutionIdentifierAsPlainString() throws Exception {
+    var submission = submission(null);
+
+    repository.save(new SubmissionWrite(submission, randomUser()));
+
+    var institution =
+        persistedItem(submission).get("inclusions").l().getFirst().m().get("institutionIdentifier");
+    assertThat(
+        institution.s(), is(submission.inclusions().getFirst().institutionIdentifier().value()));
+  }
+
+  @Test
   void shouldListVersionsOfSubmissionNewestFirst() throws Exception {
     var submission = submission(null);
     repository.save(new SubmissionWrite(submission, randomUser()));

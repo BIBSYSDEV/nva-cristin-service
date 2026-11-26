@@ -1,3 +1,5 @@
 package no.unit.nva.clinicaltrial.model;
 
-public record Inclusion(String institutionIdentifier, Integer count) {}
+import no.unit.nva.identifiers.OrganizationIdentifier;
+
+public record Inclusion(OrganizationIdentifier institutionIdentifier, Integer count) {}
