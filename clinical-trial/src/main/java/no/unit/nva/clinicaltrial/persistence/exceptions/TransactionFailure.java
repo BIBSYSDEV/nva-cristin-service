@@ -3,7 +3,7 @@ package no.unit.nva.clinicaltrial.persistence.exceptions;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import no.unit.nva.clinicaltrial.persistence.dao.Dao;
+import no.unit.nva.clinicaltrial.persistence.dao.TableAttributes;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.CancellationReason;
 import software.amazon.awssdk.services.dynamodb.model.TransactionCanceledException;
@@ -36,7 +36,7 @@ public record TransactionFailure(TransactionCanceledException cancelled) {
   }
 
   private static Long storedVersionOf(Map<String, AttributeValue> item) {
-    return Optional.ofNullable(item.get(Dao.VERSION_ATTRIBUTE))
+    return Optional.ofNullable(item.get(TableAttributes.VERSION_ATTRIBUTE))
         .map(AttributeValue::n)
         .map(Long::valueOf)
         .orElse(null);

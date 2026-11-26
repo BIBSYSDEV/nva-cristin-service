@@ -1,5 +1,8 @@
 package no.unit.nva.clinicaltrial.persistence.dao;
 
+import static no.unit.nva.clinicaltrial.persistence.dao.TableAttributes.PARTITION_KEY;
+import static no.unit.nva.clinicaltrial.persistence.dao.TableAttributes.SORT_KEY;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.Instant;

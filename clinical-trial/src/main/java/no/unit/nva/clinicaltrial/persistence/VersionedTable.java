@@ -12,6 +12,7 @@ import no.unit.nva.clinicaltrial.model.Entity;
 import no.unit.nva.clinicaltrial.model.Version;
 import no.unit.nva.clinicaltrial.model.write.Writer;
 import no.unit.nva.clinicaltrial.persistence.dao.Dao;
+import no.unit.nva.clinicaltrial.persistence.dao.TableAttributes;
 import no.unit.nva.clinicaltrial.persistence.dao.VersionDao;
 import no.unit.nva.clinicaltrial.persistence.dao.VersionedDao;
 import no.unit.nva.clinicaltrial.persistence.exceptions.ConditionFailedException;
@@ -34,7 +35,10 @@ import software.amazon.awssdk.services.dynamodb.model.TransactionCanceledExcepti
 public class VersionedTable {
 
   private static final String EXPECTED_VERSION = ":expectedVersion";
-  private static final String CREATE_CONDITION = "attribute_not_exists(" + Dao.PARTITION_KEY + ")";
+  private static final String CREATE_CONDITION =
+      "attribute_not_exists(" + TableAttributes.PARTITION_KEY + ")";
+  private static final Expression CREATE_EXPRESSION =
+      Expression.builder().expression(CREATE_CONDITION).build();
   private static final String VERSION_NAME = "#version";
   private static final String UPDATE_CONDITION = VERSION_NAME + " = " + EXPECTED_VERSION;
   private static final long FIRST_VERSION = 1L;
@@ -73,12 +77,7 @@ public class VersionedTable {
     var versionDao = VersionDao.versionOf(dao, Action.from(entity), writer);
     return Stream.of(
         putRequest(dao.toDocument(), condition(entity.version())),
-        putRequest(versionDao.toDocument()));
-  }
-
-  private static TransactPutItemEnhancedRequest<EnhancedDocument> putRequest(
-      EnhancedDocument document) {
-    return TransactPutItemEnhancedRequest.builder(EnhancedDocument.class).item(document).build();
+        putRequest(versionDao.toDocument(), CREATE_EXPRESSION));
   }
 
   private static TransactPutItemEnhancedRequest<EnhancedDocument> putRequest(
@@ -91,14 +90,16 @@ public class VersionedTable {
   }
 
   private static Expression condition(Long expectedVersion) {
-    return Objects.isNull(expectedVersion)
-        ? Expression.builder().expression(CREATE_CONDITION).build()
-        : Expression.builder()
-            .expression(UPDATE_CONDITION)
-            .expressionNames(Map.of(VERSION_NAME, Dao.VERSION_ATTRIBUTE))
-            .expressionValues(
-                Map.of(EXPECTED_VERSION, AttributeValue.fromN(Long.toString(expectedVersion))))
-            .build();
+    return Objects.isNull(expectedVersion) ? CREATE_EXPRESSION : updateExpression(expectedVersion);
+  }
+
+  private static Expression updateExpression(Long expectedVersion) {
+    return Expression.builder()
+        .expression(UPDATE_CONDITION)
+        .expressionNames(Map.of(VERSION_NAME, TableAttributes.VERSION_ATTRIBUTE))
+        .expressionValues(
+            Map.of(EXPECTED_VERSION, AttributeValue.fromN(Long.toString(expectedVersion))))
+        .build();
   }
 
   private static long nextVersion(Long currentVersion) {
