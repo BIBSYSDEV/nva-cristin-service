@@ -1,7 +1,8 @@
 package no.unit.nva.clinicaltrial.service;
 
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.clinicalTrial;
-import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.clinicalTrialAdmin;
+import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.eligibleProjectManagedBy;
+import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.projectManagedBy;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomPersonIdentifier;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomUser;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
@@ -9,25 +10,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 import no.unit.nva.client.FetchApiClient;
-import no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures;
 import no.unit.nva.clinicaltrial.model.Grant;
 import no.unit.nva.clinicaltrial.model.write.ClinicalTrialWrite;
-import no.unit.nva.clinicaltrial.model.write.User;
 import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
 import no.unit.nva.clinicaltrial.persistence.LocalDynamoDbTable;
-import no.unit.nva.cristin.projects.model.nva.Approval;
-import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
-import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
-import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
-import no.unit.nva.cristin.projects.model.nva.Person;
-import no.unit.nva.cristin.projects.model.nva.Role;
-import no.unit.nva.model.ApprovalStatus;
 import nva.commons.apigateway.exceptions.ConflictException;
 import nva.commons.apigateway.exceptions.ForbiddenException;
 import nva.commons.apigateway.exceptions.NotFoundException;
@@ -37,7 +26,6 @@ import org.junit.jupiter.api.Test;
 class ClinicalTrialServiceTest {
 
   private static final String TABLE_NAME = "clinical-trial";
-  private static final String PROJECT_MANAGER = "ProjectManager";
 
   private ClinicalTrialRepository repository;
 
@@ -73,32 +61,7 @@ class ClinicalTrialServiceTest {
   }
 
   @Test
-  void shouldRecordKbsAdminAsGrantWhenAdminPersistsClinicalTrialForProjectTheyDoNotManage()
-      throws Exception {
-    var clinicalTrial = clinicalTrial(null);
-    var service = serviceReturningProjectManagedBy(randomPersonIdentifier());
-
-    service.save(new ClinicalTrialWrite(clinicalTrial, clinicalTrialAdmin()));
-
-    var version =
-        repository.findClinicalTrialVersions(clinicalTrial.projectIdentifier()).getFirst();
-    assertThat(((User) version.writer()).grants(), is(Set.of(Grant.CLINICAL_TRIAL_ADMIN)));
-  }
-
-  @Test
-  void shouldPersistClinicalTrialWhenCallerIsKbsAdmin() throws Exception {
-    var clinicalTrial = clinicalTrial(null);
-    var service = serviceReturningProjectManagedBy(randomPersonIdentifier());
-
-    service.save(new ClinicalTrialWrite(clinicalTrial, clinicalTrialAdmin()));
-
-    assertThat(
-        repository.findClinicalTrial(clinicalTrial.projectIdentifier()).orElseThrow().version(),
-        is(1L));
-  }
-
-  @Test
-  void shouldThrowForbiddenWhenCallerIsNotProjectManager() {
+  void shouldNotPersistClinicalTrialWhenCallerIsNotGrantedAccessToProject() {
     var clinicalTrial = clinicalTrial(null);
     var service = serviceReturningProjectManagedBy(randomPersonIdentifier());
 
@@ -113,8 +76,7 @@ class ClinicalTrialServiceTest {
   void shouldThrowConflictWhenProjectIsNotEligibleForClinicalTrial() {
     var user = randomUser();
     var service =
-        new ClinicalTrialService(
-            _ -> projectWithManager(user.personIdentifier()).build(), repository);
+        new ClinicalTrialService(_ -> projectManagedBy(user.personIdentifier()), repository);
 
     assertThrows(
         ConflictException.class,
@@ -135,47 +97,9 @@ class ClinicalTrialServiceTest {
         () -> service.save(new ClinicalTrialWrite(clinicalTrial(null), randomUser())));
   }
 
-  @Test
-  void shouldThrowForbiddenWhenProjectManagerIsUnidentifiedAndCallerHasNoPersonIdentifier() {
-    var clinicalTrial = clinicalTrial(null);
-    var service = serviceReturningProjectManagedBy(null);
-    var caller = new User(randomString(), null, UUID.randomUUID(), Set.of());
-
-    assertThrows(
-        ForbiddenException.class,
-        () -> service.save(new ClinicalTrialWrite(clinicalTrial, caller)));
-  }
-
   private ClinicalTrialService serviceReturningProjectManagedBy(String personIdentifier) {
-    FetchApiClient<String, NvaProject> projectsApi = _ -> projectManagedBy(personIdentifier);
+    FetchApiClient<String, NvaProject> projectsApi =
+        _ -> eligibleProjectManagedBy(personIdentifier);
     return new ClinicalTrialService(projectsApi, repository);
-  }
-
-  private NvaProject projectManagedBy(String personIdentifier) {
-    return eligible(projectWithManager(personIdentifier)).build();
-  }
-
-  private NvaProject.Builder eligible(NvaProject.Builder project) {
-    return project
-        .withHealthProjectData(new HealthProjectData(HealthProjectType.DRUGSTUDY, null, null))
-        .withApprovals(
-            List.of(new Approval(null, null, ApprovalStatus.APPROVED, null, null, null)));
-  }
-
-  private NvaProject.Builder projectWithManager(String personIdentifier) {
-    return new NvaProject.Builder()
-        .withContributors(
-            List.of(
-                new NvaContributor(
-                    person(personIdentifier), List.of(new Role(PROJECT_MANAGER, null)))));
-  }
-
-  private Person person(String personIdentifier) {
-    return new Person(
-        Optional.ofNullable(personIdentifier).map(ClinicalTrialFixtures::personId).orElse(null),
-        randomString(),
-        randomString(),
-        randomString(),
-        randomString());
   }
 }

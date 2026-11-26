@@ -7,13 +7,23 @@ import static no.unit.nva.utils.UriUtils.getNvaApiId;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import no.unit.nva.clinicaltrial.model.write.User;
+import no.unit.nva.cristin.projects.model.nva.Approval;
+import no.unit.nva.cristin.projects.model.nva.HealthProjectData;
+import no.unit.nva.cristin.projects.model.nva.HealthProjectType;
+import no.unit.nva.cristin.projects.model.nva.NvaContributor;
+import no.unit.nva.cristin.projects.model.nva.NvaProject;
+import no.unit.nva.cristin.projects.model.nva.Person;
+import no.unit.nva.cristin.projects.model.nva.Role;
+import no.unit.nva.model.ApprovalStatus;
 
 public final class ClinicalTrialFixtures {
 
   private static final String CUSTOMER_PATH = "customer";
+  private static final String PROJECT_MANAGER_ROLE = "ProjectManager";
 
   private ClinicalTrialFixtures() {}
 
@@ -52,6 +62,34 @@ public final class ClinicalTrialFixtures {
 
   public static User user(Set<Grant> grants) {
     return new User(randomString(), randomPersonIdentifier(), UUID.randomUUID(), grants);
+  }
+
+  public static NvaProject projectManagedBy(String personIdentifier) {
+    return projectWithManager(personIdentifier).build();
+  }
+
+  public static NvaProject eligibleProjectManagedBy(String personIdentifier) {
+    return projectWithManager(personIdentifier)
+        .withHealthProjectData(new HealthProjectData(HealthProjectType.DRUGSTUDY, null, null))
+        .withApprovals(List.of(new Approval(null, null, ApprovalStatus.APPROVED, null, null, null)))
+        .build();
+  }
+
+  private static NvaProject.Builder projectWithManager(String personIdentifier) {
+    return new NvaProject.Builder()
+        .withContributors(
+            List.of(
+                new NvaContributor(
+                    manager(personIdentifier), List.of(new Role(PROJECT_MANAGER_ROLE, null)))));
+  }
+
+  private static Person manager(String personIdentifier) {
+    return new Person(
+        Optional.ofNullable(personIdentifier).map(ClinicalTrialFixtures::personId).orElse(null),
+        randomString(),
+        randomString(),
+        randomString(),
+        randomString());
   }
 
   public static String randomPersonIdentifier() {
