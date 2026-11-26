@@ -42,6 +42,13 @@ public record SubmissionDao(
         .build();
   }
 
+  public static Key keyPrefixOf(String projectIdentifier) {
+    return Key.builder()
+        .partitionValue(Dao.projectKeyOf(projectIdentifier))
+        .sortValue(SUBMISSION_KEY_PREFIX)
+        .build();
+  }
+
   @Override
   public Submission toEntity() {
     return new Submission(

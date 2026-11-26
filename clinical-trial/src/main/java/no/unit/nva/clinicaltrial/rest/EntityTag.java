@@ -10,10 +10,20 @@ public record EntityTag(Long version) {
 
   public static final String VERSION_DOES_NOT_MATCH = "ETag does not match the current version";
 
+  public static final String ETAG_HEADER = "ETag";
+
   private static final String IF_MATCH_HEADER = "If-Match";
   private static final String IF_MATCH_REQUIRED = "Update requires an If-Match header";
   private static final String QUOTE = "\"";
   private static final String EMPTY_STRING = "";
+
+  public static EntityTag fromVersion(Long version) {
+    return new EntityTag(version);
+  }
+
+  public String headerValue() {
+    return QUOTE + version + QUOTE;
+  }
 
   public static EntityTag fromRequest(RequestInfo requestInfo) throws ApiGatewayException {
     var ifMatchHeader = getIfMatchHeader(requestInfo);

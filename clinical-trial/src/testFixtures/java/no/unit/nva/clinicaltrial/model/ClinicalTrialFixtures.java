@@ -2,6 +2,7 @@ package no.unit.nva.clinicaltrial.model;
 
 import static no.unit.nva.cristin.model.Constants.DOMAIN_NAME;
 import static no.unit.nva.cristin.model.Constants.ORGANIZATION_PATH;
+import static no.unit.nva.cristin.model.Constants.PROJECT_PATH_NVA;
 import static no.unit.nva.testutils.RandomDataGenerator.randomInteger;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static no.unit.nva.utils.UriUtils.getNvaApiId;
@@ -32,6 +33,10 @@ public final class ClinicalTrialFixtures {
 
   public static URI randomCustomer() {
     return new CustomerIdentifier(UUID.randomUUID()).toId(DOMAIN_NAME);
+  }
+
+  public static URI projectId(String projectIdentifier) {
+    return getNvaApiId(projectIdentifier, PROJECT_PATH_NVA);
   }
 
   public static URI personId(PersonIdentifier personIdentifier) {
