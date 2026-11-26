@@ -1,5 +1,6 @@
 package no.unit.nva.clinicaltrial.rest;
 
+import static java.net.HttpURLConnection.HTTP_BAD_GATEWAY;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
@@ -28,6 +29,7 @@ import no.unit.nva.identifiers.PersonIdentifier;
 import no.unit.nva.stubs.FakeContext;
 import no.unit.nva.testutils.HandlerRequestBuilder;
 import nva.commons.apigateway.GatewayResponse;
+import nva.commons.apigateway.exceptions.BadGatewayException;
 import nva.commons.core.Environment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -98,6 +100,25 @@ class FetchClinicalTrialHandlerTest {
     assertThat(
         GatewayResponse.fromOutputStream(output, Problem.class).getStatusCode(),
         is(HTTP_FORBIDDEN));
+  }
+
+  @Test
+  void shouldReturnBadGatewayWhenProjectsApiIsUnavailable() throws Exception {
+    var handlerWithUnavailableApi =
+        new FetchClinicalTrialHandler(
+            new ClinicalTrialService(
+                _ -> {
+                  throw new BadGatewayException(randomString());
+                },
+                repository),
+            new Environment());
+
+    handlerWithUnavailableApi.handleRequest(
+        request(projectIdentifier, projectManagerIdentifier), output, context());
+
+    assertThat(
+        GatewayResponse.fromOutputStream(output, Problem.class).getStatusCode(),
+        is(HTTP_BAD_GATEWAY));
   }
 
   @Test
