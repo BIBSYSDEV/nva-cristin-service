@@ -27,6 +27,7 @@ import nva.commons.apigateway.exceptions.ConflictException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.apigateway.exceptions.PreconditionFailedException;
 import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
 
 public class SaveSubmissionHandler extends ApiGatewayHandler<SubmissionRequest, Void> {
 
@@ -36,6 +37,11 @@ public class SaveSubmissionHandler extends ApiGatewayHandler<SubmissionRequest, 
 
   private final transient SubmissionService service;
   private transient SubmissionOperation operation;
+
+  @JacocoGenerated
+  public SaveSubmissionHandler() {
+    this(SubmissionService.defaultService(), new Environment());
+  }
 
   public SaveSubmissionHandler(SubmissionService service, Environment environment) {
     super(SubmissionRequest.class, environment);

@@ -22,6 +22,7 @@ import nva.commons.apigateway.exceptions.ConflictException;
 import nva.commons.apigateway.exceptions.NotFoundException;
 import nva.commons.apigateway.exceptions.PreconditionFailedException;
 import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
 
 public class SaveClinicalTrialHandler extends ApiGatewayHandler<ClinicalTrialRequest, Void> {
 
@@ -32,6 +33,11 @@ public class SaveClinicalTrialHandler extends ApiGatewayHandler<ClinicalTrialReq
 
   private final transient ClinicalTrialService service;
   private transient ClinicalTrialOperation operation;
+
+  @JacocoGenerated
+  public SaveClinicalTrialHandler() {
+    this(ClinicalTrialService.defaultService(), new Environment());
+  }
 
   public SaveClinicalTrialHandler(ClinicalTrialService service, Environment environment) {
     super(ClinicalTrialRequest.class, environment);

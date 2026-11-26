@@ -13,13 +13,27 @@ import no.unit.nva.clinicaltrial.persistence.dao.PeriodDao;
 import no.unit.nva.clinicaltrial.persistence.dao.SubmissionDao;
 import no.unit.nva.clinicaltrial.persistence.exceptions.ConditionFailedException;
 import no.unit.nva.clinicaltrial.persistence.exceptions.ItemNotFoundException;
+import nva.commons.core.Environment;
+import nva.commons.core.JacocoGenerated;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 public class ClinicalTrialRepository {
+
+  private static final String TABLE_NAME = "TABLE_NAME";
 
   private final transient VersionedTable table;
 
   public ClinicalTrialRepository(VersionedTable table) {
     this.table = table;
+  }
+
+  @JacocoGenerated
+  public static ClinicalTrialRepository defaultRepository() {
+    return new ClinicalTrialRepository(
+        new VersionedTable(
+            DynamoDbEnhancedClient.builder().dynamoDbClient(DynamoDbClient.create()).build(),
+            new Environment().readEnv(TABLE_NAME)));
   }
 
   public void save(Actor actor, Entity... entities)

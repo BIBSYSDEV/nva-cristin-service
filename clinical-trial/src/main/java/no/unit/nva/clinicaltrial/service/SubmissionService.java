@@ -12,11 +12,13 @@ import no.unit.nva.clinicaltrial.model.write.User;
 import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
 import no.unit.nva.clinicaltrial.persistence.exceptions.ConditionFailedException;
 import no.unit.nva.clinicaltrial.persistence.exceptions.ItemNotFoundException;
+import no.unit.nva.cristin.projects.fetch.FetchCristinProjectApiClient;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import no.unit.nva.identifiers.OrganizationIdentifier;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.BadRequestException;
 import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.core.JacocoGenerated;
 
 public class SubmissionService {
 
@@ -37,6 +39,13 @@ public class SubmissionService {
       FetchApiClient<String, NvaProject> projectsApi, ClinicalTrialRepository repository) {
     this.projectsApi = projectsApi;
     this.repository = repository;
+  }
+
+  @JacocoGenerated
+  public static SubmissionService defaultService() {
+    return new SubmissionService(
+        new FetchCristinProjectApiClient()::queryOneCristinProjectUsingIdIntoNvaProject,
+        ClinicalTrialRepository.defaultRepository());
   }
 
   public void save(Submission submission, User user)
