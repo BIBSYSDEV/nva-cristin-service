@@ -84,9 +84,9 @@ public class QueryPersonEmploymentClient extends ApiClient {
 
   private static boolean isAtInstitution(Employment employment, String institution) {
     return Optional.ofNullable(employment.getOrganization())
-               .map(Utils::extractInstitution)
-               .map(institution::equals)
-               .orElse(false);
+        .map(Utils::extractInstitution)
+        .map(institution::equals)
+        .orElse(false);
   }
 
   private void checkResponseForBadRequestIndicatingNotFoundIdentifier(int statusCode)

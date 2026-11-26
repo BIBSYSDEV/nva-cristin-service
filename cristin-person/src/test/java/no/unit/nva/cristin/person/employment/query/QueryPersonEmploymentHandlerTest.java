@@ -50,6 +50,10 @@ public class QueryPersonEmploymentHandlerTest {
   private static final String CRISTIN_QUERY_RESPONSE_JSON = "cristinQueryEmploymentResponse.json";
   private static final String DUMMY_CRISTIN_RESPONSE =
       IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE_JSON));
+  private static final String CRISTIN_QUERY_RESPONSE_WITHOUT_AFFILIATION_JSON =
+      "cristinQueryEmploymentWithoutAffiliationResponse.json";
+  private static final String DUMMY_CRISTIN_RESPONSE_WITHOUT_AFFILIATION =
+      IoUtils.stringFromResources(Path.of(CRISTIN_QUERY_RESPONSE_WITHOUT_AFFILIATION_JSON));
   private static final Integer SIZE_OF_DUMMY_CRISTIN_RESPONSE = 2;
   private static final Integer ZERO = 0;
   private static final Integer ONE = 1;
@@ -112,7 +116,8 @@ public class QueryPersonEmploymentHandlerTest {
     var gatewayResponse = sendQuery(Map.of(PARAM_FIELD_ID, INVALID_IDENTIFIER));
 
     assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
-    assertThat(gatewayResponse.getBody(), containsString(invalidPathParameterMessage(PARAM_FIELD_ID)));
+    assertThat(
+        gatewayResponse.getBody(), containsString(invalidPathParameterMessage(PARAM_FIELD_ID)));
   }
 
   @Test
@@ -156,7 +161,8 @@ public class QueryPersonEmploymentHandlerTest {
 
   @Test
   void shouldReturnOnlyEmploymentsAtOwnInstitutionWhenClientIsThirdParty() throws IOException {
-    var gatewayResponse = sendQueryAsThirdParty(INSTITUTION_WITH_EXPECTED_HIT_IN_DUMMY_CRISTIN_RESPONSE);
+    var gatewayResponse =
+        sendQueryAsThirdParty(INSTITUTION_WITH_EXPECTED_HIT_IN_DUMMY_CRISTIN_RESPONSE);
     var response = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SEARCH_RESPONSE_REF);
 
     assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
@@ -164,13 +170,30 @@ public class QueryPersonEmploymentHandlerTest {
     assertThat(
         institutionOf(response.getHits().getFirst().getOrganization()),
         equalTo(institutionOf(INSTITUTION_WITH_EXPECTED_HIT_IN_DUMMY_CRISTIN_RESPONSE)));
-    assertThat(unitFrom(response.getHits().getFirst().getOrganization()), equalTo(UNIT_IN_DUMMY_CRISTIN_RESPONSE));
+    assertThat(
+        unitFrom(response.getHits().getFirst().getOrganization()),
+        equalTo(UNIT_IN_DUMMY_CRISTIN_RESPONSE));
   }
 
   @Test
   void shouldReturnNoEmploymentsWhenThirdPartyInstitutionHasNoEmploymentsForPerson()
       throws IOException {
-    var gatewayResponse = sendQueryAsThirdParty(INSTITUTION_WITHOUT_EXPECTED_HIT_IN_DUMMY_CRISTIN_RESPONSE);
+    var gatewayResponse =
+        sendQueryAsThirdParty(INSTITUTION_WITHOUT_EXPECTED_HIT_IN_DUMMY_CRISTIN_RESPONSE);
+    var response = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SEARCH_RESPONSE_REF);
+
+    assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
+    assertThat(response.getSize(), equalTo(ZERO));
+    assertThat(response.getHits().size(), equalTo(ZERO));
+  }
+
+  @Test
+  void shouldReturnNoEmploymentsWhenThirdPartyEmploymentHasNoAffiliation()
+      throws IOException, InterruptedException {
+    when(clientMock.<String>send(any(), any()))
+        .thenReturn(new HttpResponseFaker(DUMMY_CRISTIN_RESPONSE_WITHOUT_AFFILIATION, 200));
+    var gatewayResponse =
+        sendQueryAsThirdParty(INSTITUTION_WITHOUT_EXPECTED_HIT_IN_DUMMY_CRISTIN_RESPONSE);
     var response = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SEARCH_RESPONSE_REF);
 
     assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());

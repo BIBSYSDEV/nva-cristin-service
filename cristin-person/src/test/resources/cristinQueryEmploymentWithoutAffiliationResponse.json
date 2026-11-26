@@ -1,0 +1,17 @@
+[
+  {
+    "id": "1015",
+    "affiliation": {},
+    "active": false,
+    "position": {
+      "code": "M0000029",
+      "name": {
+        "nb": "Gjest"
+      },
+      "enabled": false
+    },
+    "start_date": "2017-12-01T00:00:00.000Z",
+    "end_date": "2019-12-31T00:00:00.000Z",
+    "url": "https://api.cristin.no/v2/persons/738/affiliationss/1015"
+  }
+]
