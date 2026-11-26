@@ -3,6 +3,8 @@ package no.unit.nva.clinicaltrial.persistence.dao;
 import static no.unit.nva.commons.json.JsonUtils.dtoObjectMapper;
 import static nva.commons.core.attempt.Try.attempt;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.databind.JavaType;
 import java.time.Instant;
 import software.amazon.awssdk.enhanced.dynamodb.AttributeValueType;
@@ -10,9 +12,11 @@ import software.amazon.awssdk.enhanced.dynamodb.TableMetadata;
 import software.amazon.awssdk.enhanced.dynamodb.document.DocumentTableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.document.EnhancedDocument;
 
+@JsonTypeInfo(use = Id.NAME, property = Dao.TYPE_ATTRIBUTE)
 public interface Dao {
 
   String PARTITION_KEY = "PK";
+  String TYPE_ATTRIBUTE = "type";
   String SORT_KEY = "SK";
   String ITEM_NOT_MAPPABLE = "Item is not mappable";
 

@@ -1,12 +1,14 @@
 package no.unit.nva.clinicaltrial.persistence.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.Instant;
 import java.util.Objects;
 import no.unit.nva.clinicaltrial.model.ClinicalTrial;
 import no.unit.nva.clinicaltrial.model.Reportable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 
+@JsonTypeName("ClinicalTrial")
 public record ClinicalTrialDao(
     @JsonProperty(PARTITION_KEY) String partitionKey,
     @JsonProperty(SORT_KEY) String sortKey,

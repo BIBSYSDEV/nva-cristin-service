@@ -1,6 +1,7 @@
 package no.unit.nva.clinicaltrial.persistence.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.Instant;
 import no.unit.nva.clinicaltrial.model.Action;
 import no.unit.nva.clinicaltrial.model.Entity;
@@ -8,6 +9,7 @@ import no.unit.nva.clinicaltrial.model.Version;
 import no.unit.nva.clinicaltrial.model.write.Writer;
 import no.unit.nva.identifiers.SortableIdentifier;
 
+@JsonTypeName("Version")
 public record VersionDao<T>(
     @JsonProperty(PARTITION_KEY) String partitionKey,
     @JsonProperty(SORT_KEY) String sortKey,

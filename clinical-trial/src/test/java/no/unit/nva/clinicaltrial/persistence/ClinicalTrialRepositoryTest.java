@@ -61,7 +61,7 @@ class ClinicalTrialRepositoryTest {
 
     assertThat(
         persistedItem(clinicalTrial.projectIdentifier()).keySet(),
-        is(Set.of("PK", "SK", "reportable", "version", "createdDate", "modifiedDate")));
+        is(Set.of("PK", "SK", "type", "reportable", "version", "createdDate", "modifiedDate")));
   }
 
   @Test
@@ -136,7 +136,9 @@ class ClinicalTrialRepositoryTest {
 
     assertThat(
         persistedVersion(clinicalTrial.projectIdentifier()).keySet(),
-        is(Set.of("PK", "SK", "entity", "writer", "action", "createdDate", "modifiedDate")));
+        is(
+            Set.of(
+                "PK", "SK", "type", "entity", "writer", "action", "createdDate", "modifiedDate")));
   }
 
   @Test
