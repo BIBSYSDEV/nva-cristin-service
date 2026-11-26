@@ -3,12 +3,12 @@ package no.unit.nva.clinicaltrial.persistence;
 import java.util.List;
 import java.util.Optional;
 import no.unit.nva.clinicaltrial.model.ClinicalTrial;
+import no.unit.nva.clinicaltrial.model.Entity;
 import no.unit.nva.clinicaltrial.model.Period;
 import no.unit.nva.clinicaltrial.model.Submission;
 import no.unit.nva.clinicaltrial.model.Version;
-import no.unit.nva.clinicaltrial.model.write.Write;
+import no.unit.nva.clinicaltrial.model.write.Writer;
 import no.unit.nva.clinicaltrial.persistence.dao.ClinicalTrialDao;
-import no.unit.nva.clinicaltrial.persistence.dao.Dao;
 import no.unit.nva.clinicaltrial.persistence.dao.PeriodDao;
 import no.unit.nva.clinicaltrial.persistence.dao.SubmissionDao;
 import no.unit.nva.clinicaltrial.persistence.exceptions.ConditionFailedException;
@@ -22,15 +22,13 @@ public class ClinicalTrialRepository {
     this.table = table;
   }
 
-  public void save(Write write) throws ConditionFailedException, ItemNotFoundException {
-    table.save(write);
+  public void save(Writer writer, Entity... entities)
+      throws ConditionFailedException, ItemNotFoundException {
+    table.save(writer, entities);
   }
 
   public Optional<ClinicalTrial> findClinicalTrial(String projectIdentifier) {
-    return table
-        .item(ClinicalTrialDao.keyOf(projectIdentifier))
-        .map(document -> Dao.fromDocument(document, ClinicalTrialDao.class))
-        .map(ClinicalTrialDao::toEntity);
+    return table.item(ClinicalTrialDao.keyOf(projectIdentifier), ClinicalTrialDao.class);
   }
 
   public List<Version<ClinicalTrial>> findClinicalTrialVersions(String projectIdentifier) {
@@ -38,10 +36,7 @@ public class ClinicalTrialRepository {
   }
 
   public Optional<Period> findPeriod(String periodIdentifier) {
-    return table
-        .item(PeriodDao.keyOf(periodIdentifier))
-        .map(document -> Dao.fromDocument(document, PeriodDao.class))
-        .map(PeriodDao::toEntity);
+    return table.item(PeriodDao.keyOf(periodIdentifier), PeriodDao.class);
   }
 
   public List<Version<Period>> findPeriodVersions(String periodIdentifier) {
@@ -49,10 +44,8 @@ public class ClinicalTrialRepository {
   }
 
   public Optional<Submission> findSubmission(String projectIdentifier, String periodIdentifier) {
-    return table
-        .item(SubmissionDao.keyOf(projectIdentifier, periodIdentifier))
-        .map(document -> Dao.fromDocument(document, SubmissionDao.class))
-        .map(SubmissionDao::toEntity);
+    return table.item(
+        SubmissionDao.keyOf(projectIdentifier, periodIdentifier), SubmissionDao.class);
   }
 
   public List<Version<Submission>> findSubmissionVersions(

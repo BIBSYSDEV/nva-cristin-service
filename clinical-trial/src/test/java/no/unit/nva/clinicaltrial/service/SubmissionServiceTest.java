@@ -18,9 +18,6 @@ import no.unit.nva.clinicaltrial.model.Period;
 import no.unit.nva.clinicaltrial.model.Reportable;
 import no.unit.nva.clinicaltrial.model.Submission;
 import no.unit.nva.clinicaltrial.model.SubmissionStatus;
-import no.unit.nva.clinicaltrial.model.write.ClinicalTrialWrite;
-import no.unit.nva.clinicaltrial.model.write.PeriodWrite;
-import no.unit.nva.clinicaltrial.model.write.SubmissionWrite;
 import no.unit.nva.clinicaltrial.model.write.SystemWriter;
 import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
 import no.unit.nva.clinicaltrial.persistence.LocalDynamoDbTable;
@@ -45,11 +42,8 @@ class SubmissionServiceTest {
     repository = LocalDynamoDbTable.repositoryOf(LocalDynamoDbTable.create(TABLE_NAME), TABLE_NAME);
     periodIdentifier = randomPeriodIdentifier();
     projectIdentifier = randomProjectIdentifier();
-    repository.save(
-        new PeriodWrite(new Period(periodIdentifier, null), new SystemWriter(ADMIN_PROCESS)));
-    repository.save(
-        new ClinicalTrialWrite(
-            new ClinicalTrial(projectIdentifier, Reportable.YES, null), randomUser()));
+    repository.save(new SystemWriter(ADMIN_PROCESS), new Period(periodIdentifier, null));
+    repository.save(randomUser(), new ClinicalTrial(projectIdentifier, Reportable.YES, null));
   }
 
   @Test
@@ -59,7 +53,7 @@ class SubmissionServiceTest {
     var submission = submissionOf(List.of(new Inclusion(institution, 3)), null);
     var service = serviceFor(user.personIdentifier());
 
-    service.save(new SubmissionWrite(submission, user));
+    service.save(submission, user);
 
     var persisted = persisted(submission);
     assertThat(persisted.status(), is(SubmissionStatus.SUBMITTED));
@@ -72,10 +66,10 @@ class SubmissionServiceTest {
     var institution = randomInstitutionIdentifier();
     var service = serviceFor(user.personIdentifier());
     var submission = submissionOf(List.of(new Inclusion(institution, 3)), null);
-    service.save(new SubmissionWrite(submission, user));
+    service.save(submission, user);
 
     var replaced = withInclusions(persisted(submission), List.of(new Inclusion(institution, 7)));
-    service.save(new SubmissionWrite(replaced, user));
+    service.save(replaced, user);
 
     assertThat(persisted(submission).inclusions(), is(replaced.inclusions()));
   }
@@ -86,9 +80,7 @@ class SubmissionServiceTest {
     var submission = submissionOf(List.of(new Inclusion(institution, 3)), null);
     var service = serviceFor(randomPersonIdentifier());
 
-    assertThrows(
-        ForbiddenException.class,
-        () -> service.save(new SubmissionWrite(submission, randomUser())));
+    assertThrows(ForbiddenException.class, () -> service.save(submission, randomUser()));
     assertThat(
         repository.findSubmission(submission.projectIdentifier(), submission.periodIdentifier()),
         is(Optional.empty()));
@@ -106,8 +98,7 @@ class SubmissionServiceTest {
             null);
     var service = serviceFor(user.personIdentifier());
 
-    assertThrows(
-        NotFoundException.class, () -> service.save(new SubmissionWrite(submission, user)));
+    assertThrows(NotFoundException.class, () -> service.save(submission, user));
   }
 
   @Test
@@ -122,8 +113,7 @@ class SubmissionServiceTest {
             null);
     var service = serviceFor(user.personIdentifier());
 
-    assertThrows(
-        NotFoundException.class, () -> service.save(new SubmissionWrite(submission, user)));
+    assertThrows(NotFoundException.class, () -> service.save(submission, user));
   }
 
   @Test
@@ -132,8 +122,7 @@ class SubmissionServiceTest {
     var submission = submissionOf(List.of(), null);
     var service = serviceFor(user.personIdentifier());
 
-    assertThrows(
-        BadRequestException.class, () -> service.save(new SubmissionWrite(submission, user)));
+    assertThrows(BadRequestException.class, () -> service.save(submission, user));
   }
 
   @Test
@@ -142,8 +131,7 @@ class SubmissionServiceTest {
     var submission = submissionOf(List.of(new Inclusion(null, 3)), null);
     var service = serviceFor(user.personIdentifier());
 
-    assertThrows(
-        BadRequestException.class, () -> service.save(new SubmissionWrite(submission, user)));
+    assertThrows(BadRequestException.class, () -> service.save(submission, user));
   }
 
   @Test
@@ -153,8 +141,7 @@ class SubmissionServiceTest {
     var submission = submissionOf(List.of(new Inclusion(institution, -1)), null);
     var service = serviceFor(user.personIdentifier());
 
-    assertThrows(
-        BadRequestException.class, () -> service.save(new SubmissionWrite(submission, user)));
+    assertThrows(BadRequestException.class, () -> service.save(submission, user));
   }
 
   @Test
@@ -165,8 +152,7 @@ class SubmissionServiceTest {
         submissionOf(List.of(new Inclusion(institution, 3), new Inclusion(institution, 4)), null);
     var service = serviceFor(user.personIdentifier());
 
-    assertThrows(
-        BadRequestException.class, () -> service.save(new SubmissionWrite(submission, user)));
+    assertThrows(BadRequestException.class, () -> service.save(submission, user));
   }
 
   private Submission submissionOf(List<Inclusion> inclusions, Long version) {

@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Optional;
 import no.unit.nva.client.FetchApiClient;
 import no.unit.nva.clinicaltrial.model.Grant;
-import no.unit.nva.clinicaltrial.model.write.ClinicalTrialWrite;
 import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
 import no.unit.nva.clinicaltrial.persistence.LocalDynamoDbTable;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -41,7 +40,7 @@ class ClinicalTrialServiceTest {
     var clinicalTrial = clinicalTrial(null);
     var service = serviceReturningProjectManagedBy(user.personIdentifier());
 
-    service.save(new ClinicalTrialWrite(clinicalTrial, user));
+    service.save(clinicalTrial, user);
 
     assertThat(
         repository.findClinicalTrial(clinicalTrial.projectIdentifier()).orElseThrow().version(),
@@ -54,7 +53,7 @@ class ClinicalTrialServiceTest {
     var clinicalTrial = clinicalTrial(null);
     var service = serviceReturningProjectManagedBy(user.personIdentifier());
 
-    service.save(new ClinicalTrialWrite(clinicalTrial, user));
+    service.save(clinicalTrial, user);
 
     var version =
         repository.findClinicalTrialVersions(clinicalTrial.projectIdentifier()).getFirst();
@@ -66,9 +65,7 @@ class ClinicalTrialServiceTest {
     var clinicalTrial = clinicalTrial(null);
     var service = serviceReturningProjectManagedBy(randomPersonIdentifier());
 
-    assertThrows(
-        ForbiddenException.class,
-        () -> service.save(new ClinicalTrialWrite(clinicalTrial, randomUser())));
+    assertThrows(ForbiddenException.class, () -> service.save(clinicalTrial, randomUser()));
     assertThat(
         repository.findClinicalTrial(clinicalTrial.projectIdentifier()), is(Optional.empty()));
   }
@@ -79,9 +76,7 @@ class ClinicalTrialServiceTest {
     var service =
         new ClinicalTrialService(_ -> projectManagedBy(user.personIdentifier()), repository);
 
-    assertThrows(
-        ConflictException.class,
-        () -> service.save(new ClinicalTrialWrite(clinicalTrial(null), user)));
+    assertThrows(ConflictException.class, () -> service.save(clinicalTrial(null), user));
   }
 
   @Test
@@ -93,9 +88,7 @@ class ClinicalTrialServiceTest {
             },
             repository);
 
-    assertThrows(
-        NotFoundException.class,
-        () -> service.save(new ClinicalTrialWrite(clinicalTrial(null), randomUser())));
+    assertThrows(NotFoundException.class, () -> service.save(clinicalTrial(null), randomUser()));
   }
 
   private ClinicalTrialService serviceReturningProjectManagedBy(PersonIdentifier personIdentifier) {

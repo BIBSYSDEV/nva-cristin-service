@@ -7,46 +7,49 @@ import no.unit.nva.clinicaltrial.model.Action;
 import no.unit.nva.clinicaltrial.model.Entity;
 import no.unit.nva.clinicaltrial.model.Version;
 import no.unit.nva.clinicaltrial.model.write.Writer;
-import no.unit.nva.identifiers.SortableIdentifier;
+import software.amazon.awssdk.enhanced.dynamodb.Key;
 
 @JsonTypeName("Version")
 public record VersionDao<T>(
     @JsonProperty(PARTITION_KEY) String partitionKey,
     @JsonProperty(SORT_KEY) String sortKey,
+    String entityType,
     T entity,
     Writer writer,
     Action action,
-    Instant createdDate,
     Instant modifiedDate)
     implements Dao {
 
-  private static final String VERSION_KEY_PREFIX = "VERSION#";
-  private static final String KEY_SEPARATOR = "#";
+  private static final String HISTORY_KEY_PREFIX = "HISTORY";
+  private static final String VERSION_KEY_FORMAT = "%019d";
 
   public static <E extends Entity> VersionDao<E> versionOf(
-      VersionedDao<E> entityDao, Writer writer) {
-    var action = entityDao.toEntity().action();
-    var entity = entityDao.entityAtVersion(entityDao.nextVersion());
-    var timestamp = entityDao.modifiedDate();
+      VersionedDao<E> entityDao, Action action, Writer writer) {
+    var entity = entityDao.toEntity();
     return new VersionDao<>(
-        entityDao.partitionKey(),
-        keyPrefixOf(entityDao.sortKey()) + SortableIdentifier.next(),
+        historyPartitionOf(entityDao.partitionKey(), entityDao.sortKey()),
+        sortKeyOf(entityDao.version()),
+        entity.getClass().getSimpleName(),
         entity,
         writer,
         action,
-        timestamp,
-        timestamp);
+        entityDao.modifiedDate());
   }
 
-  public static String keyPrefixOf(String entitySortKey) {
-    return VERSION_KEY_PREFIX + entitySortKey + KEY_SEPARATOR;
+  private static String historyPartitionOf(String entityPartitionKey, String entitySortKey) {
+    return HISTORY_KEY_PREFIX + KEY_SEPARATOR + entityPartitionKey + KEY_SEPARATOR + entitySortKey;
+  }
+
+  public static String historyPartitionOf(Key entityKey) {
+    return historyPartitionOf(
+        entityKey.partitionKeyValue().s(), entityKey.sortKeyValue().orElseThrow().s());
   }
 
   public Version<T> toVersion() {
-    return new Version<>(identifier(), entity, writer, action, modifiedDate);
+    return new Version<>(entity, writer, action, modifiedDate);
   }
 
-  private SortableIdentifier identifier() {
-    return new SortableIdentifier(sortKey.substring(sortKey.lastIndexOf(KEY_SEPARATOR) + 1));
+  private static String sortKeyOf(long version) {
+    return VERSION_KEY_FORMAT.formatted(version);
   }
 }

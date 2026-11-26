@@ -17,7 +17,10 @@ public interface Dao {
 
   String PARTITION_KEY = "PK";
   String TYPE_ATTRIBUTE = "type";
-  String PROJECT_KEY_PREFIX = "PROJECT#";
+  String VERSION_ATTRIBUTE = "version";
+  String MODIFIED_DATE = "modifiedDate";
+  String KEY_SEPARATOR = "#";
+  String PROJECT_KEY_PREFIX = "PROJECT" + KEY_SEPARATOR;
   String SORT_KEY = "SK";
   String ITEM_NOT_MAPPABLE = "Item is not mappable";
 
@@ -31,8 +34,6 @@ public interface Dao {
   String partitionKey();
 
   String sortKey();
-
-  Instant createdDate();
 
   Instant modifiedDate();
 

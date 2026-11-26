@@ -1,7 +1,8 @@
 package no.unit.nva.clinicaltrial.service;
 
 import no.unit.nva.client.FetchApiClient;
-import no.unit.nva.clinicaltrial.model.write.ClinicalTrialWrite;
+import no.unit.nva.clinicaltrial.model.ClinicalTrial;
+import no.unit.nva.clinicaltrial.model.write.User;
 import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
 import no.unit.nva.clinicaltrial.persistence.exceptions.ConditionFailedException;
 import no.unit.nva.clinicaltrial.persistence.exceptions.ItemNotFoundException;
@@ -22,12 +23,12 @@ public class ClinicalTrialService {
     this.repository = repository;
   }
 
-  public void save(ClinicalTrialWrite clinicalTrialWrite)
+  public void save(ClinicalTrial clinicalTrial, User user)
       throws ApiGatewayException, ConditionFailedException, ItemNotFoundException {
-    var project = projectsApi.executeFetch(clinicalTrialWrite.clinicalTrial().projectIdentifier());
-    var user = ProjectAccess.granted(project, clinicalTrialWrite.user());
+    var project = projectsApi.executeFetch(clinicalTrial.projectIdentifier());
+    var writer = ProjectAccess.granted(project, user);
     verifyEligible(project);
-    repository.save(new ClinicalTrialWrite(clinicalTrialWrite.clinicalTrial(), user));
+    repository.save(writer, clinicalTrial);
   }
 
   private static void verifyEligible(NvaProject project) throws ConflictException {

@@ -10,7 +10,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import java.util.Optional;
 import no.unit.nva.clinicaltrial.model.ClinicalTrial;
 import no.unit.nva.clinicaltrial.model.Reportable;
-import no.unit.nva.clinicaltrial.model.write.ClinicalTrialWrite;
+import no.unit.nva.clinicaltrial.model.write.User;
 import no.unit.nva.clinicaltrial.persistence.exceptions.ConditionFailedException;
 import no.unit.nva.clinicaltrial.persistence.exceptions.ItemNotFoundException;
 import no.unit.nva.clinicaltrial.service.ClinicalTrialService;
@@ -50,7 +50,7 @@ public class SaveClinicalTrialHandler extends ApiGatewayHandler<ClinicalTrialReq
       throws ApiGatewayException {
     operation = ClinicalTrialOperation.fromRequest(requestInfo);
     var clinicalTrial = createClinicalTrial(input, requestInfo);
-    save(new ClinicalTrialWrite(clinicalTrial, userFrom(requestInfo)));
+    save(clinicalTrial, userFrom(requestInfo));
     return null;
   }
 
@@ -71,9 +71,9 @@ public class SaveClinicalTrialHandler extends ApiGatewayHandler<ClinicalTrialReq
     return operation.isCreate() ? HTTP_CREATED : HTTP_NO_CONTENT;
   }
 
-  private void save(ClinicalTrialWrite clinicalTrialWrite) throws ApiGatewayException {
+  private void save(ClinicalTrial clinicalTrial, User user) throws ApiGatewayException {
     try {
-      service.save(clinicalTrialWrite);
+      service.save(clinicalTrial, user);
     } catch (ConditionFailedException conditionFailed) {
       throw operation.isCreate()
           ? new ConflictException(PROJECT_ALREADY_HAS_CLINICAL_TRIAL)

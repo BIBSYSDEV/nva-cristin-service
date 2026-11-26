@@ -10,7 +10,6 @@ import java.util.Set;
 import no.unit.nva.clinicaltrial.model.Action;
 import no.unit.nva.clinicaltrial.model.Submission;
 import no.unit.nva.clinicaltrial.model.SubmissionStatus;
-import no.unit.nva.clinicaltrial.model.write.SubmissionWrite;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -34,7 +33,7 @@ class SubmissionPersistenceTest {
   void shouldFindPersistedSubmission() throws Exception {
     var submission = submission(null);
 
-    repository.save(new SubmissionWrite(submission, randomUser()));
+    repository.save(randomUser(), submission);
 
     var persisted = persistedSubmission(submission);
     assertThat(persisted.inclusions(), is(submission.inclusions()));
@@ -45,21 +44,12 @@ class SubmissionPersistenceTest {
   void shouldPersistSubmissionWithExpectedAttributeNames() throws Exception {
     var submission = submission(null);
 
-    repository.save(new SubmissionWrite(submission, randomUser()));
+    repository.save(randomUser(), submission);
 
     var item = persistedItem(submission);
     assertThat(
         item.keySet(),
-        is(
-            Set.of(
-                "PK",
-                "SK",
-                "type",
-                "inclusions",
-                "status",
-                "version",
-                "createdDate",
-                "modifiedDate")));
+        is(Set.of("PK", "SK", "type", "inclusions", "status", "version", "modifiedDate")));
     assertThat(
         item.get("inclusions").l().getFirst().m().keySet(),
         is(Set.of("institutionIdentifier", "count")));
@@ -69,7 +59,7 @@ class SubmissionPersistenceTest {
   void shouldPersistInstitutionIdentifierAsPlainString() throws Exception {
     var submission = submission(null);
 
-    repository.save(new SubmissionWrite(submission, randomUser()));
+    repository.save(randomUser(), submission);
 
     var institution =
         persistedItem(submission).get("inclusions").l().getFirst().m().get("institutionIdentifier");
@@ -80,15 +70,15 @@ class SubmissionPersistenceTest {
   @Test
   void shouldListVersionsOfSubmissionNewestFirst() throws Exception {
     var submission = submission(null);
-    repository.save(new SubmissionWrite(submission, randomUser()));
+    repository.save(randomUser(), submission);
 
-    repository.save(new SubmissionWrite(persistedSubmission(submission), randomUser()));
+    repository.save(randomUser(), persistedSubmission(submission));
 
     var versions =
         repository.findSubmissionVersions(
             submission.projectIdentifier(), submission.periodIdentifier());
     assertThat(versions.getFirst().entity().version(), is(2L));
-    assertThat(versions.getLast().action(), is(Action.CREATE_SUBMISSION));
+    assertThat(versions.getLast().action(), is(Action.CREATE));
   }
 
   private Submission persistedSubmission(Submission submission) {
