@@ -16,18 +16,18 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 
-class PeriodRepositoryTest {
+class PeriodPersistenceTest {
 
   private static final String TABLE_NAME = "clinical-trial";
   private static final String ADMIN_PROCESS = "period-administration";
 
   private DynamoDbClient client;
-  private PeriodRepository repository;
+  private ClinicalTrialRepository repository;
 
   @BeforeEach
   void setUp() {
     client = LocalDynamoDbTable.create(TABLE_NAME);
-    repository = LocalDynamoDbTable.periodsOf(client, TABLE_NAME);
+    repository = LocalDynamoDbTable.repositoryOf(client, TABLE_NAME);
   }
 
   @Test
@@ -37,7 +37,8 @@ class PeriodRepositoryTest {
     repository.save(new PeriodWrite(period, new SystemWriter(ADMIN_PROCESS)));
 
     assertThat(
-        repository.find(period.identifier()).orElseThrow().identifier(), is(period.identifier()));
+        repository.findPeriod(period.identifier()).orElseThrow().identifier(),
+        is(period.identifier()));
   }
 
   @Test
@@ -55,11 +56,11 @@ class PeriodRepositoryTest {
   void shouldListVersionsOfPeriodNewestFirst() throws Exception {
     var period = new Period(randomString(), null);
     repository.save(new PeriodWrite(period, new SystemWriter(ADMIN_PROCESS)));
-    var persisted = repository.find(period.identifier()).orElseThrow();
+    var persisted = repository.findPeriod(period.identifier()).orElseThrow();
 
     repository.save(new PeriodWrite(persisted, new SystemWriter(ADMIN_PROCESS)));
 
-    var versions = repository.findVersions(period.identifier());
+    var versions = repository.findPeriodVersions(period.identifier());
     assertThat(versions.getFirst().entity().version(), is(2L));
     assertThat(versions.getLast().action(), is(Action.CREATE_PERIOD));
   }

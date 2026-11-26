@@ -2,6 +2,7 @@ package no.unit.nva.clinicaltrial.model.write;
 
 import static java.util.stream.Collectors.toSet;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -34,6 +35,7 @@ public record User(
         Stream.concat(grants.stream(), Stream.of(grant)).collect(toSet()));
   }
 
+  @JsonIgnore
   public boolean isGranted() {
     return !grants.isEmpty();
   }

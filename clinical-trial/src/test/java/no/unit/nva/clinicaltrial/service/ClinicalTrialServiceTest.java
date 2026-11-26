@@ -54,7 +54,9 @@ class ClinicalTrialServiceTest {
 
     service.save(new ClinicalTrialWrite(clinicalTrial, user));
 
-    assertThat(repository.find(clinicalTrial.projectIdentifier()).orElseThrow().version(), is(1L));
+    assertThat(
+        repository.findClinicalTrial(clinicalTrial.projectIdentifier()).orElseThrow().version(),
+        is(1L));
   }
 
   @Test
@@ -65,7 +67,8 @@ class ClinicalTrialServiceTest {
 
     service.save(new ClinicalTrialWrite(clinicalTrial, user));
 
-    var version = repository.findVersions(clinicalTrial.projectIdentifier()).getFirst();
+    var version =
+        repository.findClinicalTrialVersions(clinicalTrial.projectIdentifier()).getFirst();
     assertThat(version.writer(), is(user.withGrant(Grant.PROJECT_MANAGER)));
   }
 
@@ -77,7 +80,8 @@ class ClinicalTrialServiceTest {
 
     service.save(new ClinicalTrialWrite(clinicalTrial, clinicalTrialAdmin()));
 
-    var version = repository.findVersions(clinicalTrial.projectIdentifier()).getFirst();
+    var version =
+        repository.findClinicalTrialVersions(clinicalTrial.projectIdentifier()).getFirst();
     assertThat(((User) version.writer()).grants(), is(Set.of(Grant.CLINICAL_TRIAL_ADMIN)));
   }
 
@@ -88,7 +92,9 @@ class ClinicalTrialServiceTest {
 
     service.save(new ClinicalTrialWrite(clinicalTrial, clinicalTrialAdmin()));
 
-    assertThat(repository.find(clinicalTrial.projectIdentifier()).orElseThrow().version(), is(1L));
+    assertThat(
+        repository.findClinicalTrial(clinicalTrial.projectIdentifier()).orElseThrow().version(),
+        is(1L));
   }
 
   @Test
@@ -99,7 +105,8 @@ class ClinicalTrialServiceTest {
     assertThrows(
         ForbiddenException.class,
         () -> service.save(new ClinicalTrialWrite(clinicalTrial, randomUser())));
-    assertThat(repository.find(clinicalTrial.projectIdentifier()), is(Optional.empty()));
+    assertThat(
+        repository.findClinicalTrial(clinicalTrial.projectIdentifier()), is(Optional.empty()));
   }
 
   @Test

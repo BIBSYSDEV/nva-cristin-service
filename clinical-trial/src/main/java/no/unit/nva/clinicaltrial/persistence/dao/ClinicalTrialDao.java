@@ -18,12 +18,11 @@ public record ClinicalTrialDao(
     Instant modifiedDate)
     implements VersionedDao<ClinicalTrial> {
 
-  private static final String PROJECT_KEY_PREFIX = "PROJECT#";
   private static final String CLINICAL_TRIAL_SORT_KEY = "CLINICAL_TRIAL";
 
   public static ClinicalTrialDao from(ClinicalTrial clinicalTrial, Instant timestamp) {
     return new ClinicalTrialDao(
-        partitionKeyOf(clinicalTrial.identifier()),
+        Dao.projectKeyOf(clinicalTrial.projectIdentifier()),
         CLINICAL_TRIAL_SORT_KEY,
         clinicalTrial.reportable(),
         clinicalTrial.version(),
@@ -33,21 +32,13 @@ public record ClinicalTrialDao(
 
   public static Key keyOf(String projectIdentifier) {
     return Key.builder()
-        .partitionValue(partitionKeyOf(projectIdentifier))
+        .partitionValue(Dao.projectKeyOf(projectIdentifier))
         .sortValue(CLINICAL_TRIAL_SORT_KEY)
         .build();
   }
 
   @Override
   public ClinicalTrial entityAtVersion(Long version) {
-    return new ClinicalTrial(projectIdentifierOf(partitionKey), reportable, version);
-  }
-
-  private static String partitionKeyOf(String projectIdentifier) {
-    return PROJECT_KEY_PREFIX + projectIdentifier;
-  }
-
-  private static String projectIdentifierOf(String partitionKey) {
-    return partitionKey.substring(PROJECT_KEY_PREFIX.length());
+    return new ClinicalTrial(Dao.projectIdentifierOf(partitionKey), reportable, version);
   }
 }
