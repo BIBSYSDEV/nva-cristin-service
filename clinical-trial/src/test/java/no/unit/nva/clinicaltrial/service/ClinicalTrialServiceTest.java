@@ -3,17 +3,22 @@ package no.unit.nva.clinicaltrial.service;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.clinicalTrial;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.eligibleProjectManagedBy;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.projectManagedBy;
+import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomPeriodIdentifier;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomPersonIdentifier;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomProjectIdentifier;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomUser;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.List;
 import java.util.Optional;
 import no.unit.nva.client.FetchApiClient;
 import no.unit.nva.clinicaltrial.model.Grant;
+import no.unit.nva.clinicaltrial.model.Submission;
+import no.unit.nva.clinicaltrial.model.SubmissionStatus;
 import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
 import no.unit.nva.clinicaltrial.persistence.LocalDynamoDbTable;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -80,7 +85,24 @@ class ClinicalTrialServiceTest {
 
     var found = service.find(clinicalTrial.projectIdentifier(), user);
 
-    assertThat(found.version(), is(1L));
+    assertThat(found.clinicalTrial().version(), is(1L));
+  }
+
+  @Test
+  void shouldReturnSubmissionsReportedForTheClinicalTrial() throws Exception {
+    var user = randomUser();
+    var clinicalTrial = clinicalTrial(null);
+    var project = clinicalTrial.projectIdentifier();
+    var service = serviceReturningProjectManagedBy(user.personIdentifier());
+    service.save(clinicalTrial, user);
+    repository.save(
+        user,
+        new Submission(
+            project, randomPeriodIdentifier(), List.of(), SubmissionStatus.SUBMITTED, null));
+
+    var found = service.find(project, user);
+
+    assertThat(found.submissions(), hasSize(1));
   }
 
   @Test

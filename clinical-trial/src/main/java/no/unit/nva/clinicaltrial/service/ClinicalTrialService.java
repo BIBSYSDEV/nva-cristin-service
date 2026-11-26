@@ -2,6 +2,7 @@ package no.unit.nva.clinicaltrial.service;
 
 import no.unit.nva.client.FetchApiClient;
 import no.unit.nva.clinicaltrial.model.ClinicalTrial;
+import no.unit.nva.clinicaltrial.model.ClinicalTrialWithSubmissions;
 import no.unit.nva.clinicaltrial.model.write.User;
 import no.unit.nva.clinicaltrial.persistence.ClinicalTrialRepository;
 import no.unit.nva.clinicaltrial.persistence.exceptions.ConditionFailedException;
@@ -33,10 +34,11 @@ public class ClinicalTrialService {
     repository.save(writer, clinicalTrial);
   }
 
-  public ClinicalTrial find(String projectIdentifier, User user) throws ApiGatewayException {
+  public ClinicalTrialWithSubmissions find(String projectIdentifier, User user)
+      throws ApiGatewayException {
     ProjectAccess.reader(projectsApi.executeFetch(projectIdentifier), user);
     return repository
-        .findClinicalTrial(projectIdentifier)
+        .findReportedTrial(projectIdentifier)
         .orElseThrow(() -> new NotFoundException(CLINICAL_TRIAL_DOES_NOT_EXIST));
   }
 

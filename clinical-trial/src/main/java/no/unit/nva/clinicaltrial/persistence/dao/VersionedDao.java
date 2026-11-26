@@ -8,7 +8,8 @@ import no.unit.nva.clinicaltrial.model.Period;
 import no.unit.nva.clinicaltrial.model.Submission;
 import software.amazon.awssdk.enhanced.dynamodb.document.EnhancedDocument;
 
-public interface VersionedDao<E extends Entity> extends Dao {
+public sealed interface VersionedDao<E extends Entity> extends Dao
+    permits ClinicalTrialDao, PeriodDao, SubmissionDao {
 
   String MISSING_VERSION = "Row does not carry a version";
 

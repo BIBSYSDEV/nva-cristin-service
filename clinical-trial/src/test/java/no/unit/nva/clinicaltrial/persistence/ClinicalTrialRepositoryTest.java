@@ -2,6 +2,7 @@ package no.unit.nva.clinicaltrial.persistence;
 
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.clinicalTrial;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.clinicalTrialAdmin;
+import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomPeriodIdentifier;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomProjectIdentifier;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomUser;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -16,6 +17,8 @@ import java.util.Set;
 import no.unit.nva.clinicaltrial.model.Action;
 import no.unit.nva.clinicaltrial.model.ClinicalTrial;
 import no.unit.nva.clinicaltrial.model.Reportable;
+import no.unit.nva.clinicaltrial.model.Submission;
+import no.unit.nva.clinicaltrial.model.SubmissionStatus;
 import no.unit.nva.clinicaltrial.persistence.exceptions.ConditionFailedException;
 import no.unit.nva.clinicaltrial.persistence.exceptions.ItemNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -111,6 +114,21 @@ class ClinicalTrialRepositoryTest {
     var clinicalTrial = clinicalTrial(Reportable.YES, 1L);
 
     assertThrows(ItemNotFoundException.class, () -> repository.save(randomUser(), clinicalTrial));
+  }
+
+  @Test
+  void shouldFindClinicalTrialWithItsSubmissionsInOneRead() throws Exception {
+    var clinicalTrial = clinicalTrial(null);
+    var project = clinicalTrial.projectIdentifier();
+    repository.save(randomUser(), clinicalTrial);
+    repository.save(randomUser(), submissionOf(project, randomPeriodIdentifier()));
+    repository.save(randomUser(), submissionOf(project, randomPeriodIdentifier()));
+    repository.save(
+        randomUser(), submissionOf(randomProjectIdentifier(), randomPeriodIdentifier()));
+
+    var reported = repository.findReportedTrial(project).orElseThrow();
+    assertThat(reported.clinicalTrial().reportable(), is(clinicalTrial.reportable()));
+    assertThat(reported.submissions(), hasSize(2));
   }
 
   @Test
@@ -252,6 +270,11 @@ class ClinicalTrialRepositoryTest {
         assertThrows(ConditionFailedException.class, () -> repository.save(randomUser(), outdated));
 
     assertThat(failure.storedVersion(), is(1L));
+  }
+
+  private Submission submissionOf(String projectIdentifier, String periodIdentifier) {
+    return new Submission(
+        projectIdentifier, periodIdentifier, List.of(), SubmissionStatus.SUBMITTED, null);
   }
 
   private AttributeValue string(String value) {

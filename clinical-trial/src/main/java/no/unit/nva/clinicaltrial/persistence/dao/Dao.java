@@ -6,17 +6,21 @@ import static no.unit.nva.clinicaltrial.persistence.dao.TableAttributes.SORT_KEY
 import static no.unit.nva.commons.json.JsonUtils.dtoObjectMapper;
 import static nva.commons.core.attempt.Try.attempt;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.databind.JavaType;
 import java.time.Instant;
 import software.amazon.awssdk.enhanced.dynamodb.AttributeValueType;
+import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableMetadata;
 import software.amazon.awssdk.enhanced.dynamodb.document.DocumentTableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.document.EnhancedDocument;
 
 @JsonTypeInfo(use = Id.NAME, property = TableAttributes.TYPE_ATTRIBUTE)
-public interface Dao {
+@JsonSubTypes({@Type(ClinicalTrialDao.class), @Type(PeriodDao.class), @Type(SubmissionDao.class)})
+public sealed interface Dao permits VersionDao, VersionedDao {
 
   String PROJECT_KEY_PREFIX = "PROJECT" + KEY_SEPARATOR;
   String ITEM_NOT_MAPPABLE = "Item is not mappable";
@@ -40,6 +44,10 @@ public interface Dao {
             .orElseThrow(
                 failure -> new IllegalStateException(ITEM_NOT_MAPPABLE, failure.getException()));
     return EnhancedDocument.fromJson(json);
+  }
+
+  static Key projectPartition(String projectIdentifier) {
+    return Key.builder().partitionValue(projectKeyOf(projectIdentifier)).build();
   }
 
   static String projectKeyOf(String projectIdentifier) {
