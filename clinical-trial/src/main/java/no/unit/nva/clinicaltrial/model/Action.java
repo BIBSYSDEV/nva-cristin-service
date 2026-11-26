@@ -1,10 +1,12 @@
 package no.unit.nva.clinicaltrial.model;
 
+import static java.util.Objects.isNull;
+
 public enum Action {
-  CREATE_CLINICAL_TRIAL,
-  UPDATE_CLINICAL_TRIAL,
-  CREATE_PERIOD,
-  UPDATE_PERIOD,
-  CREATE_SUBMISSION,
-  UPDATE_SUBMISSION
+  CREATE,
+  UPDATE;
+
+  public static Action from(Entity entity) {
+    return isNull(entity.version()) ? CREATE : UPDATE;
+  }
 }

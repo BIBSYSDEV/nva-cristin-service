@@ -1,6 +1,6 @@
 package no.unit.nva.clinicaltrial.model.write;
 
-public record SystemWriter(String process) implements Writer {
+public record System(String process) implements Actor {
 
   @Override
   public String name() {

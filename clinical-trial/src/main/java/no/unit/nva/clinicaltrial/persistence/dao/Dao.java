@@ -1,5 +1,8 @@
 package no.unit.nva.clinicaltrial.persistence.dao;
 
+import static no.unit.nva.clinicaltrial.persistence.dao.TableAttributes.KEY_SEPARATOR;
+import static no.unit.nva.clinicaltrial.persistence.dao.TableAttributes.PARTITION_KEY;
+import static no.unit.nva.clinicaltrial.persistence.dao.TableAttributes.SORT_KEY;
 import static no.unit.nva.commons.json.JsonUtils.dtoObjectMapper;
 import static nva.commons.core.attempt.Try.attempt;
 
@@ -12,13 +15,10 @@ import software.amazon.awssdk.enhanced.dynamodb.TableMetadata;
 import software.amazon.awssdk.enhanced.dynamodb.document.DocumentTableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.document.EnhancedDocument;
 
-@JsonTypeInfo(use = Id.NAME, property = Dao.TYPE_ATTRIBUTE)
+@JsonTypeInfo(use = Id.NAME, property = TableAttributes.TYPE_ATTRIBUTE)
 public interface Dao {
 
-  String PARTITION_KEY = "PK";
-  String TYPE_ATTRIBUTE = "type";
-  String PROJECT_KEY_PREFIX = "PROJECT#";
-  String SORT_KEY = "SK";
+  String PROJECT_KEY_PREFIX = "PROJECT" + KEY_SEPARATOR;
   String ITEM_NOT_MAPPABLE = "Item is not mappable";
 
   DocumentTableSchema SCHEMA =
@@ -31,8 +31,6 @@ public interface Dao {
   String partitionKey();
 
   String sortKey();
-
-  Instant createdDate();
 
   Instant modifiedDate();
 

@@ -1,9 +1,11 @@
 package no.unit.nva.clinicaltrial.persistence.dao;
 
+import static no.unit.nva.clinicaltrial.persistence.dao.TableAttributes.PARTITION_KEY;
+import static no.unit.nva.clinicaltrial.persistence.dao.TableAttributes.SORT_KEY;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.Instant;
-import java.util.Objects;
 import no.unit.nva.clinicaltrial.model.Period;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 
@@ -12,19 +14,13 @@ public record PeriodDao(
     @JsonProperty(PARTITION_KEY) String partitionKey,
     @JsonProperty(SORT_KEY) String sortKey,
     Long version,
-    Instant createdDate,
     Instant modifiedDate)
     implements VersionedDao<Period> {
 
   private static final String PERIOD_PARTITION_KEY = "PERIOD";
 
-  public static PeriodDao from(Period period, Instant timestamp) {
-    return new PeriodDao(
-        PERIOD_PARTITION_KEY,
-        period.identifier(),
-        period.version(),
-        Objects.isNull(period.version()) ? timestamp : null,
-        timestamp);
+  public static PeriodDao from(Period period, long version, Instant modifiedDate) {
+    return new PeriodDao(PERIOD_PARTITION_KEY, period.identifier(), version, modifiedDate);
   }
 
   public static Key keyOf(String identifier) {
@@ -32,7 +28,7 @@ public record PeriodDao(
   }
 
   @Override
-  public Period entityAtVersion(Long version) {
+  public Period toEntity() {
     return new Period(sortKey, version);
   }
 }

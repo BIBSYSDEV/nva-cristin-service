@@ -1,52 +1,59 @@
 package no.unit.nva.clinicaltrial.persistence.dao;
 
+import static no.unit.nva.clinicaltrial.persistence.dao.TableAttributes.KEY_SEPARATOR;
+import static no.unit.nva.clinicaltrial.persistence.dao.TableAttributes.PARTITION_KEY;
+import static no.unit.nva.clinicaltrial.persistence.dao.TableAttributes.SORT_KEY;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.Instant;
 import no.unit.nva.clinicaltrial.model.Action;
 import no.unit.nva.clinicaltrial.model.Entity;
 import no.unit.nva.clinicaltrial.model.Version;
-import no.unit.nva.clinicaltrial.model.write.Writer;
-import no.unit.nva.identifiers.SortableIdentifier;
+import no.unit.nva.clinicaltrial.model.write.Actor;
+import software.amazon.awssdk.enhanced.dynamodb.Key;
 
 @JsonTypeName("Version")
 public record VersionDao<T>(
     @JsonProperty(PARTITION_KEY) String partitionKey,
     @JsonProperty(SORT_KEY) String sortKey,
+    String entityType,
     T entity,
-    Writer writer,
+    Actor actor,
     Action action,
-    Instant createdDate,
     Instant modifiedDate)
     implements Dao {
 
-  private static final String VERSION_KEY_PREFIX = "VERSION#";
-  private static final String KEY_SEPARATOR = "#";
+  private static final String HISTORY_KEY_PREFIX = "HISTORY";
+  private static final String VERSION_KEY_FORMAT = "%019d";
 
   public static <E extends Entity> VersionDao<E> versionOf(
-      VersionedDao<E> entityDao, Writer writer) {
-    var action = entityDao.toEntity().action();
-    var entity = entityDao.entityAtVersion(entityDao.nextVersion());
-    var timestamp = entityDao.modifiedDate();
+      VersionedDao<E> entityDao, Action action, Actor actor) {
+    var entity = entityDao.toEntity();
     return new VersionDao<>(
-        entityDao.partitionKey(),
-        keyPrefixOf(entityDao.sortKey()) + SortableIdentifier.next(),
+        historyPartitionOf(entityDao.partitionKey(), entityDao.sortKey()),
+        sortKeyOf(entityDao.version()),
+        entity.getClass().getSimpleName(),
         entity,
-        writer,
+        actor,
         action,
-        timestamp,
-        timestamp);
+        entityDao.modifiedDate());
   }
 
-  public static String keyPrefixOf(String entitySortKey) {
-    return VERSION_KEY_PREFIX + entitySortKey + KEY_SEPARATOR;
+  private static String historyPartitionOf(String entityPartitionKey, String entitySortKey) {
+    return HISTORY_KEY_PREFIX + KEY_SEPARATOR + entityPartitionKey + KEY_SEPARATOR + entitySortKey;
+  }
+
+  public static String historyPartitionOf(Key entityKey) {
+    return historyPartitionOf(
+        entityKey.partitionKeyValue().s(), entityKey.sortKeyValue().orElseThrow().s());
   }
 
   public Version<T> toVersion() {
-    return new Version<>(identifier(), entity, writer, action, modifiedDate);
+    return new Version<>(entity, actor, action, modifiedDate);
   }
 
-  private SortableIdentifier identifier() {
-    return new SortableIdentifier(sortKey.substring(sortKey.lastIndexOf(KEY_SEPARATOR) + 1));
+  private static String sortKeyOf(long version) {
+    return VERSION_KEY_FORMAT.formatted(version);
   }
 }

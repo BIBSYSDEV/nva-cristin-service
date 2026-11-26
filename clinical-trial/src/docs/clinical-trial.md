@@ -124,14 +124,20 @@ Submissions are listed without their inclusions; a submission is read in full th
 
 ## Storage
 
-| Type          | PK               | SK                              | Attributes                                                                                                        |
-| ------------- | ---------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| ClinicalTrial | `PROJECT#987654` | `CLINICAL_TRIAL`                | `reportable`, `version`, `createdDate`, `modifiedDate`                                                            |
-| Submission    | `PROJECT#987654` | `SUBMISSION#2026-H1`            | `status`, `inclusions[]`, `version`                                                                               |
-| Period        | `PERIOD`         | `2026-H1`                       | `status`                                                                                                          |
-| Version       | entity's PK      | `VERSION#<entity SK>#<version>` | `entity`, `username`, `personIdentifier`, `customerIdentifier`, `grants`, `action`, `createdDate`, `modifiedDate` |
+| Type          | PK                                | SK                     | Attributes                                                        |
+| ------------- | --------------------------------- | ---------------------- | ----------------------------------------------------------------- |
+| ClinicalTrial | `PROJECT#987654`                  | `CLINICAL_TRIAL`       | `type`, `reportable`, `version`, `modifiedDate`                   |
+| Submission    | `PROJECT#987654`                  | `SUBMISSION#2026-H1`   | `type`, `status`, `inclusions[]`, `version`, `modifiedDate`       |
+| Period        | `PERIOD`                          | `2026-H1`              | `type`, `version`, `modifiedDate`                                 |
+| Version       | `HISTORY#<entity PK>#<entity SK>` | `<version, 19 digits>` | `type`, `entityType`, `entity`, `actor`, `action`, `modifiedDate` |
+
+An entity row is written whole: the table owns `version` and `modifiedDate`, and an attribute the
+entity does not carry is removed. A period has no status yet, so a submission is accepted whether or
+not its period is open. The caller of a write is stored as a nested `actor` object.
 
 Every write raises `version` on the entity and writes one Version item in the same transaction.
+Version items live in their own partition, keyed by the version, so a query on the entity's
+partition returns live rows only.
 Version items are the audit trail of who changed reported numbers; nothing in this API reads them,
 and they are never pruned.
 

@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
-@JsonSubTypes({@Type(User.class), @Type(value = SystemWriter.class, name = "System")})
-public interface Writer {
+@JsonSubTypes({@Type(User.class), @Type(System.class)})
+public interface Actor {
 
   @JsonIgnore
   String name();

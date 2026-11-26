@@ -15,8 +15,8 @@ public record Submission(
     inclusions = Objects.isNull(inclusions) ? List.of() : List.copyOf(inclusions);
   }
 
-  @Override
-  public Action action() {
-    return Objects.isNull(version) ? Action.CREATE_SUBMISSION : Action.UPDATE_SUBMISSION;
+  public Submission submit() {
+    return new Submission(
+        projectIdentifier, periodIdentifier, inclusions, SubmissionStatus.SUBMITTED, version);
   }
 }

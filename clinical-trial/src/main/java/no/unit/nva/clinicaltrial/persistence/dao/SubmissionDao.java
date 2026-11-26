@@ -1,10 +1,13 @@
 package no.unit.nva.clinicaltrial.persistence.dao;
 
+import static no.unit.nva.clinicaltrial.persistence.dao.TableAttributes.KEY_SEPARATOR;
+import static no.unit.nva.clinicaltrial.persistence.dao.TableAttributes.PARTITION_KEY;
+import static no.unit.nva.clinicaltrial.persistence.dao.TableAttributes.SORT_KEY;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
 import no.unit.nva.clinicaltrial.model.Inclusion;
 import no.unit.nva.clinicaltrial.model.Submission;
 import no.unit.nva.clinicaltrial.model.SubmissionStatus;
@@ -17,21 +20,19 @@ public record SubmissionDao(
     List<Inclusion> inclusions,
     SubmissionStatus status,
     Long version,
-    Instant createdDate,
     Instant modifiedDate)
     implements VersionedDao<Submission> {
 
-  private static final String SUBMISSION_KEY_PREFIX = "SUBMISSION#";
+  private static final String SUBMISSION_KEY_PREFIX = "SUBMISSION" + KEY_SEPARATOR;
 
-  public static SubmissionDao from(Submission submission, Instant timestamp) {
+  public static SubmissionDao from(Submission submission, long version, Instant modifiedDate) {
     return new SubmissionDao(
         Dao.projectKeyOf(submission.projectIdentifier()),
         sortKeyOf(submission.periodIdentifier()),
         submission.inclusions(),
         submission.status(),
-        submission.version(),
-        Objects.isNull(submission.version()) ? timestamp : null,
-        timestamp);
+        version,
+        modifiedDate);
   }
 
   public static Key keyOf(String projectIdentifier, String periodIdentifier) {
@@ -42,7 +43,7 @@ public record SubmissionDao(
   }
 
   @Override
-  public Submission entityAtVersion(Long version) {
+  public Submission toEntity() {
     return new Submission(
         Dao.projectIdentifierOf(partitionKey),
         periodIdentifierOf(sortKey),

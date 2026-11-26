@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.Optional;
 import no.unit.nva.clinicaltrial.model.Inclusion;
 import no.unit.nva.clinicaltrial.model.Submission;
-import no.unit.nva.clinicaltrial.model.write.SubmissionWrite;
+import no.unit.nva.clinicaltrial.model.write.User;
 import no.unit.nva.clinicaltrial.persistence.exceptions.ConditionFailedException;
 import no.unit.nva.clinicaltrial.persistence.exceptions.ItemNotFoundException;
 import no.unit.nva.clinicaltrial.service.SubmissionService;
@@ -52,7 +52,7 @@ public class SaveSubmissionHandler extends ApiGatewayHandler<SubmissionRequest, 
   protected Void processInput(SubmissionRequest input, RequestInfo requestInfo, Context context)
       throws ApiGatewayException {
     operation = SubmissionOperation.fromRequest(requestInfo);
-    save(new SubmissionWrite(createSubmission(input, requestInfo), userFrom(requestInfo)));
+    save(createSubmission(input, requestInfo), userFrom(requestInfo));
     return null;
   }
 
@@ -78,11 +78,11 @@ public class SaveSubmissionHandler extends ApiGatewayHandler<SubmissionRequest, 
   private static Inclusion inclusionOf(InclusionRequest inclusion) {
     return Objects.isNull(inclusion)
         ? new Inclusion(null, null)
-        : new Inclusion(institutionIdentifierOf(inclusion.institution()), inclusion.count());
+        : new Inclusion(organizationIdentifier(inclusion.organization()), inclusion.count());
   }
 
-  private static OrganizationIdentifier institutionIdentifierOf(URI institution) {
-    return attempt(() -> OrganizationIdentifier.fromUri(institution)).orElse(_ -> null);
+  private static OrganizationIdentifier organizationIdentifier(URI organization) {
+    return attempt(() -> OrganizationIdentifier.fromUri(organization)).orElse(_ -> null);
   }
 
   @Override
@@ -90,9 +90,9 @@ public class SaveSubmissionHandler extends ApiGatewayHandler<SubmissionRequest, 
     return operation.isCreate() ? HTTP_CREATED : HTTP_NO_CONTENT;
   }
 
-  private void save(SubmissionWrite submissionWrite) throws ApiGatewayException {
+  private void save(Submission submission, User user) throws ApiGatewayException {
     try {
-      service.save(submissionWrite);
+      service.save(submission, user);
     } catch (ConditionFailedException conditionFailed) {
       throw operation.isCreate()
           ? new ConflictException(PERIOD_ALREADY_HAS_SUBMISSION)
