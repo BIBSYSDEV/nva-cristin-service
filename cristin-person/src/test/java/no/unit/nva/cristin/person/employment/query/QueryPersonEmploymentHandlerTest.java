@@ -62,9 +62,10 @@ public class QueryPersonEmploymentHandlerTest {
   private static final String THIRD_PARTY_SCOPE =
       "https://api.nva.unit.no/scopes/third-party/person-upsert";
   private static final String THIRD_PARTY_CLIENT_ID = "some-third-party-client-id";
-  private static final URI INSTITUTION_WITH_EXPECTED_HIT =
+  private static final URI INSTITUTION_WITH_EXPECTED_HIT_IN_DUMMY_CRISTIN_RESPONSE =
       UriWrapper.fromUri(randomUri()).addChild("185.90.0.0").getUri();
-  private static final URI INSTITUTION_WITHOUT_EXPECTED_HIT =
+  private static final String UNIT_IN_DUMMY_CRISTIN_RESPONSE = "185.39.55.20";
+  private static final URI INSTITUTION_WITHOUT_EXPECTED_HIT_IN_DUMMY_CRISTIN_RESPONSE =
       UriWrapper.fromUri(randomUri()).addChild("194.0.0.0").getUri();
 
   private final HttpClient clientMock = mock(HttpClient.class);
@@ -155,20 +156,21 @@ public class QueryPersonEmploymentHandlerTest {
 
   @Test
   void shouldReturnOnlyEmploymentsAtOwnInstitutionWhenClientIsThirdParty() throws IOException {
-    var gatewayResponse = sendQueryAsThirdParty(INSTITUTION_WITH_EXPECTED_HIT);
+    var gatewayResponse = sendQueryAsThirdParty(INSTITUTION_WITH_EXPECTED_HIT_IN_DUMMY_CRISTIN_RESPONSE);
     var response = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SEARCH_RESPONSE_REF);
 
     assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
     assertThat(response.getSize(), equalTo(ONE));
     assertThat(
         institutionOf(response.getHits().getFirst().getOrganization()),
-        equalTo(institutionOf(INSTITUTION_WITH_EXPECTED_HIT)));
+        equalTo(institutionOf(INSTITUTION_WITH_EXPECTED_HIT_IN_DUMMY_CRISTIN_RESPONSE)));
+    assertThat(unitFrom(response.getHits().getFirst().getOrganization()), equalTo(UNIT_IN_DUMMY_CRISTIN_RESPONSE));
   }
 
   @Test
   void shouldReturnNoEmploymentsWhenThirdPartyInstitutionHasNoEmploymentsForPerson()
       throws IOException {
-    var gatewayResponse = sendQueryAsThirdParty(INSTITUTION_WITHOUT_EXPECTED_HIT);
+    var gatewayResponse = sendQueryAsThirdParty(INSTITUTION_WITHOUT_EXPECTED_HIT_IN_DUMMY_CRISTIN_RESPONSE);
     var response = OBJECT_MAPPER.readValue(gatewayResponse.getBody(), SEARCH_RESPONSE_REF);
 
     assertEquals(HttpURLConnection.HTTP_OK, gatewayResponse.getStatusCode());
@@ -221,8 +223,12 @@ public class QueryPersonEmploymentHandlerTest {
     return OBJECT_MAPPER.readValue(output.toString(StandardCharsets.UTF_8), getTypeRef());
   }
 
+  private static String unitFrom(URI organization) {
+    return UriWrapper.fromUri(organization).getLastPathElement();
+  }
+
   private static String institutionOf(URI organization) {
-    var organizationIdentifier = UriWrapper.fromUri(organization).getLastPathElement();
+    var organizationIdentifier = unitFrom(organization);
     return organizationIdentifier.substring(ZERO, organizationIdentifier.indexOf(PERIOD));
   }
 
