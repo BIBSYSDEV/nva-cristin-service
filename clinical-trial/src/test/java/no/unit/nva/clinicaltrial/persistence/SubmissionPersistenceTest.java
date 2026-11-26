@@ -51,8 +51,7 @@ class SubmissionPersistenceTest {
         item.keySet(),
         is(Set.of("PK", "SK", "type", "inclusions", "status", "version", "modifiedDate")));
     assertThat(
-        item.get("inclusions").l().getFirst().m().keySet(),
-        is(Set.of("institutionIdentifier", "count")));
+        item.get("inclusions").l().getFirst().m().keySet(), is(Set.of("organization", "count")));
   }
 
   @Test
@@ -62,9 +61,8 @@ class SubmissionPersistenceTest {
     repository.save(randomUser(), submission);
 
     var institution =
-        persistedItem(submission).get("inclusions").l().getFirst().m().get("institutionIdentifier");
-    assertThat(
-        institution.s(), is(submission.inclusions().getFirst().institutionIdentifier().value()));
+        persistedItem(submission).get("inclusions").l().getFirst().m().get("organization");
+    assertThat(institution.s(), is(submission.inclusions().getFirst().organization().value()));
   }
 
   @Test

@@ -20,14 +20,15 @@ import nva.commons.apigateway.exceptions.NotFoundException;
 
 public class SubmissionService {
 
-  public static final String MISSING_INCLUSIONS = "Submission must report at least one institution";
+  public static final String MISSING_INCLUSIONS =
+      "Submission must report at least one organization";
 
   private static final String CLINICAL_TRIAL_DOES_NOT_EXIST = "Clinical trial does not exist";
   private static final String PERIOD_DOES_NOT_EXIST = "Reporting period does not exist";
   private static final String MISSING_INSTITUTION =
-      "Each inclusion must name an institution by its organization identifier";
+      "Each inclusion must name an organization by its organization identifier";
   private static final String INVALID_COUNT = "Inclusion count must be zero or greater";
-  private static final String INSTITUTION_REPEATED = "Each institution may be included only once";
+  private static final String INSTITUTION_REPEATED = "Each organization may be included only once";
 
   private final transient FetchApiClient<String, NvaProject> projectsApi;
   private final transient ClinicalTrialRepository repository;
@@ -76,7 +77,7 @@ public class SubmissionService {
   }
 
   private static boolean hasNoInstitution(Inclusion inclusion) {
-    return Objects.isNull(inclusion.institutionIdentifier());
+    return Objects.isNull(inclusion.organization());
   }
 
   private static boolean hasInvalidCount(Inclusion inclusion) {
@@ -84,6 +85,6 @@ public class SubmissionService {
   }
 
   private static Set<OrganizationIdentifier> institutions(List<Inclusion> inclusions) {
-    return inclusions.stream().map(Inclusion::institutionIdentifier).collect(toSet());
+    return inclusions.stream().map(Inclusion::organization).collect(toSet());
   }
 }

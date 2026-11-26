@@ -78,11 +78,11 @@ public class SaveSubmissionHandler extends ApiGatewayHandler<SubmissionRequest, 
   private static Inclusion inclusionOf(InclusionRequest inclusion) {
     return Objects.isNull(inclusion)
         ? new Inclusion(null, null)
-        : new Inclusion(institutionIdentifierOf(inclusion.institution()), inclusion.count());
+        : new Inclusion(organizationIdentifier(inclusion.organization()), inclusion.count());
   }
 
-  private static OrganizationIdentifier institutionIdentifierOf(URI institution) {
-    return attempt(() -> OrganizationIdentifier.fromUri(institution)).orElse(_ -> null);
+  private static OrganizationIdentifier organizationIdentifier(URI organization) {
+    return attempt(() -> OrganizationIdentifier.fromUri(organization)).orElse(_ -> null);
   }
 
   @Override
