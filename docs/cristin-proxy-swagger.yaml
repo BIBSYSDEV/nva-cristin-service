@@ -561,7 +561,7 @@ paths:
     post:
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaClinicalTrialFunction.Arn}/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaSaveClinicalTrialFunction.Arn}/invocations
         httpMethod: POST
         type: "AWS_PROXY"
       tags:
@@ -605,7 +605,7 @@ paths:
     put:
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaClinicalTrialFunction.Arn}/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaSaveClinicalTrialFunction.Arn}/invocations
         httpMethod: POST
         type: "AWS_PROXY"
       tags:
@@ -653,7 +653,7 @@ paths:
     post:
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaSubmissionFunction.Arn}/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaSaveSubmissionFunction.Arn}/invocations
         httpMethod: POST
         type: "AWS_PROXY"
       tags:
@@ -698,7 +698,7 @@ paths:
     put:
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaSubmissionFunction.Arn}/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaSaveSubmissionFunction.Arn}/invocations
         httpMethod: POST
         type: "AWS_PROXY"
       tags:

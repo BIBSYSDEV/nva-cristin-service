@@ -318,13 +318,13 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
-            Path: /project/{projectIdentifier}/clinical-trial
+            Path: /project/{identifier}/clinical-trial
             Method: post
         UpdateClinicalTrialEvent:
           Type: Api
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
-            Path: /project/{projectIdentifier}/clinical-trial
+            Path: /project/{identifier}/clinical-trial
             Method: put
 
   NvaSaveSubmissionFunction:
@@ -341,13 +341,13 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
-            Path: /project/{projectIdentifier}/clinical-trial/{periodIdentifier}
+            Path: /project/{identifier}/clinical-trial/{periodIdentifier}
             Method: post
         UpdateSubmissionEvent:
           Type: Api
           Properties:
             RestApiId: !Ref NvaCristinProxyApi
-            Path: /project/{projectIdentifier}/clinical-trial/{periodIdentifier}
+            Path: /project/{identifier}/clinical-trial/{periodIdentifier}
             Method: put
 
   NvaCristinProjectsFunction:
