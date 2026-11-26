@@ -557,6 +557,192 @@ paths:
           $ref: "#/components/responses/500"
         "502":
           $ref: "#/components/responses/502"
+  /project/{identifier}/clinical-trial:
+    post:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaSaveClinicalTrialFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Clinical trial
+      summary: Create clinical trial
+      description: Registers whether the project reports as a clinical trial
+      operationId: CreateClinicalTrial
+      security:
+        - CognitoUserPool:
+            [
+              "https://api.nva.unit.no/scopes/backend",
+              "https://api.nva.unit.no/scopes/frontend",
+              "aws.cognito.signin.user.admin",
+            ]
+      parameters:
+        - $ref: "#/components/parameters/ProjectIdentifier"
+      requestBody:
+        description: Clinical trial to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClinicalTrialRequest"
+      responses:
+        "201":
+          description: Clinical trial created
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "409":
+          $ref: "#/components/responses/409"
+        "500":
+          $ref: "#/components/responses/500"
+        "502":
+          $ref: "#/components/responses/502"
+    put:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaSaveClinicalTrialFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Clinical trial
+      summary: Update clinical trial
+      description: Updates the clinical trial of the project
+      operationId: UpdateClinicalTrial
+      security:
+        - CognitoUserPool:
+            [
+              "https://api.nva.unit.no/scopes/backend",
+              "https://api.nva.unit.no/scopes/frontend",
+              "aws.cognito.signin.user.admin",
+            ]
+      parameters:
+        - $ref: "#/components/parameters/ProjectIdentifier"
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        description: Clinical trial to store
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClinicalTrialRequest"
+      responses:
+        "204":
+          description: Clinical trial updated
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "412":
+          $ref: "#/components/responses/412"
+        "428":
+          $ref: "#/components/responses/428"
+        "500":
+          $ref: "#/components/responses/500"
+        "502":
+          $ref: "#/components/responses/502"
+  /project/{identifier}/clinical-trial/{periodIdentifier}:
+    post:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaSaveSubmissionFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Clinical trial
+      summary: Create submission
+      description: Reports the participants included at each institution in one period
+      operationId: CreateSubmission
+      security:
+        - CognitoUserPool:
+            [
+              "https://api.nva.unit.no/scopes/backend",
+              "https://api.nva.unit.no/scopes/frontend",
+              "aws.cognito.signin.user.admin",
+            ]
+      parameters:
+        - $ref: "#/components/parameters/ProjectIdentifier"
+        - $ref: "#/components/parameters/PeriodIdentifier"
+      requestBody:
+        description: Submission to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmissionRequest"
+      responses:
+        "201":
+          description: Submission created
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "409":
+          $ref: "#/components/responses/409"
+        "500":
+          $ref: "#/components/responses/500"
+        "502":
+          $ref: "#/components/responses/502"
+    put:
+      x-amazon-apigateway-integration:
+        uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NvaSaveSubmissionFunction.Arn}/invocations
+        httpMethod: POST
+        type: "AWS_PROXY"
+      tags:
+        - Clinical trial
+      summary: Update submission
+      description: Replaces the inclusions reported for the period
+      operationId: UpdateSubmission
+      security:
+        - CognitoUserPool:
+            [
+              "https://api.nva.unit.no/scopes/backend",
+              "https://api.nva.unit.no/scopes/frontend",
+              "aws.cognito.signin.user.admin",
+            ]
+      parameters:
+        - $ref: "#/components/parameters/ProjectIdentifier"
+        - $ref: "#/components/parameters/PeriodIdentifier"
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        description: Submission to store
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmissionRequest"
+      responses:
+        "204":
+          description: Submission updated
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "403":
+          $ref: "#/components/responses/403"
+        "404":
+          $ref: "#/components/responses/404"
+        "412":
+          $ref: "#/components/responses/412"
+        "428":
+          $ref: "#/components/responses/428"
+        "500":
+          $ref: "#/components/responses/500"
+        "502":
+          $ref: "#/components/responses/502"
   /category/project:
     get:
       x-amazon-apigateway-integration:
@@ -2443,7 +2629,83 @@ components:
         application/problem+json:
           schema:
             $ref: "#/components/schemas/Problem"
+    "409":
+      description: Conflict
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    "412":
+      description: Precondition Failed
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    "428":
+      description: Precondition Required
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+  parameters:
+    ProjectIdentifier:
+      name: identifier
+      in: path
+      description: Identifier of the project
+      required: true
+      schema:
+        type: string
+    PeriodIdentifier:
+      name: periodIdentifier
+      in: path
+      description: Identifier of the reporting period
+      required: true
+      schema:
+        type: string
+    IfMatch:
+      name: If-Match
+      in: header
+      description: Version the update applies to
+      required: true
+      schema:
+        type: string
   schemas:
+    ClinicalTrialRequest:
+      type: object
+      required:
+        - reportable
+      properties:
+        reportable:
+          type: string
+          description: Whether the project reports as a clinical trial
+          enum:
+            - "Yes"
+            - "No"
+    SubmissionRequest:
+      type: object
+      required:
+        - inclusions
+      properties:
+        inclusions:
+          type: array
+          description: Participants included at each institution
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/Inclusion"
+    Inclusion:
+      type: object
+      required:
+        - institution
+        - count
+      properties:
+        institution:
+          type: string
+          format: uri
+          description: Organization that included the participants
+        count:
+          type: integer
+          description: Number of participants included
+          minimum: 0
     Projects:
       type: object
       properties:
