@@ -227,6 +227,9 @@ Resources:
           KeyType: RANGE
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
+      Tags:
+        - Key: IncludedInBackup
+          Value: "true"
 
   ReadClinicalTrialTableRole:
     Type: AWS::IAM::Role
