@@ -2,6 +2,7 @@ package no.unit.nva.cristin.person.employment.create;
 
 import static no.unit.nva.cristin.common.Utils.CAN_UPDATE_ANY_INSTITUTION;
 import static no.unit.nva.cristin.common.Utils.extractCristinInstitutionIdentifier;
+import static no.unit.nva.cristin.common.Utils.extractInstitution;
 import static no.unit.nva.cristin.common.Utils.getValidPersonId;
 import static no.unit.nva.cristin.model.Constants.DEFAULT_RESPONSE_MEDIA_TYPES;
 import static no.unit.nva.utils.LogUtils.LOG_IDENTIFIERS;
@@ -75,11 +76,23 @@ public class CreatePersonEmploymentHandler extends ApiGatewayHandler<Employment,
     validateHasAccessRights(requestInfo);
     logUser(requestInfo);
     CreatePersonEmploymentValidator.validate(input);
+    if (AccessUtils.isRestrictedToOwnInstitution(requestInfo)) {
+      validateOrganizationIsAtOwnInstitution(input, requestInfo);
+    }
   }
 
   private void validateHasAccessRights(RequestInfo requestInfo) throws ForbiddenException {
     if (!AccessUtils.requesterIsUserAdministrator(requestInfo)
-        && !requestInfo.userIsAuthorized(MANAGE_CUSTOMERS)) {
+        && !requestInfo.userIsAuthorized(MANAGE_CUSTOMERS)
+        && !requestInfo.clientIsThirdParty()) {
+      throw new ForbiddenException();
+    }
+  }
+
+  private static void validateOrganizationIsAtOwnInstitution(
+      Employment input, RequestInfo requestInfo) throws BadRequestException, ForbiddenException {
+    var ownInstitution = extractCristinInstitutionIdentifier(requestInfo);
+    if (!ownInstitution.equals(extractInstitution(input.getOrganization()))) {
       throw new ForbiddenException();
     }
   }

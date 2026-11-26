@@ -50,14 +50,10 @@ public class QueryPersonEmploymentHandler
         LOG_IDENTIFIERS, extractCristinIdentifier(requestInfo), extractOrgIdentifier(requestInfo));
     var identifier = getValidPersonId(requestInfo);
 
-    return isRestrictedToOwnInstitution(requestInfo)
+    return AccessUtils.isRestrictedToOwnInstitution(requestInfo)
         ? apiClient.generateQueryResponse(
             identifier, extractCristinInstitutionIdentifier(requestInfo))
         : apiClient.generateQueryResponse(identifier);
-  }
-
-  private static boolean isRestrictedToOwnInstitution(RequestInfo requestInfo) {
-    return requestInfo.clientIsThirdParty() && !requestInfo.clientIsInternalBackend();
   }
 
   @Override
@@ -73,7 +69,7 @@ public class QueryPersonEmploymentHandler
   @Override
   protected void validateRequest(Void input, RequestInfo requestInfo, Context context)
       throws ApiGatewayException {
-    if (!isRestrictedToOwnInstitution(requestInfo)) {
+    if (!AccessUtils.isRestrictedToOwnInstitution(requestInfo)) {
       AccessUtils.validateIdentificationNumberAccess(requestInfo);
     }
   }
