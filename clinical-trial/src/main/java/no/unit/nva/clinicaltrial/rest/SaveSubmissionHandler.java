@@ -1,6 +1,8 @@
 package no.unit.nva.clinicaltrial.rest;
 
 import static java.net.HttpURLConnection.HTTP_CREATED;
+import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
+import static no.unit.nva.clinicaltrial.rest.EntityTag.VERSION_DOES_NOT_MATCH;
 import static no.unit.nva.clinicaltrial.rest.RequestUtils.getPeriodIdentifier;
 import static no.unit.nva.clinicaltrial.rest.RequestUtils.getProjectIdentifier;
 import static no.unit.nva.clinicaltrial.rest.RequestUtils.userFrom;
@@ -23,6 +25,7 @@ import nva.commons.apigateway.RequestInfo;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.ConflictException;
 import nva.commons.apigateway.exceptions.NotFoundException;
+import nva.commons.apigateway.exceptions.PreconditionFailedException;
 import nva.commons.core.Environment;
 
 public class SaveSubmissionHandler extends ApiGatewayHandler<SubmissionRequest, Void> {
@@ -32,6 +35,7 @@ public class SaveSubmissionHandler extends ApiGatewayHandler<SubmissionRequest, 
       "Period already has a submission for this clinical trial";
 
   private final transient SubmissionService service;
+  private transient SubmissionOperation operation;
 
   public SaveSubmissionHandler(SubmissionService service, Environment environment) {
     super(SubmissionRequest.class, environment);
@@ -47,6 +51,7 @@ public class SaveSubmissionHandler extends ApiGatewayHandler<SubmissionRequest, 
   @Override
   protected Void processInput(SubmissionRequest input, RequestInfo requestInfo, Context context)
       throws ApiGatewayException {
+    operation = SubmissionOperation.fromRequest(requestInfo);
     save(new SubmissionWrite(createSubmission(input, requestInfo), userFrom(requestInfo)));
     return null;
   }
@@ -58,7 +63,7 @@ public class SaveSubmissionHandler extends ApiGatewayHandler<SubmissionRequest, 
         getPeriodIdentifier(requestInfo),
         inclusionsOf(input),
         null,
-        null);
+        version(requestInfo));
   }
 
   private static List<Inclusion> inclusionsOf(SubmissionRequest input) {
@@ -82,16 +87,22 @@ public class SaveSubmissionHandler extends ApiGatewayHandler<SubmissionRequest, 
 
   @Override
   protected Integer getSuccessStatusCode(SubmissionRequest input, Void output) {
-    return HTTP_CREATED;
+    return operation.isCreate() ? HTTP_CREATED : HTTP_NO_CONTENT;
   }
 
   private void save(SubmissionWrite submissionWrite) throws ApiGatewayException {
     try {
       service.save(submissionWrite);
     } catch (ConditionFailedException conditionFailed) {
-      throw new ConflictException(PERIOD_ALREADY_HAS_SUBMISSION);
+      throw operation.isCreate()
+          ? new ConflictException(PERIOD_ALREADY_HAS_SUBMISSION)
+          : new PreconditionFailedException(VERSION_DOES_NOT_MATCH);
     } catch (ItemNotFoundException notFound) {
       throw new NotFoundException(SUBMISSION_DOES_NOT_EXIST);
     }
+  }
+
+  private Long version(RequestInfo requestInfo) throws ApiGatewayException {
+    return operation.isCreate() ? null : EntityTag.fromRequest(requestInfo).version();
   }
 }

@@ -5,6 +5,8 @@ import static no.unit.nva.cristin.common.Utils.getValidIdentifier;
 import static nva.commons.apigateway.AccessRight.MANAGE_KBS;
 import static nva.commons.core.attempt.Try.attempt;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Optional;
 import java.util.Set;
 import no.unit.nva.clinicaltrial.model.Grant;
 import no.unit.nva.clinicaltrial.model.write.User;
@@ -16,6 +18,7 @@ import nva.commons.apigateway.exceptions.BadRequestException;
 
 public final class RequestUtils {
 
+  private static final String OPERATION_NAME = "operationName";
   private static final String PERIOD_IDENTIFIER = "periodIdentifier";
   private static final String MISSING_PERIOD_IDENTIFIER =
       "Reporting period is missing from the request path";
@@ -25,6 +28,12 @@ public final class RequestUtils {
       "Caller must act on behalf of a customer identified by a customer URI";
 
   private RequestUtils() {}
+
+  public static Optional<String> getOperationName(RequestInfo requestInfo) {
+    return Optional.ofNullable(requestInfo.getRequestContext())
+        .map(requestContext -> requestContext.get(OPERATION_NAME))
+        .map(JsonNode::asText);
+  }
 
   public static String getProjectIdentifier(RequestInfo requestInfo) throws ApiGatewayException {
     return getValidIdentifier(requestInfo);
