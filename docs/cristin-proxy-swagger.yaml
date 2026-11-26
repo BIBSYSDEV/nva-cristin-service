@@ -1689,7 +1689,9 @@ paths:
       tags:
         - Person
       summary: Query person employments by identifier
-      description: Returns all person employments
+      description: >
+        Returns all person employments.
+        Third-party clients only get the employments at their own institution.
       operationId: GetPersonEmploymentsByIdentifier
       security:
         - CognitoUserPool:
@@ -1697,6 +1699,7 @@ paths:
               "https://api.nva.unit.no/scopes/backend",
               "https://api.nva.unit.no/scopes/frontend",
               "aws.cognito.signin.user.admin",
+              "https://api.nva.unit.no/scopes/third-party/person-upsert",
             ]
       responses:
         "200":

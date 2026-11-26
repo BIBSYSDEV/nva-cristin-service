@@ -193,7 +193,7 @@ public final class Utils {
         .orElse(fail -> UNKNOWN_CLIENT_ID);
   }
 
-  private static String extractInstitution(URI organization) {
+  public static String extractInstitution(URI organization) {
     var organizationIdentifier = UriUtils.extractLastPathElement(organization);
     return removeUnitPartFromIdentifierIfPresent(organizationIdentifier);
   }
