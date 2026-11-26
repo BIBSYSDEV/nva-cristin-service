@@ -6,6 +6,7 @@ import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomPeriod
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomPersonIdentifier;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomProjectIdentifier;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomUser;
+import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -84,6 +85,50 @@ class SubmissionServiceTest {
     assertThat(
         repository.findSubmission(submission.projectIdentifier(), submission.periodIdentifier()),
         is(Optional.empty()));
+  }
+
+  @Test
+  void shouldReturnSubmissionWhenCallerIsProjectManager() throws Exception {
+    var user = randomUser();
+    var submission = submissionOf(List.of(new Inclusion(randomInstitutionIdentifier(), 3)), null);
+    var service = serviceFor(user.personIdentifier());
+    service.save(submission, user);
+
+    var found = service.find(projectIdentifier, periodIdentifier, user);
+
+    assertThat(found.version(), is(1L));
+  }
+
+  @Test
+  void shouldThrowNotFoundWhenReadingSubmissionOfProjectThatDoesNotExist() {
+    var service =
+        new SubmissionService(
+            _ -> {
+              throw new NotFoundException(randomString());
+            },
+            repository);
+
+    assertThrows(
+        NotFoundException.class,
+        () -> service.find(projectIdentifier, periodIdentifier, randomUser()));
+  }
+
+  @Test
+  void shouldThrowNotFoundWhenPeriodHasNoSubmission() {
+    var user = randomUser();
+    var service = serviceFor(user.personIdentifier());
+
+    assertThrows(
+        NotFoundException.class, () -> service.find(projectIdentifier, periodIdentifier, user));
+  }
+
+  @Test
+  void shouldThrowForbiddenWhenCallerReadsProjectTheyAreNotGrantedAccessTo() {
+    var service = serviceFor(randomPersonIdentifier());
+
+    assertThrows(
+        ForbiddenException.class,
+        () -> service.find(projectIdentifier, periodIdentifier, randomUser()));
   }
 
   @Test

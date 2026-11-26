@@ -4,6 +4,7 @@ import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.clinicalTria
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.eligibleProjectManagedBy;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.projectManagedBy;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomPersonIdentifier;
+import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomProjectIdentifier;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomUser;
 import static no.unit.nva.testutils.RandomDataGenerator.randomString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -68,6 +69,47 @@ class ClinicalTrialServiceTest {
     assertThrows(ForbiddenException.class, () -> service.save(clinicalTrial, randomUser()));
     assertThat(
         repository.findClinicalTrial(clinicalTrial.projectIdentifier()), is(Optional.empty()));
+  }
+
+  @Test
+  void shouldReturnClinicalTrialWhenCallerIsProjectManager() throws Exception {
+    var user = randomUser();
+    var clinicalTrial = clinicalTrial(null);
+    var service = serviceReturningProjectManagedBy(user.personIdentifier());
+    service.save(clinicalTrial, user);
+
+    var found = service.find(clinicalTrial.projectIdentifier(), user);
+
+    assertThat(found.version(), is(1L));
+  }
+
+  @Test
+  void shouldThrowNotFoundWhenProjectHasNoClinicalTrial() {
+    var user = randomUser();
+    var service = serviceReturningProjectManagedBy(user.personIdentifier());
+
+    assertThrows(NotFoundException.class, () -> service.find(randomProjectIdentifier(), user));
+  }
+
+  @Test
+  void shouldThrowForbiddenWhenCallerReadsProjectTheyAreNotGrantedAccessTo() {
+    var service = serviceReturningProjectManagedBy(randomPersonIdentifier());
+
+    assertThrows(
+        ForbiddenException.class, () -> service.find(randomProjectIdentifier(), randomUser()));
+  }
+
+  @Test
+  void shouldThrowNotFoundWhenReadingTrialOfProjectThatDoesNotExist() {
+    var service =
+        new ClinicalTrialService(
+            _ -> {
+              throw new NotFoundException(randomString());
+            },
+            repository);
+
+    assertThrows(
+        NotFoundException.class, () -> service.find(randomProjectIdentifier(), randomUser()));
   }
 
   @Test

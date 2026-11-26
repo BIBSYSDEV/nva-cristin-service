@@ -9,9 +9,11 @@ import no.unit.nva.clinicaltrial.persistence.exceptions.ItemNotFoundException;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
 import nva.commons.apigateway.exceptions.ApiGatewayException;
 import nva.commons.apigateway.exceptions.ConflictException;
+import nva.commons.apigateway.exceptions.NotFoundException;
 
 public class ClinicalTrialService {
 
+  private static final String CLINICAL_TRIAL_DOES_NOT_EXIST = "Clinical trial does not exist";
   private static final String PROJECT_NOT_ELIGIBLE = "Project is not eligible for a clinical trial";
 
   private final transient FetchApiClient<String, NvaProject> projectsApi;
@@ -29,6 +31,13 @@ public class ClinicalTrialService {
     var writer = ProjectAccess.granted(project, user);
     verifyEligible(project);
     repository.save(writer, clinicalTrial);
+  }
+
+  public ClinicalTrial find(String projectIdentifier, User user) throws ApiGatewayException {
+    ProjectAccess.reader(projectsApi.executeFetch(projectIdentifier), user);
+    return repository
+        .findClinicalTrial(projectIdentifier)
+        .orElseThrow(() -> new NotFoundException(CLINICAL_TRIAL_DOES_NOT_EXIST));
   }
 
   private static void verifyEligible(NvaProject project) throws ConflictException {
