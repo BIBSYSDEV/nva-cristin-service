@@ -36,6 +36,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import no.unit.nva.common.IdCreatedLogger;
 import no.unit.nva.cristin.common.ErrorMessages;
+import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -199,12 +200,14 @@ public class CreatePersonEmploymentHandlerTest {
   void shouldSendThirdPartyInstitutionToUpstreamWhenThirdPartyCreatesEmployment()
       throws IOException, InterruptedException {
     sendQueryAsThirdParty(sampleEmployment(), INSTITUTION_OF_ORGANIZATION_IN_SAMPLE_EMPLOYMENT);
+    var expectedInstitution =
+        Utils.extractInstitution(INSTITUTION_OF_ORGANIZATION_IN_SAMPLE_EMPLOYMENT);
 
     var requestCaptor = ArgumentCaptor.forClass(HttpRequest.class);
     verify(httpClientMock).send(requestCaptor.capture(), any());
     assertThat(
         requestCaptor.getValue().headers().firstValue(CRISTIN_INSTITUTION_HEADER).orElseThrow(),
-        equalTo(institutionOf(INSTITUTION_OF_ORGANIZATION_IN_SAMPLE_EMPLOYMENT)));
+        equalTo(expectedInstitution));
   }
 
   @Test
@@ -240,11 +243,6 @@ public class CreatePersonEmploymentHandlerTest {
     }
     handler.handleRequest(builder.build(), output, context);
     return GatewayResponse.fromOutputStream(output, Employment.class);
-  }
-
-  private static String institutionOf(URI organization) {
-    var organizationIdentifier = UriWrapper.fromUri(organization).getLastPathElement();
-    return organizationIdentifier.substring(ZERO, organizationIdentifier.indexOf(PERIOD));
   }
 
   private static String randomIntegerAsString() {
