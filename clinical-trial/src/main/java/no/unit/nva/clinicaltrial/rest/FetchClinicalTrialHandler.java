@@ -30,12 +30,12 @@ public class FetchClinicalTrialHandler extends ApiGatewayHandler<Void, ClinicalT
   @Override
   protected ClinicalTrialResponse processInput(Void input, RequestInfo requestInfo, Context context)
       throws ApiGatewayException {
-    var reported = service.find(getProjectIdentifier(requestInfo), userFrom(requestInfo));
+    var clinicalTrialWithSubmissions = service.find(getProjectIdentifier(requestInfo), userFrom(requestInfo));
     addAdditionalHeaders(() ->
         Map.of(
             EntityTag.ETAG_HEADER,
-            EntityTag.fromVersion(reported.clinicalTrial().version()).headerValue()));
-    return ClinicalTrialResponse.from(reported);
+            EntityTag.fromVersion(clinicalTrialWithSubmissions.clinicalTrial().version()).headerValue()));
+    return ClinicalTrialResponse.from(clinicalTrialWithSubmissions);
   }
 
   @Override
