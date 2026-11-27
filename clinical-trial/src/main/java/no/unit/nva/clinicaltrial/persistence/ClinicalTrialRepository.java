@@ -33,7 +33,7 @@ public class ClinicalTrialRepository {
     return table.item(ClinicalTrialDao.keyOf(projectIdentifier), ClinicalTrialDao.class);
   }
 
-  public Optional<ClinicalTrialWithSubmissions> findReportedTrial(String projectIdentifier) {
+  public Optional<ClinicalTrialWithSubmissions> findClinicalTrialWithSubmissions(String projectIdentifier) {
     var rows = table.partition(Dao.projectPartition(projectIdentifier));
     return rows.stream()
         .filter(ClinicalTrialDao.class::isInstance)

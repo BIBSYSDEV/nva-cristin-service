@@ -126,7 +126,7 @@ class ClinicalTrialRepositoryTest {
     repository.save(
         randomUser(), submissionOf(randomProjectIdentifier(), randomPeriodIdentifier()));
 
-    var reported = repository.findReportedTrial(project).orElseThrow();
+    var reported = repository.findClinicalTrialWithSubmissions(project).orElseThrow();
     assertThat(reported.clinicalTrial().reportable(), is(clinicalTrial.reportable()));
     assertThat(reported.submissions(), hasSize(2));
   }

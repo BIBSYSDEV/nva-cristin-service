@@ -38,7 +38,7 @@ public class ClinicalTrialService {
       throws ApiGatewayException {
     ProjectAccess.reader(projectsApi.executeFetch(projectIdentifier), user);
     return repository
-        .findReportedTrial(projectIdentifier)
+        .findClinicalTrialWithSubmissions(projectIdentifier)
         .orElseThrow(() -> new NotFoundException(CLINICAL_TRIAL_DOES_NOT_EXIST));
   }
 
