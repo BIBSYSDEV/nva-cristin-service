@@ -67,8 +67,6 @@ public class CreatePersonEmploymentHandlerTest {
       UriWrapper.fromUri(randomUri()).addChild("185.90.0.0").getUri();
   private static final URI INSTITUTION_NOT_OF_ORGANIZATION_IN_SAMPLE_EMPLOYMENT =
       UriWrapper.fromUri(randomUri()).addChild("194.0.0.0").getUri();
-  private static final int ZERO = 0;
-  private static final char PERIOD = '.';
   private static final String CRISTIN_INSTITUTION_HEADER = "Cristin-Representing-Institution";
 
   private final HttpClient httpClientMock = mock(HttpClient.class);
