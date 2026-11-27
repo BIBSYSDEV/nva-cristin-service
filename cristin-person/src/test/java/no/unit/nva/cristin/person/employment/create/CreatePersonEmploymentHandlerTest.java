@@ -59,8 +59,6 @@ public class CreatePersonEmploymentHandlerTest {
   private static final String validJson =
       IoUtils.stringFromResources(Path.of("nvaApiCreateEmploymentRequest.json"));
   private static final String INVALID_URI = "https://example.org/hello";
-  private static final URI TOP_ORG_ID =
-      UriWrapper.fromUri(randomUri()).addChild("185.90.0.0").getUri();
   private static final String THIRD_PARTY_SCOPE =
       "https://api.nva.unit.no/scopes/third-party/person-upsert";
   private static final String THIRD_PARTY_CLIENT_ID = "some-third-party-client-id";
@@ -288,7 +286,7 @@ public class CreatePersonEmploymentHandlerTest {
         new HandlerRequestBuilder<Employment>(OBJECT_MAPPER)
             .withBody(body)
             .withCurrentCustomer(customerId)
-            .withTopLevelCristinOrgId(TOP_ORG_ID)
+            .withTopLevelCristinOrgId(INSTITUTION_OF_ORGANIZATION_IN_SAMPLE_EMPLOYMENT)
             .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
             .withPathParameters(validPath)
             .build();
