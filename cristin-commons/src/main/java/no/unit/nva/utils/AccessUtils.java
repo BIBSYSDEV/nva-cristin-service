@@ -73,6 +73,17 @@ public class AccessUtils {
         || requestInfo.clientIsInternalBackend();
   }
 
+  /**
+   * Checks if the client is a third party that only has access to its own institution. A client
+   * that is also internal backend is not restricted.
+   *
+   * @param requestInfo information from request used to verify allowed permissions
+   * @return true if third party and not internal backend otherwise false
+   */
+  public static boolean isRestrictedToOwnInstitution(RequestInfo requestInfo) {
+    return requestInfo.clientIsThirdParty() && !requestInfo.clientIsInternalBackend();
+  }
+
   public static boolean clientIsCustomerAdministrator(RequestInfo requestInfo) {
     return requestInfo.userIsAuthorized(MANAGE_CUSTOMERS);
   }

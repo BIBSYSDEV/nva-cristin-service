@@ -18,6 +18,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.amazonaws.services.lambda.runtime.Context;
@@ -29,10 +31,12 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.nio.file.Path;
 import java.util.Map;
 import no.unit.nva.common.IdCreatedLogger;
 import no.unit.nva.cristin.common.ErrorMessages;
+import no.unit.nva.cristin.common.Utils;
 import no.unit.nva.cristin.person.model.nva.Employment;
 import no.unit.nva.cristin.testing.HttpResponseFaker;
 import no.unit.nva.testutils.HandlerRequestBuilder;
@@ -46,6 +50,7 @@ import org.apache.hc.core5.http.HttpHeaders;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 public class CreatePersonEmploymentHandlerTest {
 
@@ -55,8 +60,14 @@ public class CreatePersonEmploymentHandlerTest {
   private static final String validJson =
       IoUtils.stringFromResources(Path.of("nvaApiCreateEmploymentRequest.json"));
   private static final String INVALID_URI = "https://example.org/hello";
-  private static final URI TOP_ORG_ID =
+  private static final String THIRD_PARTY_SCOPE =
+      "https://api.nva.unit.no/scopes/third-party/person-upsert";
+  private static final String THIRD_PARTY_CLIENT_ID = "some-third-party-client-id";
+  private static final URI INSTITUTION_OF_ORGANIZATION_IN_SAMPLE_EMPLOYMENT =
       UriWrapper.fromUri(randomUri()).addChild("185.90.0.0").getUri();
+  private static final URI INSTITUTION_NOT_OF_ORGANIZATION_IN_SAMPLE_EMPLOYMENT =
+      UriWrapper.fromUri(randomUri()).addChild("194.0.0.0").getUri();
+  private static final String CRISTIN_INSTITUTION_HEADER = "Cristin-Representing-Institution";
 
   private final HttpClient httpClientMock = mock(HttpClient.class);
   private final Environment environment = new Environment();
@@ -175,6 +186,63 @@ public class CreatePersonEmploymentHandlerTest {
         .contains(String.format(CLIENT_CREATED_RESOURCE_TEMPLATE, idUri));
   }
 
+  @Test
+  void shouldReturnCreatedWhenThirdPartyCreatesEmploymentAtOwnInstitution() throws IOException {
+    var gatewayResponse =
+        sendQueryAsThirdParty(sampleEmployment(), INSTITUTION_OF_ORGANIZATION_IN_SAMPLE_EMPLOYMENT);
+
+    assertEquals(HTTP_CREATED, gatewayResponse.getStatusCode());
+  }
+
+  @Test
+  void shouldSendThirdPartyInstitutionToUpstreamWhenThirdPartyCreatesEmployment()
+      throws IOException, InterruptedException {
+    sendQueryAsThirdParty(sampleEmployment(), INSTITUTION_OF_ORGANIZATION_IN_SAMPLE_EMPLOYMENT);
+    var expectedInstitution =
+        Utils.extractInstitution(INSTITUTION_OF_ORGANIZATION_IN_SAMPLE_EMPLOYMENT);
+
+    var requestCaptor = ArgumentCaptor.forClass(HttpRequest.class);
+    verify(httpClientMock).send(requestCaptor.capture(), any());
+    assertThat(
+        requestCaptor.getValue().headers().firstValue(CRISTIN_INSTITUTION_HEADER).orElseThrow(),
+        equalTo(expectedInstitution));
+  }
+
+  @Test
+  void shouldReturnForbiddenWhenThirdPartyCreatesEmploymentAtOtherInstitution()
+      throws IOException, InterruptedException {
+    var gatewayResponse =
+        sendQueryAsThirdParty(
+            sampleEmployment(), INSTITUTION_NOT_OF_ORGANIZATION_IN_SAMPLE_EMPLOYMENT);
+
+    assertEquals(HttpURLConnection.HTTP_FORBIDDEN, gatewayResponse.getStatusCode());
+    verify(httpClientMock, never()).send(any(), any());
+  }
+
+  @Test
+  void shouldReturnBadRequestWhenThirdPartyHasNoTopLevelOrganization()
+      throws IOException, InterruptedException {
+    var gatewayResponse = sendQueryAsThirdParty(sampleEmployment(), null);
+
+    assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, gatewayResponse.getStatusCode());
+    verify(httpClientMock, never()).send(any(), any());
+  }
+
+  private GatewayResponse<Employment> sendQueryAsThirdParty(
+      Employment body, URI topLevelOrganization) throws IOException {
+    var builder =
+        new HandlerRequestBuilder<Employment>(OBJECT_MAPPER)
+            .withBody(body)
+            .withScope(THIRD_PARTY_SCOPE)
+            .withClientId(THIRD_PARTY_CLIENT_ID)
+            .withPathParameters(validPath);
+    if (topLevelOrganization != null) {
+      builder.withTopLevelCristinOrgId(topLevelOrganization);
+    }
+    handler.handleRequest(builder.build(), output, context);
+    return GatewayResponse.fromOutputStream(output, Employment.class);
+  }
+
   private static String randomIntegerAsString() {
     return String.valueOf(randomInteger());
   }
@@ -214,7 +282,7 @@ public class CreatePersonEmploymentHandlerTest {
         new HandlerRequestBuilder<Employment>(OBJECT_MAPPER)
             .withBody(body)
             .withCurrentCustomer(customerId)
-            .withTopLevelCristinOrgId(TOP_ORG_ID)
+            .withTopLevelCristinOrgId(INSTITUTION_OF_ORGANIZATION_IN_SAMPLE_EMPLOYMENT)
             .withAccessRights(customerId, MANAGE_OWN_AFFILIATION)
             .withPathParameters(validPath)
             .build();
