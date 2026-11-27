@@ -59,6 +59,10 @@ public final class ClinicalTrialFixtures {
     return user(Set.of());
   }
 
+  public static User applicationAdmin() {
+    return user(Set.of(Grant.APPLICATION_ADMIN));
+  }
+
   public static User clinicalTrialAdmin() {
     return user(Set.of(Grant.CLINICAL_TRIAL_ADMIN));
   }

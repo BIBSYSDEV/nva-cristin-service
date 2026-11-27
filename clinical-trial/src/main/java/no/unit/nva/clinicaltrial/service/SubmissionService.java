@@ -24,6 +24,7 @@ public class SubmissionService {
       "Submission must report at least one organization";
 
   private static final String CLINICAL_TRIAL_DOES_NOT_EXIST = "Clinical trial does not exist";
+  private static final String SUBMISSION_DOES_NOT_EXIST = "Submission does not exist";
   private static final String PERIOD_DOES_NOT_EXIST = "Reporting period does not exist";
   private static final String MISSING_INSTITUTION =
       "Each inclusion must name an organization by its organization identifier";
@@ -47,6 +48,14 @@ public class SubmissionService {
     verifyPeriodExists(submission.periodIdentifier());
     verifyInclusions(submission.inclusions());
     repository.save(writer, submission.submit());
+  }
+
+  public Submission find(String projectIdentifier, String periodIdentifier, User user)
+      throws ApiGatewayException {
+    ProjectAccess.reader(projectsApi.executeFetch(projectIdentifier), user);
+    return repository
+        .findSubmission(projectIdentifier, periodIdentifier)
+        .orElseThrow(() -> new NotFoundException(SUBMISSION_DOES_NOT_EXIST));
   }
 
   private void verifyClinicalTrialExists(String projectIdentifier) throws NotFoundException {

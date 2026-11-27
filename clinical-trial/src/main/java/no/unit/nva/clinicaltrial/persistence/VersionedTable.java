@@ -112,6 +112,19 @@ public class VersionedTable {
         .map(document -> VersionedDao.entityOf(document, daoType));
   }
 
+  public List<Dao> partition(Key partitionKey) {
+    return table.query(partitionRequest(partitionKey)).items().stream()
+        .map(document -> Dao.fromDocument(document, Dao.class))
+        .toList();
+  }
+
+  private static QueryEnhancedRequest partitionRequest(Key partitionKey) {
+    return QueryEnhancedRequest.builder()
+        .queryConditional(QueryConditional.keyEqualTo(partitionKey))
+        .consistentRead(true)
+        .build();
+  }
+
   public <T> List<Version<T>> versionsOf(Key entityKey, Class<T> type) {
     return table.query(versionsRequest(entityKey)).items().stream()
         .map(document ->

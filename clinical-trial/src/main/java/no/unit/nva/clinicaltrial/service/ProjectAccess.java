@@ -1,6 +1,8 @@
 package no.unit.nva.clinicaltrial.service;
 
 import static java.util.stream.Collectors.toSet;
+import static no.unit.nva.clinicaltrial.model.Grant.APPLICATION_ADMIN;
+import static no.unit.nva.clinicaltrial.model.Grant.CLINICAL_TRIAL_ADMIN;
 import static no.unit.nva.clinicaltrial.model.Grant.PROJECT_MANAGER;
 import static no.unit.nva.cristin.projects.update.UpdateProjectResourceAccessCheck.PROJECT_MANAGER_ROLE_CODE;
 import static nva.commons.core.attempt.Try.attempt;
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import no.unit.nva.clinicaltrial.model.Grant;
 import no.unit.nva.clinicaltrial.model.write.User;
 import no.unit.nva.cristin.projects.model.nva.NvaContributor;
 import no.unit.nva.cristin.projects.model.nva.NvaProject;
@@ -20,11 +23,24 @@ import nva.commons.apigateway.exceptions.ForbiddenException;
 
 public final class ProjectAccess {
 
+  private static final Set<Grant> WRITERS = Set.of(PROJECT_MANAGER, CLINICAL_TRIAL_ADMIN);
+  private static final Set<Grant> READERS =
+      Set.of(PROJECT_MANAGER, CLINICAL_TRIAL_ADMIN, APPLICATION_ADMIN);
+
   private ProjectAccess() {}
 
   public static User granted(NvaProject project, User user) throws ForbiddenException {
+    return caller(project, user, WRITERS);
+  }
+
+  public static User reader(NvaProject project, User user) throws ForbiddenException {
+    return caller(project, user, READERS);
+  }
+
+  private static User caller(NvaProject project, User user, Set<Grant> allowed)
+      throws ForbiddenException {
     var caller = isProjectManager(project, user) ? user.withGrant(PROJECT_MANAGER) : user;
-    if (!caller.isGranted()) {
+    if (allowed.stream().noneMatch(caller.grants()::contains)) {
       throw new ForbiddenException();
     }
     return caller;

@@ -1,5 +1,6 @@
 package no.unit.nva.clinicaltrial.service;
 
+import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.applicationAdmin;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.clinicalTrialAdmin;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.projectManagedBy;
 import static no.unit.nva.clinicaltrial.model.ClinicalTrialFixtures.randomPersonIdentifier;
@@ -35,6 +36,23 @@ class ProjectAccessTest {
     var granted = ProjectAccess.granted(projectManagedBy(randomPersonIdentifier()), admin);
 
     assertThat(granted.grants(), is(Set.of(Grant.CLINICAL_TRIAL_ADMIN)));
+  }
+
+  @Test
+  void shouldLetApplicationAdminReadProjectTheyDoNotManage() throws Exception {
+    var admin = applicationAdmin();
+
+    var reader = ProjectAccess.reader(projectManagedBy(randomPersonIdentifier()), admin);
+
+    assertThat(reader.grants(), is(Set.of(Grant.APPLICATION_ADMIN)));
+  }
+
+  @Test
+  void shouldRefuseWriteFromApplicationAdmin() {
+    var project = projectManagedBy(randomPersonIdentifier());
+
+    assertThrows(
+        ForbiddenException.class, () -> ProjectAccess.granted(project, applicationAdmin()));
   }
 
   @Test

@@ -1,13 +1,18 @@
 package no.unit.nva.clinicaltrial.rest;
 
+import static java.util.stream.Collectors.toSet;
+import static no.unit.nva.clinicaltrial.model.Grant.APPLICATION_ADMIN;
 import static no.unit.nva.clinicaltrial.model.Grant.CLINICAL_TRIAL_ADMIN;
 import static no.unit.nva.cristin.common.Utils.getValidIdentifier;
+import static nva.commons.apigateway.AccessRight.MANAGE_ALL_PROJECTS;
 import static nva.commons.apigateway.AccessRight.MANAGE_KBS;
 import static nva.commons.core.attempt.Try.attempt;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import no.unit.nva.clinicaltrial.model.Grant;
 import no.unit.nva.clinicaltrial.model.write.User;
 import no.unit.nva.identifiers.CustomerIdentifier;
@@ -67,6 +72,10 @@ public final class RequestUtils {
   }
 
   private static Set<Grant> grantsOf(RequestInfo requestInfo) {
-    return requestInfo.userIsAuthorized(MANAGE_KBS) ? Set.of(CLINICAL_TRIAL_ADMIN) : Set.of();
+    return Stream.of(
+            requestInfo.userIsAuthorized(MANAGE_KBS) ? CLINICAL_TRIAL_ADMIN : null,
+            requestInfo.userIsAuthorized(MANAGE_ALL_PROJECTS) ? APPLICATION_ADMIN : null)
+        .filter(Objects::nonNull)
+        .collect(toSet());
   }
 }
